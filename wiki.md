@@ -2,7 +2,7 @@
 
 ## 현재 상태
 
-**RUNNING / DEVELOPMENT — round-01 계획 확정, 구현·검사 진행**
+**INDEPENDENT_QA_WAITING_WINDOWS — 소스 고정, 독립 검수와 Windows 검사 진행**
 
 - 실행 ID / 회차: `20261016-gpt-01` / `round-01`
 - 시작 기록 날짜: 2026-10-16 (America/Chicago)
@@ -11,12 +11,29 @@
 - 작업 방식: API 없이 현재 Codex 작업 안의 개별 GPT 에이전트
 - 실행 소스 원본: GitHub `chemryu/chembrain` / `codex/gpt-agent-workflow`
 - 진행 기록 원본: `codex/gpt-workflow-records` — 최초 게시 대기
-- 검토 시작 소스 SHA: `5c1c15a920a6f50dc330366507597902c8a0ef64`
-- 역할 실행: Planning 완료, Development·Wiki 진행 중, Independent QA·Revision 후속 실행 대기
-- 이번 회차 앱 구현 변경: DOI 서버 보호·영어 UI·회귀 검사 구현 중, 아직 새 소스 커밋 미확정
-- 이번 회차 QA·Revision 승인: NOT RUN
+- 고정된 검토 대상 소스 SHA: `3f102821649ff13b5581ebdff18274ef46602322`
+- 회차 시작 소스 SHA: `5c1c15a920a6f50dc330366507597902c8a0ef64`
+- 역할 실행: Planning·Development 구현/로컬 검사 완료, Independent QA·Wiki 진행 중, Revision 대기
+- 이번 회차 앱 구현 변경: DOI 서버 보호·영어 UI·회귀 검사 구현 완료, 고정 SHA로 푸시됨
+- 기존 DOI 지적: 수정 구현 완료, 독립 검증·최종 해결 판정 대기
+- 이번 회차 QA: RUNNING / Revision 승인: NOT RUN
+- 고정 SHA Windows CI: PENDING — 이전 커밋 결과를 승계하지 않음
 - Windows Box 폴더: 직접 저장·자동 동기화 미구성
-- 전달 가능 여부: **아니오 — DOI 미해결 지적과 이번 회차 검증이 남아 있음**
+- 전달 가능 여부: **아니오 — 독립 QA·Revision·정확한 SHA의 Windows 증거가 남아 있음**
+
+## round-01 · 소스 고정 및 독립 검수 시작
+
+Development가 실행 소스를 `3f102821649ff13b5581ebdff18274ef46602322`로 고정하고 `codex/gpt-agent-workflow`에 푸시했습니다. [Development 보고서](runs/20261016-gpt-01/round-01/development.md)에 변경 파일·이유·실행 명령을 보관합니다.
+
+- Python 전체 로컬 검사: 153 PASS, 1 SKIP (Windows 전용 DPAPI)
+- 프런트엔드 빌드: PASS
+- 실제 Chromium UI: PASS — DOI 삭제 시도·거절·링크 유지 포함
+- 소스 일반 시작 및 실제 재실행 데이터 보존: PASS
+- 고정 SHA Windows CI: PENDING
+- Independent QA: RUNNING, 최종 승인 없음
+- Revision: NOT RUN
+
+기존 DOI 문제는 **수정 구현 완료·독립 검증 대기**이며, Wiki가 해결을 대신 승인하지 않습니다. 이전 Windows SHA의 증거는 이번 커밋 통과 근거가 아닙니다. 깨끗한 Windows PC와 사용자 기본 브라우저 통합 검사는 여전히 NOT RUN입니다. 진행 기록 브랜치의 최초 게시도 아직 대기 중입니다.
 
 ## round-01 · 계획 확정 및 기록 분리
 
