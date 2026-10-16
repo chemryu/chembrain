@@ -15,3 +15,14 @@ def test_no_arguments_starts_normal_mode_with_browser_enabled(tmp_path, monkeypa
     assert calls == [(tmp_path / 'Local App Data' / 'Chembrain', False, False)]
     # The normal entry point also releases the log before the folder can be removed on Windows.
     (calls[0][0] / 'chembrain.log').unlink()
+
+
+def test_browser_probe_records_the_url_without_an_external_browser(tmp_path):
+    import webbrowser
+    from scripts.check_desktop_launch import browser_command
+
+    record = tmp_path / 'folder with spaces' / 'browser.txt'
+    record.parent.mkdir()
+    url = 'http://127.0.0.1:12345'
+    assert webbrowser.get(browser_command(record)).open(url)
+    assert record.read_text(encoding='ascii').strip() == url

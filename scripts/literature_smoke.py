@@ -27,7 +27,7 @@ def main():
         expect(page.locator('.inspector .conditions')).to_contain_text('52%')
         evidence = page.locator('.evidence-card').filter(has_text='Compound 6')
         expect(evidence).to_have_attribute('href','https://doi.org/10.1038/nature17431')
-        expect(evidence).to_contain_text('PDF p.45')
+        expect(evidence).to_contain_text('Original PDF page 45')
         expect(page.locator('blockquote, .source-text')).to_have_count(0)
         page.get_by_role('button',name='Paper library').click()
         expect(page.locator('.source-card')).to_have_count(6)

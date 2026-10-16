@@ -28,6 +28,7 @@ import { Graph } from "./Graph";
 import { SourceMetadataForm, documentRoles, doiUrl } from "./SourceMetadata";
 import {
   availability,
+  evidencePageLabel,
   categories,
   type Category,
   type Evidence,
@@ -42,7 +43,7 @@ import "./styles.css";
 
 type View = "graph" | "sources" | "routes" | "molecules";
 type Modal =
-  | { kind: "molecule" }
+  | { kind: "molecule"; molecule?: Molecule }
   | { kind: "reaction"; reaction?: Reaction; evidence?: Evidence }
   | null;
 const emptyWorkspace: Workspace = { molecules: [], reactions: [], sources: [] };
@@ -472,6 +473,12 @@ function App() {
                     ) : selectedMolecule ? (
                       <MoleculeDetail
                         molecule={selectedMolecule}
+                        onEdit={() =>
+                          setModal({
+                            kind: "molecule",
+                            molecule: selectedMolecule,
+                          })
+                        }
                         workspace={workspace}
                         onSelect={setSelected}
                       />
@@ -543,7 +550,7 @@ function App() {
                           {m.is_demo && <DemoBadge />}
                         </div>
                         <img
-                          src={`/api/molecules/${m.id}/svg`}
+                          src={`/api/molecules/${m.id}/svg?v=${encodeURIComponent(m.smiles)}`}
                           alt={`${m.name} structure`}
                         />
                         <h3>{m.name}</h3>
@@ -583,7 +590,9 @@ function App() {
         <ModalShell
           title={
             modal.kind === "molecule"
-              ? "Add molecule"
+              ? modal.molecule
+                ? "Edit molecule"
+                : "Add molecule"
               : modal.reaction
                 ? "Edit reaction record"
                 : "New reaction record"
@@ -592,10 +601,21 @@ function App() {
         >
           {modal.kind === "molecule" ? (
             <MoleculeForm
+              initial={modal.molecule}
+              structureLocked={
+                !!modal.molecule &&
+                workspace.reactions.some((r) =>
+                  [...r.reactants, ...r.products].includes(modal.molecule!.id),
+                )
+              }
               onSaved={async () => {
                 await reload();
                 setModal(null);
-                setNotice("Molecule added to the library.");
+                setNotice(
+                  modal.molecule
+                    ? "Molecule updated."
+                    : "Molecule added to the library.",
+                );
               }}
             />
           ) : (
@@ -800,7 +820,7 @@ function ReactionDetail({
                 <ExternalLink size={12} />
               </div>
               <small>
-                PDF p.{e.page}
+                {evidencePageLabel(e, reference)}
                 {e.locator && ` · ${e.locator}`}
               </small>
               <span className="source-doi">
@@ -851,10 +871,12 @@ function MoleculeDetail({
   molecule: m,
   workspace,
   onSelect,
+  onEdit,
 }: {
   molecule: Molecule;
   workspace: Workspace;
   onSelect: (id: string) => void;
+  onEdit: () => void;
 }) {
   const related = workspace.reactions.filter((r) =>
     [...r.reactants, ...r.products].includes(m.id),
@@ -866,7 +888,10 @@ function MoleculeDetail({
         <Hexagon size={17} />
       </div>
       <div className="molecule-hero">
-        <img src={`/api/molecules/${m.id}/svg`} alt={`${m.name} structure`} />
+        <img
+          src={`/api/molecules/${m.id}/svg?v=${encodeURIComponent(m.smiles)}`}
+          alt={`${m.name} structure`}
+        />
         <h2>{m.name}</h2>
         <p>{m.aliases.join(" · ")}</p>
         {m.is_demo && <DemoBadge />}
@@ -916,6 +941,12 @@ function MoleculeDetail({
           <p className="detail-note">{m.notes}</p>
         </div>
       )}
+      <div className="inspector-action">
+        <button className="button full" onClick={onEdit}>
+          Edit molecule
+          <ArrowRight size={15} />
+        </button>
+      </div>
     </>
   );
 }
@@ -1060,7 +1091,7 @@ function Sources({
                   .filter((e) => e.source_id === source.id)
                   .map(
                     (e) =>
-                      `PDF p.${e.page}${e.locator ? ` · ${e.locator}` : ""}`,
+                      `${evidencePageLabel(e, source)}${e.locator ? ` · ${e.locator}` : ""}`,
                   )
                   .join("; ")}
               </p>
@@ -1457,7 +1488,15 @@ function ModalShell({
     </div>
   );
 }
-function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
+function MoleculeForm({
+  onSaved,
+  initial,
+  structureLocked = false,
+}: {
+  onSaved: () => Promise<void>;
+  initial?: Molecule;
+  structureLocked?: boolean;
+}) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -1468,17 +1507,20 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
     setError("");
     try {
       await api(
-        "/molecules",
-        json({
-          name: data.get("name"),
-          smiles: data.get("smiles"),
-          aliases: String(data.get("aliases") || "")
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean),
-          availability: data.get("availability"),
-          notes: data.get("notes"),
-        }),
+        initial ? `/molecules/${initial.id}` : "/molecules",
+        json(
+          {
+            name: data.get("name"),
+            smiles: data.get("smiles"),
+            aliases: String(data.get("aliases") || "")
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean),
+            availability: data.get("availability"),
+            notes: data.get("notes"),
+          },
+          initial ? "PUT" : "POST",
+        ),
       );
       await onSaved();
     } catch (e) {
@@ -1497,6 +1539,7 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
         Molecule name
         <input
           name="name"
+          defaultValue={initial?.name}
           placeholder="e.g. Benzaldehyde"
           required
           maxLength={200}
@@ -1506,24 +1549,36 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
         SMILES
         <input
           name="smiles"
+          aria-label="SMILES"
+          defaultValue={initial?.smiles}
+          readOnly={structureLocked}
           className="mono"
           placeholder="e.g. O=Cc1ccccc1"
           required
           maxLength={2000}
         />
         <small>
-          Duplicates are checked by chemical structure, including
-          stereochemistry.
+          {structureLocked
+            ? "This structure is used in reactions. Add a new molecule to change its chemical identity."
+            : "Duplicates are checked by chemical structure, including stereochemistry."}
         </small>
       </label>
       <div className="form-grid">
         <label>
           Aliases
-          <input name="aliases" placeholder="Comma-separated synonyms" />
+          <input
+            name="aliases"
+            defaultValue={initial?.aliases.join(", ")}
+            placeholder="Comma-separated synonyms"
+          />
         </label>
         <label>
           Availability
-          <select name="availability" defaultValue="unknown">
+          <select
+            name="availability"
+            aria-label="Availability"
+            defaultValue={initial?.availability || "unknown"}
+          >
             {Object.entries(availability).map(([id, label]) => (
               <option value={id} key={id}>
                 {label}
@@ -1536,6 +1591,8 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
         Research notes
         <textarea
           name="notes"
+          aria-label="Research notes"
+          defaultValue={initial?.notes}
           rows={3}
           placeholder="Stock location, supplier or structural notes"
         />
@@ -1547,7 +1604,9 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
       )}
       <footer>
         <span className="subtle-text">
-          New molecules are saved in your workspace.
+          {initial
+            ? "Changes keep the same molecule ID and reaction links."
+            : "New molecules are saved in your workspace."}
         </span>
         <button className="button primary" disabled={busy}>
           {busy ? (
@@ -1627,6 +1686,9 @@ function ReactionForm({
   const [sourceId, setSourceId] = useState("");
   const [page, setPage] = useState(1);
   const [locator, setLocator] = useState("");
+  const [pageNumbering, setPageNumbering] = useState<
+    "pdf" | "printed" | "unspecified"
+  >("unspecified");
   const [sourceDetail, setSourceDetail] = useState<SourceDetail | null>(null);
   const [conditions, setConditions] = useState<Record<string, string>>(
     initial?.conditions || {},
@@ -1910,6 +1972,20 @@ function ReactionForm({
             </a>
           )}
           <label>
+            Page numbering
+            <select
+              aria-label="Page numbering"
+              value={pageNumbering}
+              onChange={(e) =>
+                setPageNumbering(e.target.value as typeof pageNumbering)
+              }
+            >
+              <option value="unspecified">Unspecified</option>
+              <option value="pdf">Original PDF page (1-based)</option>
+              <option value="printed">Printed page label</option>
+            </select>
+          </label>
+          <label>
             Page, figure or procedure
             <input
               value={locator}
@@ -1931,6 +2007,7 @@ function ReactionForm({
                   quote: "",
                   locator,
                   citation_only: true,
+                  page_numbering: pageNumbering,
                 },
               ]);
               setLocator("");
@@ -1944,6 +2021,7 @@ function ReactionForm({
           Research notes
           <textarea
             name="notes"
+            aria-label="Research notes"
             defaultValue={initial?.notes}
             rows={3}
             placeholder="Selectivity, purification and replication notes"

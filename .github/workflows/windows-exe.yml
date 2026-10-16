@@ -1,4 +1,4 @@
-name: Build Windows EXE
+name: Validate Windows EXE (review candidate)
 on:
   push:
     branches: [codex/chembrain-mvp]
@@ -35,6 +35,8 @@ jobs:
           python -m pip install --require-hashes -r requirements.lock 2>&1 | tee dependencies.log
           python -m pip install pyinstaller==6.16.0 2>&1 | tee -a dependencies.log
           npm ci 2>&1 | tee -a dependencies.log
+          python -m pip install playwright==1.62.0 2>&1 | tee -a dependencies.log
+          python -m playwright install chromium 2>&1 | tee -a dependencies.log
       - id: validation
         name: Build English interface and test API
         shell: bash
@@ -49,7 +51,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & .\release\Chembrain.exe --smoke-test 2>&1 | Tee-Object packaged-smoke.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python scripts/check_desktop_launch.py release/Chembrain.exe 2>&1 | Tee-Object normal-launch.log
+          python scripts/check_desktop_launch.py --browser-ui --restricted-runtime release/Chembrain.exe 2>&1 | Tee-Object normal-launch.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Copy-Item packaging/README-Windows.txt release/README.txt
           Compress-Archive -Path release/Chembrain.exe,release/README.txt -DestinationPath Chembrain-Windows-x64.zip
@@ -57,21 +59,11 @@ jobs:
       - id: artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Chembrain-Windows-x64
+          name: Chembrain-Windows-review-candidate-${{ github.sha }}
           path: |
-            release/Chembrain.exe
-            release/README.txt
+            Chembrain-Windows-x64.zip
+            SHA256SUMS.txt
           retention-days: 30
-      - id: publication
-        name: Publish Windows release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          tag="windows-${GITHUB_RUN_NUMBER}"
-          gh release create "$tag" Chembrain-Windows-x64.zip SHA256SUMS.txt --target "$GITHUB_SHA" --title "Chembrain for Windows · build ${GITHUB_RUN_NUMBER}" --notes-file packaging/README-Windows.txt 2>&1 | tee publication.log
       - name: Save build result for remote verification
         if: always()
         env:

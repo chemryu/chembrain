@@ -28,7 +28,7 @@ def seed_literature(store: Store, manifest_path: Path):
         result.update(id="literature-reaction-" + reaction["key"], is_demo=False, updated_at=now,
                       reactants=[molecule_ids[k] for k in reaction["reactants"]], products=[molecule_ids[k] for k in reaction["products"]],
                       evidence=[{"source_id": source_ids[e["source"]], "page": e["page"], "locator": e["locator"],
-                                 "quote": "", "citation_only": True} for e in reaction["evidence"]])
+                                 "quote": "", "citation_only": True, "page_numbering": "pdf"} for e in reaction["evidence"]])
         store.put("reaction", result)
 
 

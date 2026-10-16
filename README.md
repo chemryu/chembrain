@@ -2,24 +2,24 @@
 
 A local chemistry workspace that connects molecules, reaction conditions and paper citations in an interactive reaction map. The interface and bundled examples are in English. Papers open through DOI links; no full-text reader or paper downloads are needed.
 
-## Windows: double-click to run
+## Windows: review candidates
 
-Open [Releases](https://github.com/chemryu/chembrain/releases), download **Chembrain-Windows-x64.zip** from a successful Windows build, extract it, then double-click **Chembrain.exe**. This package includes Python, RDKit, the local API and the compiled interface. **You do not need to install Python or Node.js.**
+Windows builds on this branch are **review candidates**, not approved releases. The old `windows-3` release has a known ordinary-startup bug and must not be treated as the validated output of the current branch.
 
-The app opens your browser automatically. Keep the console window open while using it; close that window or press Ctrl+C to quit. Windows 10/11, 64-bit is required. This build is unsigned, so Windows may display a publisher warning.
+[Validate Windows EXE](https://github.com/chemryu/chembrain/actions/workflows/windows-exe.yml) builds and tests the EXE, then retains a commit-specific Actions artifact and checksum for independent review. It does **not** publish a GitHub Release. A new release is held until independent review is complete.
 
-Your records are saved in `%LOCALAPPDATA%\Chembrain`, separately from the EXE. Keep that folder when updating and back it up to preserve your records. Internet access is only needed when opening a publisher's DOI link.
+An approved package is intended to run by extracting its ZIP and double-clicking `Chembrain.exe`. It bundles Python, RDKit, the API and the compiled interface. Data is stored separately in `%LOCALAPPDATA%\Chembrain`; updating the EXE must preserve that folder. Keep the console open while using the app.
 
-**Code → Download ZIP** downloads the source code, not the ready-to-run application. The Windows package is created by [Build Windows EXE](https://github.com/chemryu/chembrain/actions/workflows/windows-exe.yml); if no release is available, check that workflow's result. A saved workflow is not proof that an EXE has been built.
+Current automated validation checks ordinary zero-argument startup, a captured browser-open request, browser interactions against the packaged EXE and a real restart using existing user data. The EXE also runs with Python/Node launchers removed from its PATH. **That is not a clean Windows VM test**; clean-machine validation and the normal system-default browser integration remain separate checks. The shell browser probe prevents unrelated Edge profile locks; Playwright checks the actual UI independently.
 
 ## What is included
 
 - An interactive map of molecules and organic, photochemical and electrochemical reactions.
-- RDKit-validated SMILES, stereochemical identifiers and molecular structure drawings.
+- RDKit-validated SMILES, stereochemical identifiers and molecular structure drawings. Molecules support name, alias, inventory and note editing; structures already used in reactions cannot be replaced in place.
 - A paper library with DOI links, citations, reference notes and linked reactions. Add new papers by DOI without uploading PDFs.
 - Reaction records with method-specific conditions, yields and page/figure/procedure locators. New DOI citations record manual review; they do not claim an automatic text match.
 - Bounded route search that retains all reactant branches and excludes drafts by default.
-- Markdown export with ID-based backlinks and DOI citations. Full paper text and source excerpts are omitted.
+- Markdown export with ID-based backlinks and DOI citations. Original PDF page indices, printed pages and unspecified numbering are distinguished. Full paper text and source excerpts are omitted.
 
 The desktop app starts with **14 molecules and 6 representative reactions from 3 papers**. Four records are reviewed; two Nicewicz entries remain drafts because article and SI yields disagree. This is partial assisted curation, not independent experimental reproduction or a complete substrate-scope database. Inventory and purchasing status are unknown.
 
@@ -65,7 +65,7 @@ For UI development, `bash scripts/dev.sh` runs Vite and the API together. No ext
 
 ## Build a Windows EXE
 
-The workflow builds on `windows-latest` using Python 3.12 and Node.js 24, installs hash-locked application dependencies, builds the UI, runs the API tests, packages a single EXE with PyInstaller and runs both its functional smoke test and an ordinary zero-argument EXE launch. Only a passing build publishes the Windows ZIP and checksum file to GitHub Releases. An Actions artifact is also available for 30 days.
+The workflow builds on `windows-latest` using Python 3.12 and Node.js 24, installs hash-locked application dependencies, builds the UI, runs the API tests, packages a single EXE with PyInstaller and runs both its functional smoke test and an ordinary zero-argument EXE launch. It exercises the packaged UI using Playwright, then restarts the EXE over the same default data folder and compares all records. Passing candidates and their checksums are retained as Actions artifacts for 30 days; no release is published automatically.
 
 To build locally on Windows after source setup:
 

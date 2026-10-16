@@ -35,6 +35,15 @@ def export_record(record: dict) -> dict:
     return result
 
 
+def evidence_page_label(evidence: dict, source: dict | None = None) -> str:
+    numbering = evidence.get("page_numbering", "unspecified")
+    if numbering == "pdf" or (not evidence.get("citation_only") and numbering == "unspecified" and source and source.get("kind") == "pdf"):
+        return f"Original PDF page {evidence['page']} (1-based; printed page labels may differ)"
+    if numbering == "printed":
+        return f"Printed page {evidence['page']}"
+    return f"Reference page {evidence['page']} (numbering unspecified)"
+
+
 def extract_candidates(pages: list[dict]) -> list[dict]:
     pattern = re.compile(r"yield|reaction|irradiat|electro|cataly|solvent|stirr|synthes|수율|반응|전극|용매|촉매|합성", re.I)
     candidates = []
@@ -88,6 +97,23 @@ def create_app(data_dir: Path | None = None, demo: bool | None = None) -> FastAP
                     return result
                 raise HTTPException(409, f"Structure already registered: {existing['name']}")
         result = {**body.model_dump(), **chemistry, "id": uuid.uuid4().hex, "is_demo": False}
+        store.put("molecule", result)
+        return result
+
+    @app.put("/api/molecules/{mid}")
+    def update_molecule(mid: str, body: MoleculeInput):
+        previous = get_record("molecule", mid)
+        try:
+            chemistry = describe_molecule(body.smiles)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        identity_changed = chemistry["smiles"] != previous["smiles"] or chemistry["inchikey"] != previous["inchikey"]
+        if identity_changed and any(mid in r["reactants"] + r["products"] for r in store.all("reaction")):
+            raise HTTPException(422, "This structure is used in reactions. Add a new molecule to change its chemical identity.")
+        for existing in store.all("molecule"):
+            if existing["id"] != mid and existing["smiles"] == chemistry["smiles"] and existing["inchikey"] == chemistry["inchikey"]:
+                raise HTTPException(409, f"Structure already registered: {existing['name']}")
+        result = {**previous, **body.model_dump(), **chemistry, "updated_at": datetime.now(timezone.utc).isoformat()}
         store.put("molecule", result)
         return result
 
@@ -274,7 +300,7 @@ def create_app(data_dir: Path | None = None, demo: bool | None = None) -> FastAP
                             locator = f" · {evidence['locator']}" if evidence.get("locator") else ""
                             source = store.get("source", evidence["source_id"])
                             doi = f" · https://doi.org/{source['doi']}" if source and source.get("doi") else ""
-                            lines += [f"[[{evidence['source_id']}]] · PDF p.{evidence['page']}{locator}{doi}", ""]
+                            lines += [f"[[{evidence['source_id']}]] · {evidence_page_label(evidence, source)}{locator}{doi}", ""]
                         lines += [record.get("notes", "")]
                     lines += ["", "## Structured data", "", "```json", json.dumps(export_record(record), ensure_ascii=False, indent=2), "```"]
                     archive.writestr(f"{record['id']}.md", "\n".join(lines))

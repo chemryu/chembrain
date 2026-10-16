@@ -17,6 +17,7 @@ export type Evidence = {
   quote: string;
   locator?: string;
   citation_only?: boolean;
+  page_numbering?: "pdf" | "printed" | "unspecified";
 };
 export type Reaction = {
   id: string;
@@ -86,3 +87,14 @@ export const availability = {
   order: "Orderable · user reported",
   unknown: "Availability unknown",
 };
+
+export function evidencePageLabel(e: Evidence, source?: Source): string {
+  if (
+    e.page_numbering === "pdf" ||
+    (!e.citation_only &&
+      (!e.page_numbering || e.page_numbering === "unspecified") && source?.kind === "pdf")
+  )
+    return `Original PDF page ${e.page} (1-based; printed page labels may differ)`;
+  if (e.page_numbering === "printed") return `Printed page ${e.page}`;
+  return `Reference page ${e.page} (numbering unspecified)`;
+}

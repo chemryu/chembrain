@@ -29,7 +29,7 @@ function MoleculeCard({ data }: NodeProps<MoleculeNode>) {
         MOLECULE {data.molecule.is_demo && <span>DEMO</span>}
       </div>
       <img
-        src={`/api/molecules/${data.molecule.id}/svg`}
+        src={`/api/molecules/${data.molecule.id}/svg?v=${encodeURIComponent(data.molecule.smiles)}`}
         alt={`${data.molecule.name} structure`}
         draggable={false}
       />

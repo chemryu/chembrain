@@ -24,6 +24,7 @@ class Evidence(BaseModel):
     page: int = Field(ge=1)
     quote: str = Field(default="", max_length=10000)
     citation_only: bool = False
+    page_numbering: Literal["pdf", "printed", "unspecified"] = "unspecified"
     locator: str = Field(default="", max_length=300)
 
 
