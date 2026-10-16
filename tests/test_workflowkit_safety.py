@@ -38,6 +38,22 @@ def test_initialization_refuses_symlink_parent_and_template_file(tmp_path):
     assert victim.read_text() == 'keep'
 
 
+@pytest.mark.parametrize('relative', ['state.json', 'Start-Workflow.cmd', 'Watch-Workflow.cmd',
+                                      'deliverables/' + 'a' * 40,
+                                      'runs/previous/validation.json',
+                                      'workspace/previous/round-01/source.py'])
+def test_initialization_checks_existing_output_descendants(tmp_path, relative):
+    root = cli.initialize(tmp_path / 'Box')
+    outside = tmp_path / 'outside'
+    outside.mkdir()
+    link = root / relative
+    link.parent.mkdir(parents=True, exist_ok=True)
+    link.symlink_to(outside, target_is_directory=True)
+    with pytest.raises(ValueError, match='symlinks or junctions'):
+        cli.initialize(root)
+    assert not list(outside.iterdir())
+
+
 def test_install_frozen_controller_and_launchers_without_powershell(tmp_path, monkeypatch):
     executable = tmp_path / 'download' / 'ChembrainWorkflow.exe'
     executable.parent.mkdir()

@@ -32,9 +32,18 @@ def reject_link_components(path):
 def initialize(root):
     root = Path(root)
     reject_link_components(root)
+    for filename in ('state.json', 'Start-Workflow.cmd', 'Watch-Workflow.cmd'):
+        reject_link_components(root / filename)
     for directory in ('workspace','changes','reviews','runs','deliverables','agents',
                       'requests','_controller'):
-        reject_link_components(root / directory)
+        owned = root / directory
+        reject_link_components(owned)
+        if owned.exists():
+            def fail_walk(error):
+                raise ValueError('Cannot inspect an existing workflow directory.') from error
+            for current, directories, files in os.walk(owned, followlinks=False, onerror=fail_walk):
+                for name in sorted(directories + files):
+                    reject_link_components(Path(current) / name)
     root.mkdir(parents=True, exist_ok=True)
     templates = Path(__file__).parent / 'templates'
     for source in templates.rglob('*'):

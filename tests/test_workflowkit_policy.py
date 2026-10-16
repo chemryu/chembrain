@@ -57,7 +57,7 @@ def test_trusted_snapshot_can_include_validator_and_controller_source(tmp_path):
                 'workflowkit/policy.py': '# trusted policy source\n',
                 'RULEBOOK.md': '# Rules\n'}
     materialize_snapshot(tmp_path, snapshot)
-    assert all((tmp_path / path).read_text() == value for path, value in snapshot.items())
+    assert all((tmp_path / path).read_text(encoding='utf-8') == value for path, value in snapshot.items())
 
 
 @pytest.mark.parametrize('path', ['.git/config', '.env.local', '.aws/credentials',
@@ -93,7 +93,7 @@ def test_safe_apply_preflights_entire_proposal(tmp_path):
     assert not (root / 'good.py').exists()
     assert not (outside / 'escaped.py').exists()
     apply_edits(root, [{'path': 'src/app.py', 'content': 'print(1)\n'}])
-    assert (root / 'src/app.py').read_text() == 'print(1)\n'
+    assert (root / 'src/app.py').read_text(encoding='utf-8') == 'print(1)\n'
     with pytest.raises(ValueError):
         apply_edits(root, [{'path': 'SRC/app.py', 'content': 'alias'}])
     with pytest.raises(ValueError):
@@ -147,9 +147,9 @@ def test_marker_must_be_exact_and_each_behavior_has_separate_evidence():
 def test_atomic_records_and_journal(tmp_path):
     config = tmp_path / 'state.json'
     atomic_json(config, {'hello': '안녕'})
-    assert json.loads(config.read_text()) == {'hello': '안녕'}
+    assert json.loads(config.read_text(encoding='utf-8')) == {'hello': '안녕'}
     first = append_event(tmp_path, {'type': 'review_received', 'commit': COMMIT})
     second = append_event(tmp_path, {'type': 'review_received', 'commit': COMMIT})
     assert first != second
-    assert json.loads(first.read_text())['type'] == 'review_received'
+    assert json.loads(first.read_text(encoding='utf-8'))['type'] == 'review_received'
     assert len(list((tmp_path / 'events').glob('*.json'))) == 2
