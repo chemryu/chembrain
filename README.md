@@ -65,7 +65,7 @@ For UI development, `bash scripts/dev.sh` runs Vite and the API together. No ext
 
 ## Build a Windows EXE
 
-The workflow builds on `windows-latest` using Python 3.12 and Node.js 24, installs hash-locked application dependencies, builds the UI, runs the API tests, packages a single EXE with PyInstaller and runs that EXE's functional smoke test. Only a passing build publishes the Windows ZIP and checksum file to GitHub Releases. An Actions artifact is also available for 30 days.
+The workflow builds on `windows-latest` using Python 3.12 and Node.js 24, installs hash-locked application dependencies, builds the UI, runs the API tests, packages a single EXE with PyInstaller and runs both its functional smoke test and an ordinary zero-argument EXE launch. Only a passing build publishes the Windows ZIP and checksum file to GitHub Releases. An Actions artifact is also available for 30 days.
 
 To build locally on Windows after source setup:
 
@@ -83,6 +83,7 @@ PyInstaller must run on the target OS. Building the Linux package does not valid
 .venv/bin/python -m pytest -q
 npm run build
 .venv/bin/python scripts/desktop.py --smoke-test
+.venv/bin/python scripts/check_desktop_launch.py .venv/bin/python scripts/desktop.py --no-browser
 python3 scripts/browser_smoke.py
 ```
 

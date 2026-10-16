@@ -49,6 +49,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & .\release\Chembrain.exe --smoke-test 2>&1 | Tee-Object packaged-smoke.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python scripts/check_desktop_launch.py release/Chembrain.exe 2>&1 | Tee-Object normal-launch.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Copy-Item packaging/README-Windows.txt release/README.txt
           Compress-Archive -Path release/Chembrain.exe,release/README.txt -DestinationPath Chembrain-Windows-x64.zip
           Get-FileHash Chembrain-Windows-x64.zip -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  Chembrain-Windows-x64.zip" } | Set-Content SHA256SUMS.txt

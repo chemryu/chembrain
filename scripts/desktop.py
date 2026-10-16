@@ -32,7 +32,7 @@ def main():
         run(args.data_dir, no_browser=args.no_browser)
 
 
-def run(data_dir: Path, no_browser: bool, smoke_test: bool):
+def run(data_dir: Path, no_browser: bool, smoke_test: bool = False):
     data_dir.mkdir(parents=True, exist_ok=True)
     os.environ["CHEMBRAIN_DATA_DIR"] = str(data_dir)
     os.environ["CHEMBRAIN_SEED_LITERATURE"] = "1"
