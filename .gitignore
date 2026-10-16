@@ -15,3 +15,4 @@ test-results/
 
 release/
 build/
+.data-desktop/

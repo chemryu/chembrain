@@ -1874,6 +1874,7 @@ function ReactionForm({
             <label>
               Reference
               <select
+                aria-label="Reference"
                 value={sourceId}
                 onChange={(e) => setSourceId(e.target.value)}
               >

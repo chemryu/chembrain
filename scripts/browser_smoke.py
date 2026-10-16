@@ -132,10 +132,11 @@ def main():
                     expect(page.locator('.molecule-node')).to_have_count(16)
                     mobile = browser.new_page(viewport={'width':390,'height':844}, is_mobile=True, has_touch=True)
                     mobile.goto('http://127.0.0.1:8765',wait_until='networkidle')
-                    assert mobile.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), 'Mobile page overflows'
+                    expect(mobile.locator('.molecule-node')).to_have_count(16)
+                    assert mobile.evaluate('document.documentElement.scrollWidth <= 390'), 'Mobile page overflows'
                     mobile.get_by_role('button',name='Paper library').click()
                     expect(mobile.locator('.source-card')).to_have_count(7)
-                    assert mobile.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), 'Mobile paper library overflows'
+                    assert mobile.evaluate('document.documentElement.scrollWidth <= 390'), 'Mobile paper library overflows'
                     mobile.screenshot(path='/tmp/chembrain-english-mobile.png',full_page=True)
                     assert not errors, errors
                     browser.close()

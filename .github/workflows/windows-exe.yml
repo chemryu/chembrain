@@ -15,6 +15,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: Report build start
+        shell: bash
+        run: bash scripts/report_windows_build.sh running
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -24,31 +27,41 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-      - name: Install locked app dependencies
+      - id: dependencies
+        name: Install locked app dependencies
+        shell: bash
         run: |
-          python -m pip install --require-hashes -r requirements.lock
-          python -m pip install pyinstaller==6.16.0
-          npm ci
-      - name: Build English interface and test API
+          set -euo pipefail
+          python -m pip install --require-hashes -r requirements.lock 2>&1 | tee dependencies.log
+          python -m pip install pyinstaller==6.16.0 2>&1 | tee -a dependencies.log
+          npm ci 2>&1 | tee -a dependencies.log
+      - id: validation
+        name: Build English interface and test API
+        shell: bash
         run: |
-          npm run build
-          python -m pytest -q
-      - name: Package and test the EXE
+          set -euo pipefail
+          npm run build 2>&1 | tee interface.log
+          python -m pytest -q 2>&1 | tee api.log
+      - id: packaging
+        name: Package and test the EXE
         run: |
-          python -m PyInstaller packaging/chembrain.spec --noconfirm --distpath release
-          & .\release\Chembrain.exe --smoke-test
+          python -m PyInstaller packaging/chembrain.spec --noconfirm --distpath release 2>&1 | Tee-Object packaging.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & .\release\Chembrain.exe --smoke-test 2>&1 | Tee-Object packaged-smoke.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Copy-Item packaging/README-Windows.txt release/README.txt
           Compress-Archive -Path release/Chembrain.exe,release/README.txt -DestinationPath Chembrain-Windows-x64.zip
           Get-FileHash Chembrain-Windows-x64.zip -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  Chembrain-Windows-x64.zip" } | Set-Content SHA256SUMS.txt
-      - uses: actions/upload-artifact@v4
+      - id: artifact
+        uses: actions/upload-artifact@v4
         with:
           name: Chembrain-Windows-x64
           path: |
             release/Chembrain.exe
             release/README.txt
           retention-days: 30
-      - name: Publish Windows release
+      - id: publication
+        name: Publish Windows release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -56,21 +69,11 @@ jobs:
         run: |
           set -euo pipefail
           tag="windows-${GITHUB_RUN_NUMBER}"
-          gh release create "$tag" Chembrain-Windows-x64.zip SHA256SUMS.txt --target "$GITHUB_SHA" --title "Chembrain for Windows · build ${GITHUB_RUN_NUMBER}" --notes-file packaging/README-Windows.txt
+          gh release create "$tag" Chembrain-Windows-x64.zip SHA256SUMS.txt --target "$GITHUB_SHA" --title "Chembrain for Windows · build ${GITHUB_RUN_NUMBER}" --notes-file packaging/README-Windows.txt 2>&1 | tee publication.log
       - name: Save build result for remote verification
         if: always()
         env:
           BUILD_RESULT: ${{ job.status }}
+          BUILD_STEPS: ${{ toJSON(steps) }}
         shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/build-status"
-          cd "$RUNNER_TEMP/build-status"
-          git init -b build/windows-status
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          printf '{"status":"%s","commit":"%s","run_url":"https://github.com/%s/actions/runs/%s","release_url":"https://github.com/%s/releases/tag/windows-%s"}\n' "$BUILD_RESULT" "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$GITHUB_REPOSITORY" "$GITHUB_RUN_NUMBER" > status.json
-          git add status.json
-          git commit -m "Windows build ${GITHUB_RUN_NUMBER}: ${BUILD_RESULT}"
-          git -C "$GITHUB_WORKSPACE" fetch "$RUNNER_TEMP/build-status" build/windows-status
-          git -C "$GITHUB_WORKSPACE" push origin FETCH_HEAD:refs/heads/build/windows-status --force
+        run: bash scripts/report_windows_build.sh "$BUILD_RESULT"

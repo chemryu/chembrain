@@ -2379,3 +2379,21 @@ a.evidence-card {
 .source-metadata-form h2 {
   margin-top: 0;
 }
+
+@media (max-width: 700px) {
+  .filter-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+  .filter-tabs button {
+    justify-content: center;
+    white-space: normal;
+  }
+  .sidebar .nav-item {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 4px;
+    text-align: center;
+  }
+}
