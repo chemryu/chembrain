@@ -254,7 +254,7 @@ function App() {
             <strong>{nav.find((n) => n.id === view)?.label}</strong>
           </div>
           <div className="topbar-right">
-            <span className="version">LOCAL · v0.1</span>
+            <span className="version">LOCAL · v0.2</span>
             <button
               className="button small"
               onClick={() => {

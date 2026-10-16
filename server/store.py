@@ -1,4 +1,5 @@
 import json
+from contextlib import contextmanager
 import sqlite3
 from pathlib import Path
 
@@ -14,10 +15,15 @@ class Store:
             db.execute("CREATE INDEX IF NOT EXISTS records_kind ON records(kind)")
             db.execute("CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
 
+    @contextmanager
     def connect(self):
         db = sqlite3.connect(self.path, timeout=30)
-        db.execute("PRAGMA journal_mode=WAL")
-        return db
+        try:
+            db.execute("PRAGMA journal_mode=WAL")
+            with db:
+                yield db
+        finally:
+            db.close()
 
     def all(self, kind: str) -> list[dict]:
         with self.connect() as db:

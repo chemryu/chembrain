@@ -62,7 +62,7 @@ def test_published_manifest_keeps_conflicting_results_as_drafts():
     from pathlib import Path
     from server.chemistry import describe_molecule
 
-    manifest = json.loads((Path(__file__).resolve().parent.parent / "examples/uploaded-literature.json").read_text())
+    manifest = json.loads((Path(__file__).resolve().parent.parent / "examples/uploaded-literature.json").read_text(encoding="utf-8"))
     for molecule in manifest["molecules"]:
         assert describe_molecule(molecule["smiles"])["formula"] == molecule["formula"]
     nicewicz = [r for r in manifest["reactions"] if r["key"].startswith("nicewicz")]

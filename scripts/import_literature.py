@@ -118,12 +118,12 @@ def main():
     parser.add_argument("--base-url", default="http://127.0.0.1:8000")
     parser.add_argument("--report", type=Path, default=ROOT / ".data/curations/uploaded-literature-report.json")
     args = parser.parse_args()
-    manifest = json.loads(args.manifest.read_text())
+    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     paths = preflight(manifest, args.attachments_dir)
     with httpx.Client(base_url=args.base_url, timeout=120, trust_env=False) as client:
         report = import_manifest(client, manifest, paths)
     args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+    args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": "imported", "report": str(args.report), **report["counts"]}, ensure_ascii=False))
 
 

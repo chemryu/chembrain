@@ -37,7 +37,18 @@ def run(data_dir: Path, no_browser: bool, smoke_test: bool):
     os.environ["CHEMBRAIN_DATA_DIR"] = str(data_dir)
     os.environ["CHEMBRAIN_SEED_LITERATURE"] = "1"
     os.environ["CHEMBRAIN_SEED_DEMO"] = "0"
-    logging.basicConfig(filename=data_dir / "chembrain.log", level=logging.INFO, encoding="utf-8")
+    logger = logging.getLogger()
+    handler = logging.FileHandler(data_dir / "chembrain.log", encoding="utf-8")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    try:
+        serve(data_dir, no_browser, smoke_test)
+    finally:
+        logger.removeHandler(handler)
+        handler.close()
+
+
+def serve(data_dir: Path, no_browser: bool, smoke_test: bool):
     if not getattr(sys, "frozen", False):
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     # Bind once and give that same socket to Uvicorn, avoiding port races.
