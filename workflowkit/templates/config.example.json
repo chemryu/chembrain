@@ -1,0 +1,11 @@
+{
+  "repository": "chemryu/chembrain",
+  "branch": "codex/chembrain-mvp",
+  "author_model": "",
+  "reviewer_model": "",
+  "max_rounds": 5,
+  "ci_timeout_seconds": 1800,
+  "poll_seconds": 20,
+  "required_checks": ["windows_build", "packaged_ui", "restart_persistence", "runtime_path_independence"],
+  "protected_paths": [".git", ".github", "workflowkit", "agents", "RULEBOOK.md", "wiki.md", "config.json"]
+}

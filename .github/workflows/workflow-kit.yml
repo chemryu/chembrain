@@ -1,0 +1,80 @@
+name: Build Box workflow setup kit
+on:
+  push:
+    branches: [codex/chembrain-mvp]
+    paths: ['workflowkit/**', 'tests/test_workflowkit*', 'packaging/workflowkit.spec', '.github/workflows/workflow-kit.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: chembrain-workflow-kit-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kit:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test controller without live credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install pytest==9.1.1 pyinstaller==6.16.0 2>&1 | tee kit-dependencies.log
+          python -m pytest tests/test_workflowkit* -q 2>&1 | tee kit-tests.log
+      - name: Build and exercise folder initialization
+        run: |
+          Start-Transcript -Path kit-build.log
+          python -m PyInstaller packaging/workflowkit.spec --noconfirm --distpath kit-release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $fixtureRoot = Join-Path $env:RUNNER_TEMP 'Box fixture with spaces'
+          & .\kit-release\ChembrainWorkflow.exe init --root $fixtureRoot
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path (Join-Path $fixtureRoot 'wiki.md'))) { throw 'wiki.md missing' }
+          if (-not (Test-Path (Join-Path $fixtureRoot 'RULEBOOK.md'))) { throw 'RULEBOOK.md missing' }
+          & .\kit-release\ChembrainWorkflow.exe status --root $fixtureRoot
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item workflowkit/distribution/* kit-release/
+          & .\kit-release\ChembrainWorkflow.exe install --root $fixtureRoot
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path (Join-Path $fixtureRoot 'Start-Workflow.cmd'))) { throw 'Launcher missing' }
+          Compress-Archive -Path kit-release/* -DestinationPath Chembrain-Box-Workflow-Setup.zip
+          Get-FileHash Chembrain-Box-Workflow-Setup.zip -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  Chembrain-Box-Workflow-Setup.zip" } | Set-Content kit-SHA256SUMS.txt
+          Stop-Transcript
+      - id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Chembrain-Box-Workflow-Setup
+          path: |
+            Chembrain-Box-Workflow-Setup.zip
+            kit-SHA256SUMS.txt
+          retention-days: 30
+      - name: Save kit receipt
+        if: always()
+        shell: bash
+        env:
+          KIT_STATUS: ${{ job.status }}
+          KIT_ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          set -euo pipefail
+          receipt_dir="$RUNNER_TEMP/kit-receipt"
+          mkdir -p "$receipt_dir"
+          cd "$receipt_dir"
+          git init -b build/workflow-kit-status
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          Path('status.json').write_text(json.dumps({'status':os.environ['KIT_STATUS'],'commit':os.environ['GITHUB_SHA'],'artifact_url':os.environ['KIT_ARTIFACT_URL'],'run_url':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",'live_api_calls_tested':False,'box_folder_installed_on_user_pc':False},indent=2),encoding='utf-8')
+          PY
+          if [[ -f "$GITHUB_WORKSPACE/kit-SHA256SUMS.txt" ]]; then cp "$GITHUB_WORKSPACE/kit-SHA256SUMS.txt" .; fi
+          for log in kit-dependencies.log kit-tests.log kit-build.log; do
+            if [[ -f "$GITHUB_WORKSPACE/$log" ]]; then cp "$GITHUB_WORKSPACE/$log" .; fi
+          done
+          git add .
+          git commit -m "Workflow setup kit build: $KIT_STATUS"
+          git -C "$GITHUB_WORKSPACE" fetch "$receipt_dir" build/workflow-kit-status
+          git -C "$GITHUB_WORKSPACE" push origin FETCH_HEAD:refs/heads/build/workflow-kit-status --force

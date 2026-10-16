@@ -104,7 +104,7 @@ def main():
             if os.name != 'nt':
                 parser.error('Restricted runtime validation targets the Windows EXE.')
             root = Path(os.environ['SystemRoot'])
-            env['PATH'] = os.pathsep.join(map(str, [root / 'System32', root]))
+            env['PATH'] = os.pathsep.join(map(str, [root / 'System32']))
             for name in ('PYTHONHOME','PYTHONPATH','VIRTUAL_ENV','CONDA_PREFIX','NODE_PATH'):
                 env.pop(name, None)
             for executable in ('python','python3','py','node','npm'):
@@ -131,6 +131,12 @@ def main():
                 from browser_smoke import verify_restarted_ui
                 verify_restarted_ui(url)
             print('Second ordinary launch: same default data folder, all records and user corrections preserved.', flush=True)
+    if os.name == 'nt':
+        if args.browser_ui:
+            print('WINDOWS_PACKAGED_UI_PASS', flush=True)
+        print('WINDOWS_RESTART_PERSISTENCE_PASS', flush=True)
+        if args.restricted_runtime:
+            print('WINDOWS_RUNTIME_PATH_INDEPENDENCE_PASS', flush=True)
     print('Ordinary launch validation passed: browser request, UI/assets, RDKit and process restart with existing data. Temporary files cleaned.', flush=True)
 
 
