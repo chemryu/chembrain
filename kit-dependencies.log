@@ -1,0 +1,38 @@
+Collecting pytest==9.1.1
+  Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+Collecting pyinstaller==6.16.0
+  Downloading pyinstaller-6.16.0-py3-none-win_amd64.whl.metadata (8.5 kB)
+Requirement already satisfied: colorama>=0.4 in C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\site-packages (from pytest==9.1.1) (0.4.6)
+Collecting iniconfig>=1.0.1 (from pytest==9.1.1)
+  Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+Requirement already satisfied: packaging>=22 in C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\site-packages (from pytest==9.1.1) (26.3)
+Collecting pluggy<2,>=1.5 (from pytest==9.1.1)
+  Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+Collecting pygments>=2.7.2 (from pytest==9.1.1)
+  Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting altgraph (from pyinstaller==6.16.0)
+  Downloading altgraph-0.17.5-py2.py3-none-any.whl.metadata (7.5 kB)
+Collecting pefile!=2024.8.26,>=2022.5.30 (from pyinstaller==6.16.0)
+  Downloading pefile-2023.2.7-py3-none-any.whl.metadata (1.4 kB)
+Collecting pyinstaller-hooks-contrib>=2025.8 (from pyinstaller==6.16.0)
+  Downloading pyinstaller_hooks_contrib-2026.8-py3-none-any.whl.metadata (16 kB)
+Collecting pywin32-ctypes>=0.2.1 (from pyinstaller==6.16.0)
+  Downloading pywin32_ctypes-0.2.3-py3-none-any.whl.metadata (3.9 kB)
+Collecting setuptools>=42.0.0 (from pyinstaller==6.16.0)
+  Downloading setuptools-84.0.0-py3-none-any.whl.metadata (6.6 kB)
+Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+Downloading pyinstaller-6.16.0-py3-none-win_amd64.whl (1.4 MB)
+   ---------------------------------------- 1.4/1.4 MB 17.9 MB/s  0:00:00
+Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+Downloading pefile-2023.2.7-py3-none-any.whl (71 kB)
+Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+   ---------------------------------------- 1.3/1.3 MB 61.8 MB/s  0:00:00
+Downloading pyinstaller_hooks_contrib-2026.8-py3-none-any.whl (462 kB)
+Downloading pywin32_ctypes-0.2.3-py3-none-any.whl (30 kB)
+Downloading setuptools-84.0.0-py3-none-any.whl (818 kB)
+   ---------------------------------------- 818.2/818.2 kB 34.8 MB/s  0:00:00
+Downloading altgraph-0.17.5-py2.py3-none-any.whl (21 kB)
+Installing collected packages: altgraph, setuptools, pywin32-ctypes, pyinstaller-hooks-contrib, pygments, pluggy, pefile, iniconfig, pytest, pyinstaller
+
+Successfully installed altgraph-0.17.5 iniconfig-2.3.1 pefile-2023.2.7 pluggy-1.7.0 pygments-2.21.0 pyinstaller-6.16.0 pyinstaller-hooks-contrib-2026.8 pytest-9.1.1 pywin32-ctypes-0.2.3 setuptools-84.0.0
