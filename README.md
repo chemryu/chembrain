@@ -2,7 +2,7 @@
 
 A local chemistry workspace that connects molecules, reaction conditions and paper citations in an interactive reaction map. The interface and bundled examples are in English. Papers open through DOI links; no full-text reader or paper downloads are needed.
 
-Development now uses a [GPT-only, five-role review workflow](README-GPT.md) within Codex. No external AI API key is required. See [wiki.md](wiki.md) for the current paused state and unresolved review finding.
+Development now uses a [GPT-only, five-role review workflow](README-GPT.md) within Codex. No external AI API key is required. Current review records are maintained in the [workflow wiki](https://github.com/chemryu/chembrain/blob/codex/gpt-workflow-records/wiki.md), separately from the exact source commit being tested.
 
 ## Windows: review candidates
 

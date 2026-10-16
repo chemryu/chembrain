@@ -1054,6 +1054,9 @@ function Sources({
             key={source.id}
             source={source}
             sources={workspace.sources}
+            doiRequired={source.kind === "reference" || workspace.reactions.some((reaction) =>
+              reaction.evidence.some((evidence) => evidence.source_id === source.id && evidence.citation_only)
+            )}
             onSaved={async (detail) => {
               await onUpdated(detail);
               setEditing(false);

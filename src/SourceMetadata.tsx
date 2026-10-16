@@ -13,10 +13,12 @@ export const documentRoles = {
 export function SourceMetadataForm({
   source,
   sources,
+  doiRequired,
   onSaved,
 }: {
   source: SourceDetail;
   sources: Source[];
+  doiRequired: boolean;
   onSaved: (source: SourceDetail) => Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
@@ -70,6 +72,9 @@ export function SourceMetadataForm({
             name="doi"
             defaultValue={source.doi || ""}
             placeholder="10.1126/science.1255525"
+            required={doiRequired}
+            maxLength={200}
+            aria-describedby={doiRequired ? "source-doi-help" : undefined}
           />
         </label>
         <label>
@@ -87,6 +92,11 @@ export function SourceMetadataForm({
           </select>
         </label>
       </div>
+      {doiRequired && (
+        <small id="source-doi-help">
+          A DOI is required because this reference or a linked reaction relies on its DOI link.
+        </small>
+      )}
       <label>
         Citation
         <input

@@ -52,6 +52,20 @@ def exercise_ui(base_url: str, screenshot_dir=None):
         page.get_by_label('Citation', exact=True).fill('Browser test fixture only')
         page.get_by_role('button', name='Add reference', exact=True).click()
         expect(page.get_by_role('heading', name='Browser fixture paper', exact=True)).to_be_visible()
+        page.get_by_role('button', name='Edit reference', exact=True).click()
+        metadata = page.locator('.source-metadata-form')
+        doi = metadata.get_by_label('DOI', exact=True)
+        doi.fill('')
+        metadata.get_by_role('button', name='Save reference', exact=True).click()
+        assert doi.evaluate('(input) => input.validity.valueMissing')
+        expect(metadata).to_be_visible()
+        doi.fill('   ')
+        metadata.get_by_role('button', name='Save reference', exact=True).click()
+        expect(metadata.get_by_role('alert')).to_contain_text('A DOI is required')
+        expect(page.get_by_role('link', name='Open DOI', exact=True)).to_have_attribute('href','https://doi.org/10.1000/browser-fixture')
+        doi.fill('https://doi.org/10.1000/browser-fixture')
+        metadata.get_by_role('button', name='Save reference', exact=True).click()
+        expect(metadata).not_to_be_visible()
         page.get_by_role('button', name='Molecule library', exact=True).click()
         page.get_by_role('button', name='Add molecule', exact=True).click()
         dialog = page.get_by_role('dialog')
@@ -144,7 +158,7 @@ def exercise_ui(base_url: str, screenshot_dir=None):
         if screenshot_dir: mobile.screenshot(path=str(Path(screenshot_dir) / 'chembrain-english-mobile.png'),full_page=True)
         assert not errors, errors
         browser.close()
-        print(json.dumps({'status':'passed','checks':['English interface','14-molecule literature starter','DOI links without full text','paper filter','DOI reference creation','nested molecule creation','molecule metadata editing','DOI citation reaction create/edit','photochemical conditions','route search and draft exclusion','DOI-only Markdown export','persistent reload','mobile layouts','no JS errors']}))
+        print(json.dumps({'status':'passed','checks':['English interface','14-molecule literature starter','DOI links without full text','paper filter','DOI reference creation','DOI deletion rejected without losing the citation','nested molecule creation','molecule metadata editing','DOI citation reaction create/edit','photochemical conditions','route search and draft exclusion','DOI-only Markdown export','persistent reload','mobile layouts','no JS errors']}))
 
 
 def verify_restarted_ui(base_url: str):

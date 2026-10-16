@@ -1,7 +1,7 @@
 name: Validate Windows EXE (review candidate)
 on:
   push:
-    branches: [codex/chembrain-mvp]
+    branches: [codex/chembrain-mvp, codex/gpt-agent-workflow]
   workflow_dispatch:
 permissions:
   contents: write

@@ -3,6 +3,7 @@ import json
 import zipfile
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 from server.app import create_app
@@ -71,3 +72,65 @@ def test_legacy_translation_preserves_custom_edits(tmp_path):
     record = store.get('reaction', 'custom')
     assert record['name'] == 'My own Korean title' and record['notes'] == 'Edited notes'
     assert record['conditions'] == {'Solvent': 'water'}
+
+
+@pytest.mark.parametrize('kind', ['reference', 'upload'])
+@pytest.mark.parametrize('status', ['reviewed', 'draft'])
+def test_cited_doi_cannot_be_removed_or_break_saved_reactions(tmp_path, kind, status):
+    client = TestClient(create_app(tmp_path, demo=False))
+    metadata = {'title': 'Cited fixture', 'doi': '10.1000/preserved', 'document_role': 'main'}
+    if kind == 'reference':
+        source = client.post('/api/references', json=metadata).json()
+    else:
+        source = client.post('/api/sources', files={'file': ('original.txt', b'Original source must survive metadata edits.')}).json()
+        assert client.put(f"/api/sources/{source['id']}/metadata", json=metadata).status_code == 200
+    first = client.post('/api/molecules', json={'name': 'Methanol', 'smiles': 'CO'}).json()
+    second = client.post('/api/molecules', json={'name': 'Formaldehyde', 'smiles': 'C=O'}).json()
+    body = {'name': 'Preserved citation', 'reactants': [first['id']], 'products': [second['id']], 'status': status,
+            'evidence': [{'source_id': source['id'], 'page': 1, 'locator': 'Procedure A', 'citation_only': True}]}
+    created = client.post('/api/reactions', json=body)
+    assert created.status_code == 201
+    reaction_id = created.json()['id']
+    params = {'target': second['id'], 'include_drafts': True}
+    before = client.get('/api/workspace').json()
+    routes = client.get('/api/routes', params=params).json()
+    assert routes['routes']
+    for change in [{'doi': ''}, {'doi': '  \t'}, {}]:
+        attempt = {**metadata, 'notes': 'This rejected note must not be saved.'}
+        attempt.pop('doi')
+        response = client.put(f"/api/sources/{source['id']}/metadata", json={**attempt, **change})
+        assert response.status_code == 422
+        assert 'A DOI is required' in response.json()['detail']
+        assert client.get('/api/workspace').json() == before
+        assert client.get('/api/routes', params=params).json() == routes
+    restarted = TestClient(create_app(tmp_path, demo=False))
+    assert restarted.get('/api/workspace').json() == before
+    assert restarted.put('/api/reactions/' + reaction_id, json=body).status_code == 200
+    with zipfile.ZipFile(io.BytesIO(restarted.get('/api/export').content)) as archive:
+        text = archive.read(reaction_id + '.md').decode('utf-8')
+        assert 'https://doi.org/10.1000/preserved' in text
+        assert 'Original source must survive' not in text
+    updated = restarted.put(f"/api/sources/{source['id']}/metadata", json={**metadata, 'doi': 'https://doi.org/10.1000/corrected'})
+    assert updated.status_code == 200 and updated.json()['doi'] == '10.1000/corrected'
+    assert updated.json()['id'] == source['id']
+    assert restarted.put('/api/reactions/' + reaction_id, json=body).status_code == 200
+    if kind == 'upload':
+        assert restarted.get(f"/api/sources/{source['id']}/file").content == b'Original source must survive metadata edits.'
+
+
+def test_unlinked_reference_requires_doi_but_text_evidence_keeps_it_optional(tmp_path):
+    client = TestClient(create_app(tmp_path, demo=False))
+    reference = client.post('/api/references', json={'title': 'Unlinked paper', 'doi': '10.1000/unlinked'}).json()
+    assert client.put(f"/api/sources/{reference['id']}/metadata", json={'title': 'Unlinked paper'}).status_code == 422
+    source = client.post('/api/sources', files={'file': ('note.txt', b'Observed reaction in a lab note.')}).json()
+    metadata = {'title': 'Lab note', 'doi': '10.1000/optional'}
+    assert client.put(f"/api/sources/{source['id']}/metadata", json=metadata).status_code == 200
+    a = client.post('/api/molecules', json={'name': 'Methanol', 'smiles': 'CO'}).json()
+    b = client.post('/api/molecules', json={'name': 'Formaldehyde', 'smiles': 'C=O'}).json()
+    body = {'name': 'Text-backed reaction', 'reactants': [a['id']], 'products': [b['id']], 'status': 'reviewed',
+            'evidence': [{'source_id': source['id'], 'page': 1, 'quote': 'Observed reaction in a lab note.'}]}
+    created = client.post('/api/reactions', json=body)
+    assert created.status_code == 201
+    updated = client.put(f"/api/sources/{source['id']}/metadata", json={**metadata, 'doi': ''})
+    assert updated.status_code == 200 and updated.json()['doi'] == ''
+    assert client.put('/api/reactions/' + created.json()['id'], json=body).status_code == 200

@@ -248,6 +248,13 @@ def create_app(data_dir: Path | None = None, demo: bool | None = None) -> FastAP
     @app.put("/api/sources/{sid}/metadata")
     def update_source_metadata(sid: str, body: SourceMetadataInput):
         source = get_record("source", sid)
+        doi_required = source["kind"] == "reference" or any(
+            evidence.get("source_id") == sid and evidence.get("citation_only")
+            for reaction in store.all("reaction")
+            for evidence in reaction.get("evidence", [])
+        )
+        if doi_required and not body.doi:
+            raise HTTPException(422, "A DOI is required for DOI-only references and references used by DOI citations.")
         if sid in body.related_source_ids or len(body.related_source_ids) != len(set(body.related_source_ids)):
             raise HTTPException(422, "Related references must be unique and cannot include this reference.")
         for related_id in body.related_source_ids:
