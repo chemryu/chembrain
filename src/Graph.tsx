@@ -30,7 +30,7 @@ function MoleculeCard({ data }: NodeProps<MoleculeNode>) {
       </div>
       <img
         src={`/api/molecules/${data.molecule.id}/svg`}
-        alt={`${data.molecule.name} 구조식`}
+        alt={`${data.molecule.name} structure`}
         draggable={false}
       />
       <strong>{data.molecule.name}</strong>
@@ -61,10 +61,10 @@ function ReactionCard({ data }: NodeProps<ReactionNode>) {
       <strong>{data.reaction.name}</strong>
       <small>
         {data.reaction.is_demo
-          ? "데모 연결"
+          ? "Demo connection"
           : data.reaction.status === "reviewed"
-            ? "기록 검토 완료"
-            : "검토 전 초안"}
+            ? "Record reviewed"
+            : "Draft"}
       </small>
       <Handle type="source" position={Position.Right} />
     </div>

@@ -21,12 +21,11 @@ import {
   Plus,
   Search,
   Sparkles,
-  Upload,
   X,
 } from "lucide-react";
 import { api, json } from "./api";
 import { Graph } from "./Graph";
-import { SourceMetadataForm, documentRoles } from "./SourceMetadata";
+import { SourceMetadataForm, documentRoles, doiUrl } from "./SourceMetadata";
 import {
   availability,
   categories,
@@ -48,7 +47,7 @@ type Modal =
   | null;
 const emptyWorkspace: Workspace = { molecules: [], reactions: [], sources: [] };
 const errorText = (error: unknown) =>
-  error instanceof Error ? error.message : "요청을 처리하지 못했습니다.";
+  error instanceof Error ? error.message : "Unable to process the request.";
 
 function App() {
   const [workspace, setWorkspace] = useState<Workspace>(emptyWorkspace);
@@ -60,14 +59,11 @@ function App() {
   const [showDemo, setShowDemo] = useState(true);
   const [selected, setSelected] = useState<string | null>("demo-acylation");
   const [source, setSource] = useState<SourceDetail | null>(null);
-  const [sourcePage, setSourcePage] = useState(1);
   const sourceRequest = useRef(0);
   const [modal, setModal] = useState<Modal>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [uploading, setUploading] = useState(false);
   const [sourceLoading, setSourceLoading] = useState(false);
-  const uploadRef = useRef<HTMLInputElement>(null);
 
   async function reload() {
     const data = await api<Workspace>("/workspace");
@@ -92,45 +88,20 @@ function App() {
       return () => clearTimeout(id);
     }
   }, [notice]);
-  async function openSource(id: string, page = 1) {
+  async function openSource(id: string) {
     const request = ++sourceRequest.current;
     setView("sources");
     setSource(null);
-    setSourcePage(page);
     setSourceLoading(true);
     try {
       const detail = await api<SourceDetail>(`/sources/${id}`);
       if (request === sourceRequest.current) {
         setSource(detail);
-        setSourcePage(Math.max(1, Math.min(page, detail.page_count)));
       }
     } catch (e) {
       setError(errorText(e));
     } finally {
       if (request === sourceRequest.current) setSourceLoading(false);
-    }
-  }
-  async function upload(file: File | undefined) {
-    if (!file) return;
-    setUploading(true);
-    setError("");
-    try {
-      const body = new FormData();
-      body.append("file", file);
-      const uploaded = await api<{ id: string }>("/sources", {
-        method: "POST",
-        body,
-      });
-      await reload();
-      await openSource(uploaded.id);
-      setNotice(
-        "자료가 저장되었습니다. 원문을 확인하고 반응 기록을 등록하세요.",
-      );
-    } catch (e) {
-      setError(errorText(e));
-    } finally {
-      setUploading(false);
-      if (uploadRef.current) uploadRef.current.value = "";
     }
   }
   const visible = useMemo(() => {
@@ -181,10 +152,10 @@ function App() {
   const selectedReaction = visible.reactions.find((r) => r.id === selected);
   const userSources = workspace.sources.filter((s) => !s.is_demo);
   const nav = [
-    { id: "graph" as View, label: "반응 지도", icon: Network },
-    { id: "sources" as View, label: "자료 보관함", icon: BookOpen },
-    { id: "routes" as View, label: "경로 탐색", icon: GitBranch },
-    { id: "molecules" as View, label: "분자 사전", icon: Hexagon },
+    { id: "graph" as View, label: "Reaction map", icon: Network },
+    { id: "sources" as View, label: "Paper library", icon: BookOpen },
+    { id: "routes" as View, label: "Find routes", icon: GitBranch },
+    { id: "molecules" as View, label: "Molecule library", icon: Hexagon },
   ];
   return (
     <div className="app-shell">
@@ -214,7 +185,7 @@ function App() {
         >
           <span className="workspace-avatar">C</span>
           <span>
-            나의 연구실<small>Local workspace</small>
+            My lab<small>Local workspace</small>
           </span>
           <ChevronDown size={14} />
         </button>
@@ -261,16 +232,16 @@ function App() {
         <div className="sidebar-bottom">
           <div className="local-status">
             <span />
-            로컬에 저장됨<small>SQLite · 외부 AI 전송 없음</small>
+            Saved locally<small>SQLite · No external AI uploads</small>
           </div>
           <a className="export-link" href="/api/export">
             <ArrowDownToLine size={16} />
-            Markdown 내보내기
+            Export Markdown
           </a>
           <div className="profile">
-            <span>연</span>
+            <span>R</span>
             <div>
-              연구자<small>Personal workspace</small>
+              Researcher<small>Personal workspace</small>
             </div>
             <Microscope size={17} />
           </div>
@@ -279,22 +250,20 @@ function App() {
       <main className="main">
         <header className="topbar">
           <div className="breadcrumb">
-            나의 연구실<span>/</span>
+            My lab<span>/</span>
             <strong>{nav.find((n) => n.id === view)?.label}</strong>
           </div>
           <div className="topbar-right">
             <span className="version">LOCAL · v0.1</span>
             <button
               className="button small"
-              onClick={() => uploadRef.current?.click()}
-              disabled={uploading}
+              onClick={() => {
+                setView("sources");
+                setSource(null);
+              }}
             >
-              {uploading ? (
-                <LoaderCircle size={15} className="spin" />
-              ) : (
-                <Upload size={15} />
-              )}
-              자료 업로드
+              <Plus size={15} />
+              Add paper
             </button>
           </div>
         </header>
@@ -303,21 +272,21 @@ function App() {
             <div className="eyebrow">CONNECT THE CHEMISTRY</div>
             <h1>
               {view === "graph"
-                ? "아이디어가 반응으로 이어지는 곳"
+                ? "Where ideas become reactions"
                 : view === "sources"
-                  ? "모든 연결에는 근거가 있습니다"
+                  ? "A reference for every connection"
                   : view === "routes"
-                    ? "목표에서 출발점까지"
-                    : "우리 연구실의 분자 사전"}
+                    ? "From target to starting materials"
+                    : "Your molecular library"}
             </h1>
             <p>
               {view === "graph"
-                ? "분자와 반응, 그리고 그 사이의 가능성을 탐색하세요."
+                ? "Explore molecules, reactions and the possibilities between them."
                 : view === "sources"
-                  ? "논문과 실험 노트를 모으고, 원문에서 반응의 근거를 찾아보세요."
+                  ? "Keep paper citations and DOI links beside your reaction records."
                   : view === "routes"
-                    ? "기록된 반응을 연결해 가능한 합성 경로를 비교하세요."
-                    : "구조를 기준으로 분자를 연결하고, 이름과 별칭으로 찾아보세요."}
+                    ? "Connect recorded reactions and compare possible synthesis routes."
+                    : "Connect molecules by structure and find them by name or alias."}
             </p>
           </div>
           <button
@@ -327,20 +296,13 @@ function App() {
             }
           >
             <Plus size={17} />
-            {view === "molecules" ? "분자 등록" : "반응 기록"}
+            {view === "molecules" ? "Add molecule" : "Add reaction"}
           </button>
         </div>
-        <input
-          ref={uploadRef}
-          type="file"
-          accept=".pdf,.md,.txt"
-          hidden
-          onChange={(e) => upload(e.target.files?.[0])}
-        />
         {error && (
           <div className="alert error" role="alert">
             {error}
-            <button aria-label="오류 닫기" onClick={() => setError("")}>
+            <button aria-label="Dismiss error" onClick={() => setError("")}>
               <X size={16} />
             </button>
           </div>
@@ -354,41 +316,41 @@ function App() {
         {loading ? (
           <div className="loading">
             <LoaderCircle className="spin" />
-            워크스페이스를 불러오는 중
+            Loading workspace
           </div>
         ) : (
           <>
             <div className="stats-row">
               <Stat
-                label="분자"
+                label="Molecules"
                 value={
                   workspace.molecules.filter((m) => showDemo || !m.is_demo)
                     .length
                 }
                 icon={<Hexagon size={18} />}
-                note="구조로 연결된 지식"
+                note="Connected by chemical structure"
               />
               <Stat
-                label="반응 기록"
+                label="Reaction records"
                 value={
                   workspace.reactions.filter((r) => showDemo || !r.is_demo)
                     .length
                 }
                 icon={<FlaskConical size={18} />}
-                note="조건과 근거를 함께"
+                note="Conditions with references"
               />
               <Stat
-                label="업로드한 자료"
+                label="References"
                 value={userSources.length}
                 icon={<FileText size={18} />}
-                note="논문 · 실험 노트"
+                note="Citations and DOI links"
               />
               <div className="insight">
                 <Sparkles size={20} />
                 <div>
-                  작은 발견을 연결해
+                  Connect small discoveries
                   <br />
-                  <strong>다음 반응의 실마리로.</strong>
+                  <strong>Find your next reaction.</strong>
                 </div>
                 <span className="insight-orbit">⌬</span>
               </div>
@@ -401,7 +363,7 @@ function App() {
                       className={category === "all" ? "selected" : ""}
                       onClick={() => setCategory("all")}
                     >
-                      전체 반응
+                      All reactions
                     </button>
                     {Object.entries(categories).map(([id, c]) => (
                       <button
@@ -420,11 +382,11 @@ function App() {
                   {workspace.sources.some((s) => s.doi) && (
                     <select
                       className="paper-select"
-                      aria-label="논문 필터"
+                      aria-label="Paper filter"
                       value={paperFilter}
                       onChange={(e) => setPaperFilter(e.target.value)}
                     >
-                      <option value="all">모든 논문</option>
+                      <option value="all">All papers</option>
                       {workspace.sources
                         .filter((s) => s.doi && s.document_role === "main")
                         .map((s) => (
@@ -437,7 +399,7 @@ function App() {
                   <SearchBox
                     value={search}
                     onChange={setSearch}
-                    placeholder="분자, 반응, SMILES 검색"
+                    placeholder="Search molecules, reactions, SMILES"
                   />
                 </div>
                 <div className="graph-workspace">
@@ -453,7 +415,7 @@ function App() {
                           checked={showDemo}
                           onChange={(e) => setShowDemo(e.target.checked)}
                         />
-                        데모 포함
+                        Include demos
                       </label>
                     </div>
                     {visible.molecules.length ? (
@@ -468,17 +430,17 @@ function App() {
                         icon={<Network size={32} />}
                         title={
                           search
-                            ? "검색 결과가 없습니다"
-                            : "첫 번째 연결을 만들어보세요"
+                            ? "No matching results"
+                            : "Create your first connection"
                         }
-                        text="자료를 업로드하고 분자와 반응을 등록하면 지도가 만들어집니다."
+                        text="Add molecules and reaction records to build your map."
                         action={
                           <button
                             className="button"
                             onClick={() => setModal({ kind: "molecule" })}
                           >
                             <Plus size={15} />
-                            분자 등록
+                            Add molecule
                           </button>
                         }
                       />
@@ -490,7 +452,7 @@ function App() {
                         <span className="dot-separator">·</span>
                         {visible.reactions.length} reactions
                       </span>
-                      <span>드래그로 이동 · 스크롤로 확대</span>
+                      <span>Drag to pan · Scroll to zoom</span>
                     </div>
                   </section>
                   <aside className="inspector">
@@ -516,16 +478,16 @@ function App() {
                     ) : (
                       <Empty
                         icon={<Layers3 size={28} />}
-                        title="연결 속 이야기를 살펴보세요"
-                        text="지도에서 분자나 반응을 선택하면 구조, 조건과 원문 근거가 표시됩니다."
+                        title="Explore a connection"
+                        text="Select a molecule or reaction to see its structure, conditions and DOI references."
                       />
                     )}
                   </aside>
                 </div>
                 <div className="footnote">
                   <BookOpen size={14} />
-                  데모는 제품 사용 예시입니다. 실제 합성 조건과 수율은 논문·실험
-                  기록을 검토해 등록하세요.
+                  Demo records illustrate the app. Check the literature or your
+                  experimental records before entering conditions and yields.
                 </div>
               </>
             )}
@@ -534,17 +496,12 @@ function App() {
                 workspace={workspace}
                 source={source}
                 loading={sourceLoading}
-                initialPage={sourcePage}
                 onOpen={openSource}
                 onBack={() => setSource(null)}
-                onUpload={() => uploadRef.current?.click()}
-                uploading={uploading}
-                onDrop={upload}
-                onUse={(evidence) => setModal({ kind: "reaction", evidence })}
                 onUpdated={async (detail) => {
                   setSource(detail);
                   await reload();
-                  setNotice("서지 정보가 저장되었습니다.");
+                  setNotice("Reference saved.");
                 }}
               />
             )}
@@ -552,12 +509,13 @@ function App() {
               <>
                 <div className="section-toolbar">
                   <h2>
-                    등록된 분자 <span>{workspace.molecules.length}</span>
+                    Registered molecules{" "}
+                    <span>{workspace.molecules.length}</span>
                   </h2>
                   <SearchBox
                     value={search}
                     onChange={setSearch}
-                    placeholder="이름 · 별칭 · SMILES 검색"
+                    placeholder="Search names, aliases, SMILES"
                   />
                 </div>
                 <div className="molecule-grid">
@@ -586,10 +544,10 @@ function App() {
                         </div>
                         <img
                           src={`/api/molecules/${m.id}/svg`}
-                          alt={`${m.name} 구조식`}
+                          alt={`${m.name} structure`}
                         />
                         <h3>{m.name}</h3>
-                        <p>{m.aliases.join(" · ") || "별칭 없음"}</p>
+                        <p>{m.aliases.join(" · ") || "No aliases"}</p>
                         <footer>
                           <span>{m.molecular_weight} g/mol</span>
                           <ArrowRight size={16} />
@@ -599,8 +557,8 @@ function App() {
                 </div>
                 {!workspace.molecules.length && (
                   <Empty
-                    title="분자를 등록해보세요"
-                    text="SMILES를 입력하면 구조와 식별자가 생성됩니다."
+                    title="Add your first molecule"
+                    text="Enter a SMILES string to generate a structure and identifiers."
                   />
                 )}
               </>
@@ -625,10 +583,10 @@ function App() {
         <ModalShell
           title={
             modal.kind === "molecule"
-              ? "분자 등록"
+              ? "Add molecule"
               : modal.reaction
-                ? "반응 기록 수정"
-                : "새로운 반응 기록"
+                ? "Edit reaction record"
+                : "New reaction record"
           }
           onClose={() => setModal(null)}
         >
@@ -637,7 +595,7 @@ function App() {
               onSaved={async () => {
                 await reload();
                 setModal(null);
-                setNotice("분자가 사전에 등록되었습니다.");
+                setNotice("Molecule added to the library.");
               }}
             />
           ) : (
@@ -657,7 +615,7 @@ function App() {
                 setPaperFilter("all");
                 setShowDemo(true);
                 setView("graph");
-                setNotice("반응 기록이 저장되었습니다.");
+                setNotice("Reaction record saved.");
               }}
             />
           )}
@@ -708,7 +666,7 @@ function SearchBox({
         aria-label={placeholder}
       />
       {value && (
-        <button onClick={() => onChange("")} aria-label="검색 초기화">
+        <button onClick={() => onChange("")} aria-label="Clear search">
           <X size={14} />
         </button>
       )}
@@ -736,7 +694,7 @@ function Empty({
   );
 }
 function DemoBadge() {
-  return <span className="badge demo">DEMO · 실험 미검증</span>;
+  return <span className="badge demo">DEMO · Not experimentally verified</span>;
 }
 function ReactionDetail({
   reaction: r,
@@ -772,14 +730,14 @@ function ReactionDetail({
             <span
               className={`badge ${r.status === "reviewed" ? "reviewed" : ""}`}
             >
-              {r.status === "reviewed" ? "기록 검토 완료" : "검토 전 초안"}
+              {r.status === "reviewed" ? "Record reviewed" : "Draft"}
             </span>
           )}
-          <span className="muted">{r.evidence.length}개 근거</span>
+          <span className="muted">{r.evidence.length} references</span>
         </div>
       </div>
       <div className="inspector-section">
-        <h4>반응 연결</h4>
+        <h4>Reaction participants</h4>
         <div className="reaction-equation">
           {r.reactants.map((id, i) => (
             <React.Fragment key={id}>
@@ -802,8 +760,10 @@ function ReactionDetail({
         </div>
       </div>
       <div className="inspector-section">
-        <h4>실험 조건</h4>
-        {r.reagents && <p className="detail-note">시약·촉매: {r.reagents}</p>}
+        <h4>Experimental conditions</h4>
+        {r.reagents && (
+          <p className="detail-note">Reagents and catalysts: {r.reagents}</p>
+        )}
         <dl className="conditions">
           {Object.entries(r.conditions)
             .filter(([, v]) => v)
@@ -814,51 +774,73 @@ function ReactionDetail({
               </div>
             ))}
           <div>
-            <dt>수율</dt>
+            <dt>Yield</dt>
             <dd>
-              {r.yield_percent == null ? "미기재" : `${r.yield_percent}%`}
+              {r.yield_percent == null ? "Not reported" : `${r.yield_percent}%`}
             </dd>
           </div>
         </dl>
         {!Object.values(r.conditions).some(Boolean) && (
-          <p className="subtle-text">원문을 검토해 조건을 등록하세요.</p>
+          <p className="subtle-text">
+            Check the referenced paper and enter its reported conditions.
+          </p>
         )}
       </div>
       <div className="inspector-section">
         <h4>
-          원문 근거 <span>{r.evidence.length}</span>
+          References <span>{r.evidence.length}</span>
         </h4>
-        {r.evidence.map((e, i) => (
-          <button
-            className="evidence-card"
-            key={i}
-            onClick={() => onSource(e.source_id, e.page)}
-          >
-            <div>
-              <FileText size={14} />
-              {workspace.sources.find((s) => s.id === e.source_id)?.title}
-              <ExternalLink size={12} />
-            </div>
-            <blockquote>{e.quote}</blockquote>
-            <small>
-              PDF p.{e.page} {e.locator && `· ${e.locator}`} · 원문 열기{" "}
-              <ArrowRight size={12} />
-            </small>
-          </button>
-        ))}
+        {r.evidence.map((e, i) => {
+          const reference = workspace.sources.find((s) => s.id === e.source_id);
+          const content = (
+            <>
+              <div>
+                <BookOpen size={14} />
+                {reference?.title}
+                <ExternalLink size={12} />
+              </div>
+              <small>
+                PDF p.{e.page}
+                {e.locator && ` · ${e.locator}`}
+              </small>
+              <span className="source-doi">
+                {reference?.doi || "Reference metadata"}
+              </span>
+            </>
+          );
+          return reference?.doi ? (
+            <a
+              className="evidence-card"
+              key={i}
+              href={doiUrl(reference.doi)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {content}
+            </a>
+          ) : (
+            <button
+              className="evidence-card"
+              key={i}
+              onClick={() => onSource(e.source_id)}
+            >
+              {content}
+            </button>
+          );
+        })}
         {!r.evidence.length && (
-          <p className="subtle-text">아직 연결된 근거가 없습니다.</p>
+          <p className="subtle-text">No references linked yet.</p>
         )}
       </div>
       {r.notes && (
         <div className="inspector-section">
-          <h4>연구 노트</h4>
+          <h4>Research notes</h4>
           <p className="detail-note">{r.notes}</p>
         </div>
       )}
       <div className="inspector-action">
         <button className="button full" onClick={onEdit}>
-          반응 기록 수정
+          Edit reaction record
           <ArrowRight size={15} />
         </button>
       </div>
@@ -884,7 +866,7 @@ function MoleculeDetail({
         <Hexagon size={17} />
       </div>
       <div className="molecule-hero">
-        <img src={`/api/molecules/${m.id}/svg`} alt={`${m.name} 구조식`} />
+        <img src={`/api/molecules/${m.id}/svg`} alt={`${m.name} structure`} />
         <h2>{m.name}</h2>
         <p>{m.aliases.join(" · ")}</p>
         {m.is_demo && <DemoBadge />}
@@ -892,15 +874,15 @@ function MoleculeDetail({
       <div className="inspector-section">
         <dl className="conditions">
           <div>
-            <dt>분자식</dt>
+            <dt>Formula</dt>
             <dd>{m.formula}</dd>
           </div>
           <div>
-            <dt>분자량</dt>
+            <dt>Molecular weight</dt>
             <dd>{m.molecular_weight} g/mol</dd>
           </div>
           <div>
-            <dt>확보 상태</dt>
+            <dt>Availability</dt>
             <dd>{availability[m.availability]}</dd>
           </div>
         </dl>
@@ -911,7 +893,7 @@ function MoleculeDetail({
       </div>
       <div className="inspector-section">
         <h4>
-          연결된 반응 <span>{related.length}</span>
+          Linked reactions <span>{related.length}</span>
         </h4>
         {related.map((r) => (
           <button
@@ -930,7 +912,7 @@ function MoleculeDetail({
       </div>
       {m.notes && (
         <div className="inspector-section">
-          <h4>노트</h4>
+          <h4>Notes</h4>
           <p className="detail-note">{m.notes}</p>
         </div>
       )}
@@ -944,11 +926,6 @@ function Sources({
   loading,
   onOpen,
   onBack,
-  onUpload,
-  uploading,
-  onDrop,
-  onUse,
-  initialPage,
   onUpdated,
 }: {
   workspace: Workspace;
@@ -956,46 +933,41 @@ function Sources({
   loading: boolean;
   onOpen: (id: string) => void;
   onBack: () => void;
-  onUpload: () => void;
-  uploading: boolean;
-  onDrop: (file: File | undefined) => void;
-  onUse: (evidence: Evidence) => void;
-  initialPage: number;
   onUpdated: (source: SourceDetail) => Promise<void>;
 }) {
-  const [page, setPage] = useState(1);
-  const [tab, setTab] = useState<"pages" | "candidates">("pages");
-  const [query, setQuery] = useState("");
-  const [editingMetadata, setEditingMetadata] = useState(false);
-  useEffect(() => {
-    setPage(initialPage);
-    setTab("pages");
-    setQuery("");
-    setEditingMetadata(false);
-  }, [source?.id, initialPage]);
-  const matches = useMemo(() => {
-    const term = query.trim().toLowerCase();
-    if (!source || !term) return [];
-    return source.pages.flatMap((p) => {
-      const index = p.text.toLowerCase().indexOf(term);
-      return index < 0
-        ? []
-        : [
-            {
-              page: p.number,
-              snippet: p.text.slice(
-                Math.max(0, index - 90),
-                index + term.length + 160,
-              ),
-            },
-          ];
-    });
-  }, [source, query]);
+  const [editing, setEditing] = useState(false);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => setEditing(false), [source?.id]);
+  async function addReference(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    setBusy(true);
+    setError("");
+    try {
+      const created = await api<SourceDetail>(
+        "/references",
+        json({
+          title: data.get("title"),
+          doi: data.get("doi"),
+          citation: data.get("citation"),
+          document_role: "main",
+        }),
+      );
+      await onUpdated(created);
+      form.reset();
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  }
   if (loading)
     return (
       <div className="loading">
         <LoaderCircle className="spin" />
-        자료를 불러오는 중
+        Loading reference
       </div>
     );
   if (source)
@@ -1004,39 +976,36 @@ function Sources({
         <div className="section-toolbar">
           <button className="text-button" onClick={onBack}>
             <ArrowLeft size={16} />
-            자료 목록
+            All papers
           </button>
-          <a
-            className="button small"
-            href={`/api/sources/${source.id}/file#page=${page}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <ExternalLink size={14} />
-            원본 열기
-          </a>
+          {source.doi && (
+            <a
+              className="button primary small"
+              href={doiUrl(source.doi)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ExternalLink size={14} />
+              Open DOI
+            </a>
+          )}
         </div>
         <div className="source-heading">
           <span className="document-icon">
-            <FileText size={24} />
+            <BookOpen size={24} />
           </span>
           <div>
             <h2>{source.title}</h2>
-            <p>
-              {source.page_count} pages ·{" "}
-              {source.text_characters.toLocaleString()}자 추출{" "}
-              {source.is_demo && "· 데모 자료"}
-            </p>
-            {source.citation && <p>{source.citation}</p>}
+            <p>{source.citation || "Citation not provided"}</p>
             {source.doi && (
               <a
                 className="source-doi"
-                href={`https://doi.org/${source.doi}`}
+                href={doiUrl(source.doi)}
                 target="_blank"
                 rel="noreferrer"
               >
-                DOI: {source.doi}
-                <ExternalLink size={11} />
+                {source.doi}
+                <ExternalLink size={12} />
               </a>
             )}
           </div>
@@ -1045,26 +1014,18 @@ function Sources({
           <span className="badge">
             {documentRoles[source.document_role || "other"]}
           </span>
-          <button
-            className="text-button"
-            onClick={() => setEditingMetadata(!editingMetadata)}
-          >
-            {editingMetadata ? "서지 정보 접기" : "서지 정보 편집"}
+          <button className="text-button" onClick={() => setEditing(!editing)}>
+            {editing ? "Close editor" : "Edit reference"}
           </button>
-          <SearchBox
-            value={query}
-            onChange={setQuery}
-            placeholder="자료 안에서 찾기"
-          />
         </div>
-        {editingMetadata && (
+        {editing && (
           <SourceMetadataForm
             key={source.id}
             source={source}
             sources={workspace.sources}
             onSaved={async (detail) => {
               await onUpdated(detail);
-              setEditingMetadata(false);
+              setEditing(false);
             }}
           />
         )}
@@ -1076,210 +1037,131 @@ function Sources({
         )}
         {!!source.related_source_ids?.length && (
           <div className="linked-sources">
-            <span>같은 논문 자료</span>
+            <span>Related references</span>
             {source.related_source_ids.map((id) => (
               <button key={id} onClick={() => onOpen(id)}>
-                <FileText size={13} />
                 {workspace.sources.find((s) => s.id === id)?.title}
                 <ArrowRight size={12} />
               </button>
             ))}
           </div>
         )}
-        {query.trim() && (
-          <div className="source-search-results">
-            <h4>검색된 페이지 {matches.length}개</h4>
-            {matches.slice(0, 50).map((match) => (
-              <button
-                key={match.page}
-                onClick={() => {
-                  setPage(match.page);
-                  setTab("pages");
-                  setQuery("");
-                }}
-              >
-                <strong>PDF p.{match.page}</strong>
-                <span>{match.snippet}</span>
-                <ArrowRight size={14} />
-              </button>
-            ))}
-            {!matches.length && (
-              <p className="subtle-text">
-                추출 텍스트에서 일치하는 내용이 없습니다. 그림 안의 문자는 원본
-                PDF에서 확인하세요.
+        <h3>Linked reactions</h3>
+        {workspace.reactions
+          .filter((r) => r.evidence.some((e) => e.source_id === source.id))
+          .map((r) => (
+            <article className="candidate-card" key={r.id}>
+              <h3>{r.name}</h3>
+              <span className="badge">
+                {r.status === "reviewed" ? "Record reviewed" : "Draft"}
+              </span>
+              <p>
+                {r.evidence
+                  .filter((e) => e.source_id === source.id)
+                  .map(
+                    (e) =>
+                      `PDF p.${e.page}${e.locator ? ` · ${e.locator}` : ""}`,
+                  )
+                  .join("; ")}
               </p>
-            )}
-          </div>
-        )}
-        {source.text_characters < 40 && (
-          <div className="alert">
-            추출 가능한 텍스트가 거의 없습니다. 스캔 PDF는 OCR 처리한 파일을
-            올리거나 Markdown 실험 노트로 보완하세요.
-          </div>
-        )}
-        <div className="reader-tabs">
-          <button
-            className={tab === "pages" ? "selected" : ""}
-            onClick={() => setTab("pages")}
-          >
-            페이지 원문
-          </button>
-          <button
-            className={tab === "candidates" ? "selected" : ""}
-            onClick={() => setTab("candidates")}
-          >
-            반응 관련 후보 문장 <span>{source.candidates.length}</span>
-          </button>
-        </div>
-        <p className="reader-hint">
-          텍스트 추출과 키워드 탐색 결과입니다. 구조·조건은 원문을 검토해 반응
-          기록에 입력하세요.
-        </p>
-        {tab === "pages" ? (
-          <>
-            <div className="page-controls">
-              <label>
-                페이지{" "}
-                <select
-                  aria-label="원문 페이지"
-                  value={page}
-                  onChange={(e) => setPage(Number(e.target.value))}
-                >
-                  {source.pages.map((p) => (
-                    <option key={p.number} value={p.number}>
-                      {p.number}
-                    </option>
-                  ))}
-                </select>{" "}
-                / {source.page_count}
-              </label>
-              <button
-                className="button small"
-                disabled={!source.pages[page - 1]?.text.trim()}
-                onClick={() =>
-                  onUse({
-                    source_id: source.id,
-                    page,
-                    quote: source.pages[page - 1].text.slice(0, 10000),
-                  })
-                }
-              >
-                <Plus size={14} />이 페이지로 반응 기록
-              </button>
-            </div>
-            <pre className="source-text">
-              {source.pages[page - 1]?.text ||
-                "이 페이지에서 텍스트를 추출하지 못했습니다."}
-            </pre>
-          </>
-        ) : (
-          <div className="candidate-list">
-            {source.candidates.map((c, i) => (
-              <article className="candidate-card" key={i}>
-                <div className="eyebrow">PAGE {c.page} · 검토 필요</div>
-                <p>{c.text}</p>
-                <button
-                  className="button small"
-                  onClick={() =>
-                    onUse({ source_id: source.id, page: c.page, quote: c.text })
-                  }
-                >
-                  반응 기록에 사용
-                  <ArrowRight size={14} />
-                </button>
-              </article>
-            ))}
-            {!source.candidates.length && (
-              <Empty
-                title="자동 탐색된 후보 문장이 없습니다"
-                text="페이지 원문에서 문장을 확인해 수동으로 기록할 수 있습니다."
-              />
-            )}
-          </div>
-        )}
+            </article>
+          ))}
       </div>
     );
+  const papers = workspace.sources.filter((s) => !s.is_demo);
   return (
     <>
-      <div
-        className="upload-zone"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault();
-          if (!uploading) onDrop(e.dataTransfer.files[0]);
-        }}
-      >
-        <div className="upload-icon">
-          {uploading ? (
-            <LoaderCircle className="spin" size={25} />
-          ) : (
-            <Upload size={25} />
-          )}
+      <form className="source-metadata-form" onSubmit={addReference}>
+        <h2>Add a paper by DOI</h2>
+        <p className="subtle-text">
+          Keep citations and reaction links together. No PDF download required.
+        </p>
+        <div className="form-grid">
+          <label>
+            Paper title
+            <input
+              name="title"
+              required
+              maxLength={500}
+              placeholder="Author, year or article title"
+            />
+          </label>
+          <label>
+            DOI or DOI URL
+            <input
+              name="doi"
+              required
+              maxLength={200}
+              placeholder="https://doi.org/10.1038/nature17431"
+            />
+          </label>
         </div>
-        <h2>
-          {uploading
-            ? "자료에서 텍스트를 추출하고 있습니다"
-            : "다음 발견의 시작, 자료 한 편"}
-        </h2>
-        <p>논문 PDF, Supporting Information, 실험 노트를 끌어다 놓으세요.</p>
-        <button
-          className="button primary"
-          disabled={uploading}
-          onClick={onUpload}
-        >
-          <Plus size={16} />
-          파일 선택
+        <label>
+          Citation
+          <input
+            name="citation"
+            maxLength={2000}
+            placeholder="Authors · year · journal · pages"
+          />
+        </label>
+        {error && (
+          <div className="alert error" role="alert">
+            {error}
+          </div>
+        )}
+        <button className="button primary small" disabled={busy}>
+          {busy ? (
+            <LoaderCircle size={15} className="spin" />
+          ) : (
+            <Plus size={15} />
+          )}
+          Add reference
         </button>
-        <small>PDF · MD · TXT / 파일당 최대 20 MB / 로컬 저장</small>
-      </div>
+      </form>
       <div className="section-toolbar">
         <h2>
-          자료 목록 <span>{workspace.sources.length}</span>
+          Paper library <span>{papers.length}</span>
         </h2>
-        <span className="subtle-text">
-          각 파일의 원문과 페이지를 보존합니다
-        </span>
+        <span className="subtle-text">DOI links and citations</span>
       </div>
-      <div className="source-list">
-        {workspace.sources.map((s) => (
-          <button
-            className="source-row"
-            key={s.id}
-            onClick={() => onOpen(s.id)}
-          >
+      <div className="source-grid">
+        {papers.map((s) => (
+          <article className="source-card" key={s.id}>
             <span className="document-icon">
-              <FileText size={21} />
+              <BookOpen size={23} />
             </span>
-            <div>
-              <strong>{s.title}</strong>
-              <small>
-                {s.filename} · {s.page_count} pages ·{" "}
-                {s.text_characters.toLocaleString()}자
-              </small>
-              {s.doi && (
-                <small className="source-citation">
-                  {documentRoles[s.document_role || "other"]} ·{" "}
-                  {s.citation || s.doi}
-                </small>
-              )}
-            </div>
-            {s.is_demo ? (
-              <DemoBadge />
-            ) : (
-              <span
-                className={`badge ${s.text_characters > 40 ? "reviewed" : ""}`}
+            <h3>{s.title}</h3>
+            <p>{s.citation || "Citation not provided"}</p>
+            <span className="badge">
+              {documentRoles[s.document_role || "other"]}
+            </span>
+            {s.doi && (
+              <a
+                className="source-doi"
+                href={doiUrl(s.doi)}
+                target="_blank"
+                rel="noreferrer"
               >
-                {s.text_characters > 40 ? "텍스트 추출 완료" : "OCR 필요"}
-              </span>
+                {s.doi}
+                <ExternalLink size={12} />
+              </a>
             )}
-            <ArrowRight size={17} />
-          </button>
+            <button className="text-button" onClick={() => onOpen(s.id)}>
+              Reference details
+              <ArrowRight size={14} />
+            </button>
+          </article>
         ))}
       </div>
+      {!papers.length && (
+        <Empty
+          title="Start your paper library"
+          text="Add a DOI to connect a paper to your reaction records."
+        />
+      )}
     </>
   );
 }
-
 function RouteExplorer({
   workspace,
   onSelect,
@@ -1369,9 +1251,9 @@ function RouteExplorer({
           <GitBranch size={25} />
         </div>
         <label>
-          목표 생성물
+          Target product
           <select
-            aria-label="목표 생성물"
+            aria-label="Target product"
             value={target}
             onChange={(e) => {
               setTarget(e.target.value);
@@ -1380,20 +1262,20 @@ function RouteExplorer({
             required
           >
             <option value="" disabled>
-              분자를 선택하세요
+              Select a molecule
             </option>
             {workspace.molecules.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}
-                {m.is_demo ? " · 데모" : ""}
+                {m.is_demo ? " · Demo" : ""}
               </option>
             ))}
           </select>
         </label>
         <label>
-          최대 반응 단계
+          Maximum steps
           <select
-            aria-label="최대 반응 단계"
+            aria-label="Maximum steps"
             value={steps}
             onChange={(e) => {
               setSteps(Number(e.target.value));
@@ -1402,7 +1284,7 @@ function RouteExplorer({
           >
             {[1, 2, 3, 4, 5, 6].map((n) => (
               <option key={n} value={n}>
-                {n} 단계
+                {n} steps
               </option>
             ))}
           </select>
@@ -1416,7 +1298,7 @@ function RouteExplorer({
               setRoutes(null);
             }}
           />
-          검토 전 초안 포함
+          Include drafts
         </label>
         <button className="button primary" disabled={busy || !target}>
           {busy ? (
@@ -1424,24 +1306,24 @@ function RouteExplorer({
           ) : (
             <Search size={16} />
           )}
-          경로 탐색
+          Find routes
         </button>
       </form>
       {error && <div className="alert error">{error}</div>}
       {routes === null ? (
         <Empty
           icon={<GitBranch size={36} />}
-          title="목표 분자에서 거슬러 올라가세요"
-          text="기록된 반응을 연결하고, 필요한 모든 출발물질 가지를 함께 보여줍니다."
+          title="Work backwards from a target"
+          text="Connect recorded reactions with every required starting material branch."
         />
       ) : (
         <>
           <div className="section-toolbar">
             <h2>
-              후보 경로 <span>{routes.length}</span>
+              Candidate routes <span>{routes.length}</span>
             </h2>
             <span className="subtle-text">
-              확보 상태 미확인 수 → 단계 수 순
+              Sorted by unknown availability, then steps
             </span>
           </div>
           <div className="alert">
@@ -1456,19 +1338,19 @@ function RouteExplorer({
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <strong>{name(route.molecule_id)}</strong>
-                  <span className="badge">{route.steps} 단계</span>
+                  <span className="badge">{route.steps} steps</span>
                 </div>
                 <div>
                   {route.is_demo && <DemoBadge />}
                   {route.contains_drafts && (
-                    <span className="badge">초안 포함</span>
+                    <span className="badge">Contains drafts</span>
                   )}
                 </div>
               </header>
               {tree(route)}
               <footer>
                 <div>
-                  <strong>필요 출발물질</strong>
+                  <strong>Required starting materials</strong>
                   {route.starting_materials.map(name).join(" · ")}
                 </div>
                 <span
@@ -1479,16 +1361,16 @@ function RouteExplorer({
                   }
                 >
                   {route.unknown_availability.length
-                    ? `구매·재고 미확인 ${route.unknown_availability.length}종`
-                    : "사용자 입력상 확보 가능"}
+                    ? `Availability unknown ${route.unknown_availability.length} materials`
+                    : "Available according to your inventory"}
                 </span>
               </footer>
             </article>
           ))}
           {!routes.length && (
             <Empty
-              title="연결된 경로가 없습니다"
-              text="이 생성물을 만드는 반응을 등록하거나, 초안 포함 여부와 최대 단계를 확인하세요."
+              title="No connected routes"
+              text="Add a reaction for this product, or adjust the draft filter and step limit."
             />
           )}
         </>
@@ -1564,7 +1446,7 @@ function ModalShell({
           <button
             ref={closeRef}
             className="icon-button"
-            aria-label="창 닫기"
+            aria-label="Close dialog"
             onClick={onClose}
           >
             <X size={21} />
@@ -1608,13 +1490,14 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
   return (
     <form className="edit-form" onSubmit={submit}>
       <p className="form-intro">
-        SMILES를 입력하면 RDKit이 구조를 검증하고 분자식·식별자를 만듭니다.
+        RDKit validates the SMILES string and generates a formula and
+        identifiers.
       </p>
       <label>
-        분자 이름
+        Molecule name
         <input
           name="name"
-          placeholder="예: Benzaldehyde"
+          placeholder="e.g. Benzaldehyde"
           required
           maxLength={200}
         />
@@ -1624,19 +1507,22 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
         <input
           name="smiles"
           className="mono"
-          placeholder="예: O=Cc1ccccc1"
+          placeholder="e.g. O=Cc1ccccc1"
           required
           maxLength={2000}
         />
-        <small>입체화학을 포함한 구조를 기준으로 중복을 확인합니다.</small>
+        <small>
+          Duplicates are checked by chemical structure, including
+          stereochemistry.
+        </small>
       </label>
       <div className="form-grid">
         <label>
-          별칭
-          <input name="aliases" placeholder="쉼표로 구분: 벤즈알데하이드" />
+          Aliases
+          <input name="aliases" placeholder="Comma-separated synonyms" />
         </label>
         <label>
-          확보 상태
+          Availability
           <select name="availability" defaultValue="unknown">
             {Object.entries(availability).map(([id, label]) => (
               <option value={id} key={id}>
@@ -1647,11 +1533,11 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
         </label>
       </div>
       <label>
-        연구 노트
+        Research notes
         <textarea
           name="notes"
           rows={3}
-          placeholder="재고 위치, 공급사, 구조 관련 메모 등"
+          placeholder="Stock location, supplier or structural notes"
         />
       </label>
       {error && (
@@ -1660,50 +1546,60 @@ function MoleculeForm({ onSaved }: { onSaved: () => Promise<void> }) {
         </div>
       )}
       <footer>
-        <span className="subtle-text">새 분자는 데모와 별도로 저장됩니다.</span>
+        <span className="subtle-text">
+          New molecules are saved in your workspace.
+        </span>
         <button className="button primary" disabled={busy}>
           {busy ? (
             <LoaderCircle className="spin" size={16} />
           ) : (
             <Check size={16} />
           )}
-          분자 저장
+          Save molecule
         </button>
       </footer>
     </form>
   );
 }
 const conditionFields: Record<Category, string[]> = {
-  organic: ["용매", "농도", "온도", "시간", "분위기", "반응 규모", "정제"],
+  organic: [
+    "Solvent",
+    "Concentration",
+    "Temperature",
+    "Time",
+    "Atmosphere",
+    "Scale",
+    "Purification",
+  ],
   electrochemical: [
-    "용매",
-    "농도",
-    "온도",
-    "시간",
-    "분위기",
-    "반응 규모",
-    "정제",
-    "양극",
-    "음극",
-    "전해질",
-    "전위·기준전극",
-    "전류밀도",
-    "전하량",
-    "셀 구성",
+    "Solvent",
+    "Concentration",
+    "Temperature",
+    "Time",
+    "Atmosphere",
+    "Scale",
+    "Purification",
+    "Anode",
+    "Cathode",
+    "Electrolyte",
+    "Potential and reference electrode",
+    "Current density",
+    "Charge",
+    "Cell setup",
   ],
   photochemical: [
-    "용매",
-    "농도",
-    "온도",
-    "시간",
-    "분위기",
-    "반응 규모",
-    "정제",
-    "파장",
-    "광원",
-    "출력·광자속",
-    "조사 시간",
-    "반응기",
+    "Solvent",
+    "Concentration",
+    "Temperature",
+    "Time",
+    "Atmosphere",
+    "Scale",
+    "Purification",
+    "Wavelength",
+    "Light source",
+    "Power or photon flux",
+    "Irradiation time",
+    "Reactor",
   ],
 };
 function ReactionForm({
@@ -1730,7 +1626,7 @@ function ReactionForm({
   );
   const [sourceId, setSourceId] = useState("");
   const [page, setPage] = useState(1);
-  const [quote, setQuote] = useState("");
+  const [locator, setLocator] = useState("");
   const [sourceDetail, setSourceDetail] = useState<SourceDetail | null>(null);
   const [conditions, setConditions] = useState<Record<string, string>>(
     initial?.conditions || {},
@@ -1741,7 +1637,7 @@ function ReactionForm({
     let active = true;
     setSourceDetail(null);
     setPage(1);
-    setQuote("");
+    setLocator("");
     if (sourceId)
       api<SourceDetail>(`/sources/${sourceId}`)
         .then((s) => {
@@ -1778,19 +1674,19 @@ function ReactionForm({
           ))}
         </div>
         <select
-          aria-label={`${label} 추가`}
+          aria-label={`Add ${label}`}
           value=""
           onChange={(e) => {
             if (e.target.value) change([...selected, e.target.value]);
           }}
         >
-          <option value="">분자 선택 · 여러 개 추가 가능</option>
+          <option value="">Select a molecule · multiple allowed</option>
           {workspace.molecules
             .filter((m) => !selected.includes(m.id))
             .map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}
-                {m.is_demo ? " · 데모" : ""}
+                {m.is_demo ? " · Demo" : ""}
               </option>
             ))}
         </select>
@@ -1801,7 +1697,7 @@ function ReactionForm({
     e.preventDefault();
     setError("");
     if (!reactants.length || !products.length) {
-      setError("반응물과 생성물을 각각 한 개 이상 선택하세요.");
+      setError("Select at least one reactant and one product.");
       return;
     }
     const data = new FormData(e.currentTarget);
@@ -1839,24 +1735,24 @@ function ReactionForm({
     <>
       <form className="edit-form" onSubmit={submit}>
         <p className="form-intro">
-          원문에 보고된 값과 단위를 입력하세요. 미기재 값은 빈칸으로 남길 수
-          있습니다.
+          Enter the values and units reported in the paper. Leave unreported
+          values blank.
         </p>
         <div className="form-grid">
           <label>
-            반응 이름 *
+            Reaction name *
             <input
               name="name"
               required
               defaultValue={initial?.name}
-              placeholder="예: 알코올의 광촉매 산화"
+              placeholder="e.g. Photocatalytic alcohol oxidation"
               maxLength={200}
             />
           </label>
           <label>
-            방법론
+            Method
             <select
-              aria-label="방법론"
+              aria-label="Method"
               value={category}
               onChange={(e) => setCategory(e.target.value as Category)}
             >
@@ -1869,28 +1765,29 @@ function ReactionForm({
           </label>
         </div>
         <div className="form-section-title">
-          <h3>분자 연결</h3>
+          <h3>Molecule connections</h3>
           <button
             className="text-button"
             type="button"
             onClick={() => setAddingMolecule(true)}
           >
-            <Plus size={13} />새 분자 등록
+            <Plus size={13} />
+            Add new molecule
           </button>
         </div>
         <div className="form-grid">
-          {participant("반응물", reactants, setReactants)}
-          {participant("생성물", products, setProducts)}
+          {participant("Reactants", reactants, setReactants)}
+          {participant("Products", products, setProducts)}
         </div>
         <label>
-          시약·촉매
+          Reagents and catalysts
           <input
             name="reagents"
             defaultValue={initial?.reagents}
-            placeholder="물질명, 당량, 촉매 사용량 등"
+            placeholder="Names, equivalents and catalyst loading"
           />
         </label>
-        <h3 className="form-section-title">실험 조건</h3>
+        <h3 className="form-section-title">Experimental conditions</h3>
         <div className="form-grid conditions-inputs">
           {fields.map((field) => (
             <label key={field}>
@@ -1900,14 +1797,14 @@ function ReactionForm({
                 onChange={(e) =>
                   setConditions({ ...conditions, [field]: e.target.value })
                 }
-                placeholder="미기재 · 단위 포함"
+                placeholder="Not reported · include units"
               />
             </label>
           ))}
         </div>
         <div className="form-grid">
           <label>
-            수율 (%)
+            Yield (%)
             <input
               type="number"
               min="0"
@@ -1915,22 +1812,26 @@ function ReactionForm({
               step="any"
               name="yield"
               defaultValue={initial?.yield_percent ?? ""}
-              placeholder="미기재"
+              placeholder="Not reported"
             />
           </label>
           <label>
-            검토 상태
+            Review status
             <select
-              aria-label="검토 상태"
+              aria-label="Review status"
               name="status"
               defaultValue={initial?.status || "draft"}
             >
-              <option value="draft">초안 · 경로 탐색 기본 제외</option>
-              <option value="reviewed">기록 검토 완료 · 원문 근거 필수</option>
+              <option value="draft">
+                Draft · excluded from routes by default
+              </option>
+              <option value="reviewed">
+                Record reviewed · reference required
+              </option>
             </select>
           </label>
         </div>
-        <h3 className="form-section-title">원문 근거</h3>
+        <h3 className="form-section-title">References</h3>
         {evidences.map((e, i) => (
           <div className="form-evidence" key={i}>
             <div>
@@ -1940,7 +1841,7 @@ function ReactionForm({
               <button
                 type="button"
                 className="icon-button"
-                aria-label={`근거 ${i + 1} 삭제`}
+                aria-label={`Remove reference ${i + 1}`}
                 onClick={() =>
                   setEvidences(evidences.filter((_, j) => j !== i))
                 }
@@ -1948,98 +1849,103 @@ function ReactionForm({
                 <X size={15} />
               </button>
             </div>
-            <textarea
-              aria-label={`근거 문장 ${i + 1}`}
-              value={e.quote}
-              onChange={(event) =>
-                setEvidences(
-                  evidences.map((item, j) =>
-                    j === i ? { ...item, quote: event.target.value } : item,
-                  ),
-                )
-              }
-              rows={3}
-            />
-            <small>이 페이지의 실제 문장 중 필요한 부분만 남기세요.</small>
+            <label>
+              Page, figure or procedure
+              <input
+                value={e.locator || ""}
+                onChange={(event) =>
+                  setEvidences(
+                    evidences.map((item, j) =>
+                      j === i ? { ...item, locator: event.target.value } : item,
+                    ),
+                  )
+                }
+              />
+            </label>
+            <small>
+              {e.citation_only
+                ? "DOI citation · manually checked"
+                : "Imported source evidence"}
+            </small>
           </div>
         ))}
         <div className="evidence-builder">
           <div className="form-grid">
             <label>
-              자료 선택
+              Reference
               <select
                 value={sourceId}
                 onChange={(e) => setSourceId(e.target.value)}
               >
-                <option value="">원문 자료 선택</option>
+                <option value="">Select a reference</option>
                 {workspace.sources.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.title}
-                    {s.is_demo ? " · 데모" : ""}
+                    {s.is_demo ? " · Demo" : ""}
                   </option>
                 ))}
               </select>
             </label>
             <label>
-              페이지
-              <select
+              Page
+              <input
+                type="number"
+                min={1}
+                max={sourceDetail?.page_count || undefined}
                 value={page}
-                disabled={!sourceDetail}
-                onChange={(e) => {
-                  setPage(Number(e.target.value));
-                  setQuote("");
-                }}
-              >
-                {sourceDetail?.pages.map((p) => (
-                  <option key={p.number} value={p.number}>
-                    {p.number}
-                  </option>
-                )) || <option>1</option>}
-              </select>
+                onChange={(e) => setPage(Number(e.target.value))}
+              />
             </label>
           </div>
-          {sourceDetail && (
-            <>
-              <details>
-                <summary>선택한 페이지의 원문 보기</summary>
-                <pre>
-                  {sourceDetail.pages[page - 1]?.text || "추출된 텍스트 없음"}
-                </pre>
-              </details>
-              <label>
-                원문 인용
-                <textarea
-                  value={quote}
-                  onChange={(e) => setQuote(e.target.value)}
-                  placeholder="위 원문에서 근거 문장을 복사하세요."
-                  rows={3}
-                />
-              </label>
-            </>
+          {sourceDetail?.doi && (
+            <a
+              className="source-doi"
+              href={doiUrl(sourceDetail.doi)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open DOI to check this reference
+              <ExternalLink size={12} />
+            </a>
           )}
+          <label>
+            Page, figure or procedure
+            <input
+              value={locator}
+              onChange={(e) => setLocator(e.target.value)}
+              placeholder="e.g. SI, compound 6, p. 45"
+              maxLength={300}
+            />
+          </label>
           <button
             className="button small"
             type="button"
-            disabled={!sourceDetail || !quote.trim()}
+            disabled={!sourceDetail?.doi || !locator.trim() || page < 1}
             onClick={() => {
               setEvidences([
                 ...evidences,
-                { source_id: sourceId, page, quote },
+                {
+                  source_id: sourceId,
+                  page,
+                  quote: "",
+                  locator,
+                  citation_only: true,
+                },
               ]);
-              setQuote("");
+              setLocator("");
             }}
           >
             <Plus size={14} />
-            근거 추가
+            Add citation
           </button>
         </div>
         <label>
-          연구 노트
+          Research notes
           <textarea
             name="notes"
             defaultValue={initial?.notes}
             rows={3}
-            placeholder="선택성, 정제 과정, 재현 결과 등을 기록하세요."
+            placeholder="Selectivity, purification and replication notes"
           />
         </label>
         {error && (
@@ -2049,7 +1955,8 @@ function ReactionForm({
         )}
         <footer>
           <span className="subtle-text">
-            근거 문장이 원문에 존재하는지 확인합니다.
+            DOI citations record your review; no automatic text verification is
+            performed.
           </span>
           <button className="button primary" disabled={busy}>
             {busy ? (
@@ -2057,14 +1964,14 @@ function ReactionForm({
             ) : (
               <Check size={16} />
             )}
-            반응 저장
+            Save reaction
           </button>
         </footer>
       </form>
       {addingMolecule &&
         createPortal(
           <ModalShell
-            title="분자 등록"
+            title="Add molecule"
             onClose={() => setAddingMolecule(false)}
           >
             <MoleculeForm

@@ -2333,3 +2333,49 @@ nav {
     grid-template-columns: 1fr;
   }
 }
+
+/* DOI reference library */
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+.source-grid .source-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+.source-grid .source-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.source-grid .source-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.source-grid .source-card .text-button {
+  margin-top: auto;
+}
+a.evidence-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.evidence-card .source-doi {
+  display: block;
+  margin-top: 10px;
+  overflow-wrap: anywhere;
+}
+.source-doi {
+  overflow-wrap: anywhere;
+}
+.source-metadata-form h2 {
+  margin-top: 0;
+}

@@ -67,9 +67,9 @@ def test_published_manifest_keeps_conflicting_results_as_drafts():
         assert describe_molecule(molecule["smiles"])["formula"] == molecule["formula"]
     nicewicz = [r for r in manifest["reactions"] if r["key"].startswith("nicewicz")]
     assert len(nicewicz) == 2
-    assert all(r["status"] == "draft" and "본문" in r["notes"] and "SI" in r["notes"] for r in nicewicz)
+    assert all(r["status"] == "draft" and "article" in r["notes"] and "SI" in r["notes"] for r in nicewicz)
     horn6 = next(r for r in manifest["reactions"] if r["key"] == "horn-compound6")
     horn7 = next(r for r in manifest["reactions"] if r["key"] == "horn-compound7")
-    assert horn6["conditions"]["용매"].startswith("MeCN")
-    assert horn7["conditions"]["용매"].startswith("acetone")
-    assert "전류밀도" not in horn6["conditions"]
+    assert horn6["conditions"]["Solvent"].startswith("MeCN")
+    assert horn7["conditions"]["Solvent"].startswith("acetone")
+    assert "Current density" not in horn6["conditions"]

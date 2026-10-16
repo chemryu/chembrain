@@ -15,14 +15,15 @@ class MoleculeInput(BaseModel):
     @classmethod
     def nonblank(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("빈 값은 사용할 수 없습니다.")
+            raise ValueError("A nonblank value is required.")
         return value.strip()
 
 
 class Evidence(BaseModel):
     source_id: str
     page: int = Field(ge=1)
-    quote: str = Field(min_length=1, max_length=10000)
+    quote: str = Field(default="", max_length=10000)
+    citation_only: bool = False
     locator: str = Field(default="", max_length=300)
 
 
@@ -38,7 +39,7 @@ class SourceMetadataInput(BaseModel):
     @classmethod
     def nonblank(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("자료 제목을 입력하세요.")
+            raise ValueError("Enter a reference title.")
         return value.strip()
 
     @field_validator("doi")
@@ -46,7 +47,7 @@ class SourceMetadataInput(BaseModel):
     def doi_format(cls, value: str) -> str:
         value = re.sub(r"^https?://(?:dx\.)?doi\.org/", "", value.strip(), flags=re.I)
         if value and not re.fullmatch(r"10\.\d{4,9}/[^\s]+", value):
-            raise ValueError("DOI 형식을 확인하세요. 예: 10.1126/science.1255525")
+            raise ValueError("Enter a valid DOI, e.g. 10.1126/science.1255525")
         return value
 
 
@@ -66,12 +67,12 @@ class ReactionInput(BaseModel):
     @classmethod
     def nonblank(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("반응 이름을 입력하세요.")
+            raise ValueError("Enter a reaction name.")
         return value.strip()
 
     @field_validator("conditions")
     @classmethod
     def bounded_conditions(cls, value: dict[str, str]) -> dict[str, str]:
         if len(value) > 40 or any(len(k) > 100 or len(v) > 2000 for k, v in value.items()):
-            raise ValueError("조건 필드가 너무 큽니다.")
+            raise ValueError("The condition fields exceed the size limit.")
         return value

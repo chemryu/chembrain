@@ -89,7 +89,7 @@ def import_manifest(client: httpx.Client, manifest: dict, paths: dict[str, Path]
         if existing and not existing.get("is_demo"):
             counts["reused_molecules"] += 1
         else:
-            body = {"name": molecule["name"], "smiles": molecule["smiles"], "aliases": molecule.get("aliases", []), "availability": "unknown", "notes": molecule.get("notes", "사용자 제공 논문의 대표 사례에서 구조·분자식을 확인한 문헌 분자. 구매·재고 상태 미확인.")}
+            body = {"name": molecule["name"], "smiles": molecule["smiles"], "aliases": molecule.get("aliases", []), "availability": "unknown", "notes": molecule.get("notes", "Structure and formula checked against a representative literature example. Purchasing and inventory status unknown.")}
             existing = client.post("/api/molecules", json=body).raise_for_status().json()
             counts["created_molecules"] += 1
             molecules_by_structure[canonical] = existing

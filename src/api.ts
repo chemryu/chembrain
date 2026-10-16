@@ -1,7 +1,7 @@
 export async function api<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`/api${path}`, options);
   if (!response.ok) {
-    let message = `요청 실패 (${response.status})`;
+    let message = `Request failed (${response.status})`;
     try {
       const body = await response.json();
       message =

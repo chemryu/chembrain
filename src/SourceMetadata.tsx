@@ -4,10 +4,10 @@ import { api, json } from "./api";
 import type { Source, SourceDetail } from "./types";
 
 export const documentRoles = {
-  main: "본문",
-  supplement: "보충자료 · SI",
-  notes: "실험 노트",
-  other: "기타 자료",
+  main: "Main article",
+  supplement: "Supporting information",
+  notes: "Lab notes",
+  other: "Other",
 };
 
 export function SourceMetadataForm({
@@ -46,7 +46,7 @@ export function SourceMetadataForm({
       setError(
         error instanceof Error
           ? error.message
-          : "서지 정보를 저장하지 못했습니다.",
+          : "Unable to save the reference.",
       );
     } finally {
       setBusy(false);
@@ -55,7 +55,7 @@ export function SourceMetadataForm({
   return (
     <form className="source-metadata-form" onSubmit={submit}>
       <label>
-        자료 제목
+        Reference title
         <input
           name="title"
           defaultValue={source.title}
@@ -73,10 +73,10 @@ export function SourceMetadataForm({
           />
         </label>
         <label>
-          자료 구분
+          Document type
           <select
             name="document_role"
-            aria-label="자료 구분"
+            aria-label="Document type"
             defaultValue={source.document_role || "other"}
           >
             {Object.entries(documentRoles).map(([id, label]) => (
@@ -88,16 +88,16 @@ export function SourceMetadataForm({
         </label>
       </div>
       <label>
-        서지 표기
+        Citation
         <input
           name="citation"
           defaultValue={source.citation || ""}
-          placeholder="저자 · 연도 · 학술지 · 권 · 페이지"
+          placeholder="Authors · year · journal · volume · pages"
           maxLength={2000}
         />
       </label>
       <fieldset>
-        <legend>같은 논문의 연결 자료</legend>
+        <legend>Related references</legend>
         {sources
           .filter((s) => s.id !== source.id && !s.is_demo)
           .map((s) => (
@@ -113,12 +113,12 @@ export function SourceMetadataForm({
           ))}
       </fieldset>
       <label>
-        자료 검토 메모
+        Reference notes
         <textarea
           name="notes"
           defaultValue={source.notes || ""}
           rows={3}
-          placeholder="인쇄 페이지와 PDF 페이지 차이, 표·SI 불일치 등"
+          placeholder="Page numbering or disagreements between the article and SI"
         />
       </label>
       {error && (
@@ -132,8 +132,11 @@ export function SourceMetadataForm({
         ) : (
           <Check size={14} />
         )}
-        서지 정보 저장
+        Save reference
       </button>
     </form>
   );
 }
+
+export const doiUrl = (doi: string) =>
+  `https://doi.org/${doi.split("/").map(encodeURIComponent).join("/")}`;

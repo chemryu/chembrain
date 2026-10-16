@@ -8,11 +8,11 @@ RDLogger.DisableLog("rdApp.error")
 def describe_molecule(smiles: str) -> dict:
     mol = Chem.MolFromSmiles(smiles)
     if mol is None or not mol.GetNumAtoms():
-        raise ValueError("유효한 SMILES를 입력하세요.")
+        raise ValueError("Enter a valid SMILES string.")
     canonical = Chem.MolToSmiles(mol, isomericSmiles=True)
     key = Chem.MolToInchiKey(mol)
     if not key:
-        raise ValueError("이 구조의 InChIKey를 생성할 수 없습니다.")
+        raise ValueError("Unable to generate an InChIKey for this structure.")
     return {
         "smiles": canonical,
         "inchikey": key,

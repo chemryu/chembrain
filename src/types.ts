@@ -16,6 +16,7 @@ export type Evidence = {
   page: number;
   quote: string;
   locator?: string;
+  citation_only?: boolean;
 };
 export type Reaction = {
   id: string;
@@ -72,12 +73,16 @@ export const categories: Record<
   Category,
   { label: string; short: string; color: string }
 > = {
-  organic: { label: "유기 합성", short: "ORGANIC", color: "#c3e88d" },
-  electrochemical: { label: "전기화학", short: "ELECTRO", color: "#d9b788" },
-  photochemical: { label: "광화학", short: "PHOTO", color: "#a5b8ee" },
+  organic: { label: "Organic synthesis", short: "ORGANIC", color: "#c3e88d" },
+  electrochemical: {
+    label: "Electrochemistry",
+    short: "ELECTRO",
+    color: "#d9b788",
+  },
+  photochemical: { label: "Photochemistry", short: "PHOTO", color: "#a5b8ee" },
 };
 export const availability = {
-  in_stock: "재고 있음",
-  order: "구매 가능 · 사용자 입력",
-  unknown: "구매·재고 미확인",
+  in_stock: "In stock",
+  order: "Orderable · user reported",
+  unknown: "Availability unknown",
 };
