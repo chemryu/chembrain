@@ -2,6 +2,8 @@
 
 A local chemistry workspace that connects molecules, reaction conditions and paper citations in an interactive reaction map. The interface and bundled examples are in English. Papers open through DOI links; no full-text reader or paper downloads are needed.
 
+Development now uses a [GPT-only, five-role review workflow](README-GPT.md) within Codex. No external AI API key is required. See [wiki.md](wiki.md) for the current paused state and unresolved review finding.
+
 ## Windows: review candidates
 
 Windows builds on this branch are **review candidates**, not approved releases. The old `windows-3` release has a known ordinary-startup bug and must not be treated as the validated output of the current branch.
