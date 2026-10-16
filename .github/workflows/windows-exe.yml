@@ -2,7 +2,6 @@ name: Validate Windows EXE (review candidate)
 on:
   push:
     branches: [codex/chembrain-mvp]
-    paths-ignore: ["docs/**", "**.md"]
   workflow_dispatch:
 permissions:
   contents: write

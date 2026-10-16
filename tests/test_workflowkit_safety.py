@@ -20,14 +20,16 @@ def test_initialization_refuses_redirected_owned_folders(tmp_path, name):
     assert not list(outside.iterdir())
 
 
-def test_initialization_refuses_symlink_parent_and_template_file(tmp_path):
+def test_initialization_allows_authorized_parent_mount_but_refuses_root_or_inner_links(tmp_path):
     outside = tmp_path / 'outside'
     outside.mkdir()
     linked = tmp_path / 'linked'
     linked.symlink_to(outside, target_is_directory=True)
+    selected = linked / 'project'
+    cli.initialize(selected)
+    assert (outside / 'project/wiki.md').is_file()
     with pytest.raises(ValueError, match='symlinks or junctions'):
-        cli.initialize(linked / 'project')
-    assert not list(outside.iterdir())
+        cli.initialize(linked)
     root = tmp_path / 'Box'
     root.mkdir()
     victim = outside / 'victim'
@@ -36,6 +38,13 @@ def test_initialization_refuses_symlink_parent_and_template_file(tmp_path):
     with pytest.raises(ValueError, match='symlinks or junctions'):
         cli.initialize(root)
     assert victim.read_text() == 'keep'
+
+
+def test_path_checks_require_selected_boundary(tmp_path):
+    root = tmp_path / 'Box'
+    root.mkdir()
+    with pytest.raises(ValueError, match='outside'):
+        cli.reject_link_components(tmp_path / 'elsewhere', boundary=root)
 
 
 @pytest.mark.parametrize('relative', ['state.json', 'Start-Workflow.cmd', 'Watch-Workflow.cmd',

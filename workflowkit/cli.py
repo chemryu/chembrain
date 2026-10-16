@@ -20,10 +20,18 @@ DEFAULT_ROOT = r'C:\Users\Ren Lab\Box\AIWorkflow\ChemBrainProject'
 INACTIVE = '<!-- WORKFLOW_REQUEST_INACTIVE -->'
 
 
-def reject_link_components(path):
-    """Reject symlinks and Windows junctions before any controller-owned write."""
+def reject_link_components(path, boundary=None):
+    """Reject links within the selected root; an authorized parent mount is valid."""
     path = Path(path).absolute()
-    for component in (*reversed(path.parents), path):
+    boundary = Path(boundary).absolute() if boundary is not None else path
+    if not path.is_relative_to(boundary):
+        raise ValueError('Workflow output lies outside the selected root.')
+    components = [boundary]
+    current = boundary
+    for part in path.relative_to(boundary).parts:
+        current = current / part
+        components.append(current)
+    for component in components:
         junction = getattr(component, 'is_junction', lambda: False)
         if component.is_symlink() or junction():
             raise ValueError(f'Workflow paths must not contain symlinks or junctions: {component.name}')
@@ -31,19 +39,19 @@ def reject_link_components(path):
 
 def initialize(root):
     root = Path(root)
-    reject_link_components(root)
+    reject_link_components(root, boundary=root)
     for filename in ('state.json', 'Start-Workflow.cmd', 'Watch-Workflow.cmd'):
-        reject_link_components(root / filename)
+        reject_link_components(root / filename, boundary=root)
     for directory in ('workspace','changes','reviews','runs','deliverables','agents',
                       'requests','_controller'):
         owned = root / directory
-        reject_link_components(owned)
+        reject_link_components(owned, boundary=root)
         if owned.exists():
             def fail_walk(error):
                 raise ValueError('Cannot inspect an existing workflow directory.') from error
             for current, directories, files in os.walk(owned, followlinks=False, onerror=fail_walk):
                 for name in sorted(directories + files):
-                    reject_link_components(Path(current) / name)
+                    reject_link_components(Path(current) / name, boundary=root)
     root.mkdir(parents=True, exist_ok=True)
     templates = Path(__file__).parent / 'templates'
     for source in templates.rglob('*'):
@@ -53,7 +61,7 @@ def initialize(root):
         destination = root / relative
         if source.name == 'config.example.json':
             destination = root / 'config.json'
-        reject_link_components(destination)
+        reject_link_components(destination, boundary=root)
         if not destination.resolve().is_relative_to(root.resolve()):
             raise ValueError('Initialization path escapes the selected folder.')
         if destination.is_symlink():
@@ -98,12 +106,12 @@ def install(root):
     target = root / '_controller' / 'ChembrainWorkflow.exe'
     launchers = {root / 'Start-Workflow.cmd': 'menu', root / 'Watch-Workflow.cmd': 'watch'}
     for path in (target, *launchers):
-        reject_link_components(path)
+        reject_link_components(path, boundary=root)
     target.parent.mkdir(exist_ok=True)
     source = Path(sys.executable)
     if source.resolve() != target.resolve():
         temporary = target.with_suffix('.exe.part')
-        reject_link_components(temporary)
+        reject_link_components(temporary, boundary=root)
         try:
             shutil.copyfile(source, temporary)
             temporary.replace(target)
