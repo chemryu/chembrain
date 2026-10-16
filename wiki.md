@@ -2,24 +2,45 @@
 
 ## 현재 상태
 
-**INDEPENDENT_QA_WAITING_WINDOWS — 소스 고정, 독립 검수와 Windows 검사 진행**
+**READY_REVIEWED_CANDIDATE — 다섯 역할 완료, 남은 지적 0건**
 
 - 실행 ID / 회차: `20261016-gpt-01` / `round-01`
-- 시작 기록 날짜: 2026-10-16 (America/Chicago)
-- 최신 사용자 요청 원문: **“지금 바로 시작해줘”**
-- 이전 사용자 지정 시각 원문: 오늘 `7:43pm CST` — 위 즉시 시작 요청으로 대기 해제
+- 기록 날짜: 2026-10-16 (America/Chicago)
+- 최신 사용자 요청 원문: **“지금 바로 시작해줘”** — 이전 `7:43pm CST` 대기 해제
 - 작업 방식: API 없이 현재 Codex 작업 안의 개별 GPT 에이전트
 - 실행 소스 원본: GitHub `chemryu/chembrain` / `codex/gpt-agent-workflow`
-- 진행 기록 원본: `codex/gpt-workflow-records` — 최초 게시 대기
+- 진행 기록 원본: `codex/gpt-workflow-records` — 최초 게시 완료 (`4224102580de88e3d10fa679c2457502044a8434`)
 - 고정된 검토 대상 소스 SHA: `3f102821649ff13b5581ebdff18274ef46602322`
-- 회차 시작 소스 SHA: `5c1c15a920a6f50dc330366507597902c8a0ef64`
-- 역할 실행: Planning·Development 구현/로컬 검사 완료, Independent QA·Wiki 진행 중, Revision 대기
-- 이번 회차 앱 구현 변경: DOI 서버 보호·영어 UI·회귀 검사 구현 완료, 고정 SHA로 푸시됨
-- 기존 DOI 지적: 수정 구현 완료, 독립 검증·최종 해결 판정 대기
-- 이번 회차 QA: RUNNING / Revision 승인: NOT RUN
-- 고정 SHA Windows CI: PENDING — 이전 커밋 결과를 승계하지 않음
+- 역할 실행: Planning·Development·Independent QA·Revision·Wiki 모두 COMPLETE
+- Independent QA / Revision: 동일 소스에 대해 각각 PASS, 남은 지적 **0건**
+- 기존 DOI 지적: 독립 검증과 Revision에서 RESOLVED
+- 필수 자동 검사: PASS — 로컬 Python 153 PASS / Windows 전용 1 SKIP, Windows Python 154 PASS / 0 SKIP, 프런트엔드·실제 UI·일반 시작·재실행·런타임 PATH 분리
+- Windows 증거 원본: 불변 영수증 커밋 `0c6df260af7ef7a340cd2aff80415d4577c63bbf`
+- 전달 가능 여부: **예 — 검수된 후보 파일에 한함**, 공개 Release 승인은 아님
+- 다음 Planning 인계: **CLOSE / 추가 회차 없음** — [완료 인계](runs/20261016-gpt-01/round-01/handoff.md)
+- 깨끗한 Windows PC / 사용자 기본 브라우저 통합: **NOT RUN** — 수동 확인 범위
 - Windows Box 폴더: 직접 저장·자동 동기화 미구성
-- 전달 가능 여부: **아니오 — 독립 QA·Revision·정확한 SHA의 Windows 증거가 남아 있음**
+
+## round-01 · 검수 완료 및 사용자 전달
+
+[Independent QA 전체 보고서](runs/20261016-gpt-01/round-01/qa.md)와 [Revision 전체 보고서](runs/20261016-gpt-01/round-01/revision.md)를 원문 그대로 보존했습니다. 두 역할은 위 고정 SHA에 대해 필수 자동 검사 PASS와 남은 지적 0건을 확인했습니다. Revision의 독립 추가 DOI 행렬 검사도 PASS입니다. 따라서 Wiki는 다음 Planning에 빈 수정 목록을 돌리지 않고 회차를 종료합니다.
+
+| 전달 근거 | 내용 |
+| --- | --- |
+| Windows 후보 파일 | [GitHub Actions 다운로드](https://github.com/chemryu/chembrain/actions/runs/38978428660/artifacts/12080600552) |
+| 내부 ZIP | `Chembrain-Windows-x64.zip` |
+| 내부 ZIP SHA-256 | `ceacbc857ec919b45687f4108fe1394d8a4405643e592358e75cf942ba06b9c0` |
+| 원본 영수증·검사 로그 | [windows/](runs/20261016-gpt-01/round-01/windows/) |
+| 최종 인계 | [handoff.md](runs/20261016-gpt-01/round-01/handoff.md) |
+| 기계 판독 전달 기록 | [delivery.json](runs/20261016-gpt-01/round-01/delivery.json) |
+
+다운로드한 GitHub artifact ZIP을 풀고, 그 안의 `Chembrain-Windows-x64.zip`도 풉니다. `Chembrain.exe`를 더블클릭하면 됩니다. Python·Node.js 설치와 API 키가 필요하지 않으며, 앱 사용 중 실행 콘솔을 열어 둡니다. 사용자 데이터는 `%LOCALAPPDATA%\Chembrain`에 저장합니다.
+
+SHA-256은 CI가 테스트한 EXE 패키지에 대해 생성하고 같은 artifact에 업로드한 값입니다. 이 세션은 불변 영수증·로그·체크섬을 확인했으며, 인증이 필요한 artifact를 별도로 내려받아 바이트를 재계산하지는 않았습니다. 전달은 위 artifact를 그대로 사용하며 다른 파일로 대체하거나 재압축하지 않습니다.
+
+깨끗한 Windows VM 및 사용자의 실제 기본 브라우저 연동은 NOT RUN입니다. PATH 분리와 브라우저 요청 프로브/Chromium 렌더링 검사를 그 수동 검사 대신 통과했다고 표현하지 않습니다. 공개 Release·배포·권한 변경·Box 동기화·영구 실행 GPT·예약 실행을 수행하지 않았습니다. 이후 실행 소스가 바뀌면 새 SHA에 대해 필요한 검사와 두 독립 검토를 다시 수행합니다.
+
+아래 내용은 각 단계 당시의 진행 기록으로 보존합니다.
 
 ## round-01 · 소스 고정 및 독립 검수 시작
 

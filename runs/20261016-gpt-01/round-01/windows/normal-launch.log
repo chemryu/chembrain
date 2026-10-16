@@ -1,0 +1,9 @@
+Runtime check: Python/Node launchers absent from child PATH. This is not a clean Windows VM.
+{"status": "passed", "checks": ["English interface", "14-molecule literature starter", "DOI links without full text", "paper filter", "DOI reference creation", "DOI deletion rejected without losing the citation", "nested molecule creation", "molecule metadata editing", "DOI citation reaction create/edit", "photochemical conditions", "route search and draft exclusion", "DOI-only Markdown export", "persistent reload", "mobile layouts", "no JS errors"]}
+First ordinary launch: API, structures and user changes verified.
+Restarted UI: persisted user molecule, notes and inventory visible.
+Second ordinary launch: same default data folder, all records and user corrections preserved.
+WINDOWS_PACKAGED_UI_PASS
+WINDOWS_RESTART_PERSISTENCE_PASS
+WINDOWS_RUNTIME_PATH_INDEPENDENCE_PASS
+Ordinary launch validation passed: browser request, UI/assets, RDKit and process restart with existing data. Temporary files cleaned.

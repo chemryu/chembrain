@@ -1,5 +1,5 @@
 {
-  "status": "INDEPENDENT_QA_WAITING_WINDOWS",
+  "status": "READY_REVIEWED_CANDIDATE",
   "request_date": "2026-10-16",
   "requested_resume_time_verbatim": "today 7:43pm CST",
   "scheduled_automatically": false,
@@ -16,10 +16,10 @@
   "five_role_run_started": true,
   "source_commit": "3f102821649ff13b5581ebdff18274ef46602322",
   "source_modified_this_preparation": false,
-  "unresolved_findings": 1,
-  "independent_qa_complete": false,
-  "revision_approved": false,
-  "deliverable_ready": false,
+  "unresolved_findings": 0,
+  "independent_qa_complete": true,
+  "revision_approved": true,
+  "deliverable_ready": true,
   "repository": "chemryu/chembrain",
   "branch": "codex/gpt-agent-workflow",
   "primary_record_store": "GitHub",
@@ -29,25 +29,25 @@
   "user_start_override_date": "2026-10-16",
   "user_start_override_verbatim": "지금 바로 시작해줘",
   "prior_reset_wait_superseded": true,
-  "current_phase": "Independent QA",
+  "current_phase": "COMPLETE",
   "roles": {
     "Planning": "COMPLETE",
-    "Development": "IMPLEMENTATION_AND_LOCAL_CHECKS_COMPLETE",
-    "Independent QA": "RUNNING",
-    "Revision": "NOT RUN",
-    "Wiki": "RUNNING"
+    "Development": "COMPLETE",
+    "Independent QA": "COMPLETE",
+    "Revision": "COMPLETE",
+    "Wiki": "COMPLETE"
   },
   "source_modified_this_round": true,
   "box_direct_write_or_sync_configured": false,
   "source_branch": "codex/gpt-agent-workflow",
   "records_branch": "codex/gpt-workflow-records",
-  "records_branch_published": false,
+  "records_branch_published": true,
   "records_reference_exact_source_commit": true,
   "new_source_commit_pending": false,
   "baseline_source_commit": "5c1c15a920a6f50dc330366507597902c8a0ef64",
   "source_commit_pushed": true,
-  "windows_ci_status": "PENDING",
-  "known_doi_finding_status": "IMPLEMENTED_AWAITING_INDEPENDENT_VERIFICATION",
+  "windows_ci_status": "PASS",
+  "known_doi_finding_status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
   "local_checks": {
     "python": {
       "status": "PASS",
@@ -60,5 +60,26 @@
     "source_ordinary_launch_and_restart": "PASS"
   },
   "clean_windows_vm": "NOT RUN",
-  "actual_user_default_browser": "NOT RUN"
+  "actual_user_default_browser": "NOT RUN",
+  "independent_qa_verdict": "PASS_FOR_SCOPED_REVIEW_CANDIDATE",
+  "revision_verdict": "PASS_FOR_SCOPED_REVIEW_CANDIDATE",
+  "deliverable_scope": "REVIEWED_CANDIDATE_ONLY",
+  "initial_records_commit": "4224102580de88e3d10fa679c2457502044a8434",
+  "windows_receipt_commit": "0c6df260af7ef7a340cd2aff80415d4577c63bbf",
+  "windows_tests": {
+    "status": "PASS",
+    "passed": 154,
+    "skipped": 0
+  },
+  "planning_handoff": "CLOSE_NO_FURTHER_ROUND",
+  "required_automated_checks": "PASS",
+  "candidate_artifact_url": "https://github.com/chemryu/chembrain/actions/runs/38978428660/artifacts/12080600552",
+  "candidate_inner_zip": "Chembrain-Windows-x64.zip",
+  "candidate_inner_zip_sha256": "ceacbc857ec919b45687f4108fe1394d8a4405643e592358e75cf942ba06b9c0",
+  "checksum_verification_method": "CI-produced checksum and immutable receipt provenance inspected; authenticated artifact not independently downloaded or rehashed in this session",
+  "artifact_independently_downloaded_and_rehashed": false,
+  "release_published": false,
+  "production_release_approved": false,
+  "perpetual_background_agents": false,
+  "handoff_path": "runs/20261016-gpt-01/round-01/handoff.md"
 }
