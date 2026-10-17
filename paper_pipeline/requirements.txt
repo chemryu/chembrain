@@ -1,0 +1,3 @@
+# Source processor only. Browser users need no Python.
+PyMuPDF==1.28.2
+rdkit==2026.9.1

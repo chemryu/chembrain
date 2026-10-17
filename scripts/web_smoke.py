@@ -1,0 +1,55 @@
+"""Real-browser checks for the standalone Pages app at a repository subpath."""
+import json,os,shutil,threading
+from functools import partial
+from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
+from pathlib import Path
+from playwright.sync_api import sync_playwright,expect
+ROOT=Path(__file__).resolve().parents[1]
+class Handler(SimpleHTTPRequestHandler):
+ def do_GET(self):
+  if not self.path.startswith('/chembrain/'):
+   self.send_error(404);return
+  self.path=self.path[len('/chembrain'):];super().do_GET()
+ def log_message(self,*args):pass
+
+def main():
+ server=ThreadingHTTPServer(('127.0.0.1',0),partial(Handler,directory=str(ROOT/'dist')))
+ threading.Thread(target=server.serve_forever,daemon=True).start()
+ try:
+  with sync_playwright() as p:
+   browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),args=['--no-sandbox'])
+   page=browser.new_page(viewport={'width':1440,'height':1000});errors=[];requests=[]
+   page.on('pageerror',lambda e:errors.append(str(e)));page.on('request',lambda r:requests.append(r.url))
+   url=f'http://127.0.0.1:{server.server_port}/chembrain/'
+   page.goto(url,wait_until='networkidle');expect(page.get_by_role('heading',name='Select a molecule',exact=True)).to_be_visible()
+   expect(page.locator('.web-reaction')).to_have_count(0);expect(page.get_by_text('All reactions',exact=True)).to_have_count(0);expect(page.get_by_text('Organic synthesis',exact=True)).to_have_count(0)
+   page.screenshot(path='/tmp/chembrain-web-library.png',full_page=True)
+   assert page.locator('.molecule-tile img').evaluate_all('(xs)=>xs.every(x=>x.complete&&x.naturalWidth>0)')
+   page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click();expect(page.locator('.web-reaction')).to_have_count(2)
+   page.locator('.reaction-summary').filter(has_text='Taxol side-chain coupling').click();expect(page.locator('.paper-reference')).to_have_count(1)
+   expect(page.locator('.paper-reference a')).to_have_attribute('href','https://doi.org/10.1021/ja00083a067')
+   expect(page.locator('.step')).to_have_count(3);expect(page.locator('.step').nth(2)).to_contain_text('Ethanol')
+   page.get_by_role('button',name='Edit record',exact=True).click();page.get_by_label('Reaction name',exact=True).fill('User curated coupling');page.get_by_role('button',name='Validate & save').click()
+   saved=page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")
+   assert 'User curated coupling' in saved
+   page.reload(wait_until='networkidle');expect(page.get_by_role('heading',name='Select a molecule',exact=True)).to_be_visible();expect(page.locator('.web-reaction')).to_have_count(0)
+   page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click();expect(page.locator('.reaction-summary').filter(has_text='User curated coupling')).to_have_count(1)
+   before=page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")
+   page.get_by_label('Import normalized library').set_input_files({'name':'bad.json','mimeType':'application/json','buffer':b'{"schema_version":1,"papers":[]}'})
+   expect(page.get_by_role('alert')).to_contain_text('Missing');assert page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")==before
+   page.get_by_label('Import normalized library').set_input_files(str(ROOT/'public/library.json'))
+   expect(page.get_by_role('status')).to_contain_text('Import complete');expect(page.locator('.reaction-summary').filter(has_text='User curated coupling')).to_have_count(1)
+   page.get_by_role('checkbox',name='Include synthesis-route steps').check();expect(page.locator('.web-reaction')).to_have_count(8)
+   page.locator('.molecule-tile').filter(has_text='Doxycycline').click();expect(page.locator('.web-reaction')).to_have_count(1)
+   page.locator('.reaction-summary').click();expect(page.locator('.paper-reference a')).to_have_attribute('href','https://doi.org/10.1126/science.1109755')
+   page.get_by_role('button',name='Edit citation',exact=True).click();page.get_by_label('Authors (separate with semicolons)').fill('Author correction; Andrew G. Myers');page.get_by_role('button',name='Validate & save').click();expect(page.locator('.paper-reference')).to_contain_text('Author correction')
+   with page.expect_download() as downloaded:page.get_by_role('button',name='Backup JSON',exact=True).click()
+   assert downloaded.value.suggested_filename=='chembrain-library.json'
+   page.set_viewport_size({'width':390,'height':844});page.screenshot(path='/tmp/chembrain-web-mobile.png',full_page=True)
+   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),'Mobile horizontal overflow'
+   assert not errors,errors
+   assert not any('/api/' in r or not r.startswith(url.split('/chembrain')[0]) for r in requests),requests
+   browser.close()
+   print('WEB_LIBRARY_BROWSER_PASS: empty initial panel, molecule-related records, stage solutions, one DOI reference, edit/reload/import preservation, backup, subpath assets and mobile; no backend API.')
+ finally:server.shutdown();server.server_close()
+if __name__=='__main__':main()

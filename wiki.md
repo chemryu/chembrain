@@ -2,6 +2,28 @@
 
 ## 현재 상태
 
+**CHANGES_REQUESTED — 웹 round-01 미해결 4건 + 별도 Pages 403 차단**
+
+- 날짜/시간대: 2026-10-17 (America/Chicago)
+- 최신 선택: **GitHub Pages + 브라우저 저장**, 별도 주간 논문 processor와 정규화 데이터만 전달
+- 초기 화면: molecular library, 분자 선택 전 반응 패널 비움; 기본 All reactions/Organic synthesis 화면 제거
+- 고정·푸시된 소스: `e424b34653fb96b911f5ee5708286c92baddfe5f`; 기준 `c96c210a89a077869da78e7e570f06c80768cc16`
+- Development: root 구현·로컬 검사 완료. 최초 계획은 root가 구현 전에 작성; 별도 Planning addendum은 구현 후 작성·보존됨
+- Independent QA·Revision: 초기화 후 기존 역할이 실제 검수 완료, 둘 다 **CHANGES REQUESTED / 미해결 4건 / 전달 승인 없음**
+- 다음 단계: [round-01 인계](runs/20261017-web-03/round-01/handoff.md) → round-02 Planning
+- 로컬 구현 검사: Python 237 PASS / Windows 전용 DPAPI 1 SKIP, build:web·실제 브라우저 PASS
+- Pages 실행: `39062568338`, 불변 terminal 영수증 `0331192af8d03426f4a2c28a584eaf7f9d34bb1d` — 테스트 237 PASS/1 SKIP·웹 빌드·브라우저 PASS, 설정은 **403 Resource not accessible by integration**
+- Pages 배포·실제 공개 접근: **NOT RUN**, URL 없음. 소유자 Pages 설정 응답 대기
+- 예시: 3 papers / 12 draft reactions, 데이터 약 22 KB / 사이트 약 420 KB; 미확인 SMILES·조건 null, 완전한 OCR 아님
+- 사용자 허용: PREVIEW로 표시한 **공개 미리보기 게시**. 독립 production 승인·main 자동 병합은 없음
+- 주간 cron: feature 브랜치에만 있어 **미활성**. 사용자 PC 설치 스크립트도 미실행·예약 작업 미설치
+- 브라우저 저장: 현재 브라우저만 사용, 기기 간 계정 동기화 없음. PDF 전문/원문 후보는 메인 데이터·사이트에서 제외
+- 기록 원본: GitHub `codex/gpt-workflow-records`; 실행 소스 `codex/gpt-agent-workflow`
+- 이전 Windows 차단/승인 이력은 아래와 회차 원문에 보존. Box 직접 저장·기관 인증 이전·개인 외부 AI API 호출 없음
+- 자세한 순서/범위: [새 실행 Wiki 기록](runs/20261017-web-03/round-01/wiki-record.md)
+
+## 이전 Windows 실행 차단 상태 — 20261017-gpt-02
+
 **BLOCKED_REQUIRED_WINDOWS_EVIDENCE — round-02 앱 지적 0건, 필수 증거 미확인·round-03 Planning 인계**
 
 - 날짜/시간대: 2026-10-17 (America/Chicago)
@@ -188,3 +210,22 @@ QA·Revision 최종 원문은 모두 **BLOCKED_REQUIRED_WINDOWS_EVIDENCE / 미�
 `2026-10-17T07:35:21.810849Z` 관찰에서도 마지막 영수증 `65a2dcf538f6ce8ef11fce32ee9615a6c38ad35f`는 `07:04:12Z`에 게시된 running 상태·빈 단계 결과·null artifact였습니다. 30분 job 예산보다 오래 지났지만 실제 runner 상태는 **UNKNOWN**입니다. Actions API Forbidden 때문에 권위 있는 현재 결과를 확인하지 못했으며 timeout·실패·계속 실행 중이라고 단정하지 않습니다. 같은 소스의 Windows 패키지/일반 실행/UI/재실행/PATH/scheduler/headless/최종 체크섬은 NOT VERIFIED입니다.
 
 live Crossref의 첫 관찰이 실패하면 packaged `--sync-jacs` 호출도 생략되는 검증 경로는 별도로 수정해야 합니다. 호출 생략은 NOT RUN이며 오프라인 smoke fixture나 로컬 PASS로 대체하지 않습니다. 새 SHA에 대한 기존 필수 검사·독립 QA·Revision을 그대로 유지하고 앱 범위를 넓히거나 합격 기준을 낮추지 않습니다. 현재 전달 가능한 새 artifact는 없습니다.
+
+## 2026-10-17 · 웹 구조로 목표 변경
+
+사용자의 최신 요청에 따라 이전 Windows 진단 완료를 기다리는 목표를 **GitHub Pages 공개 미리보기 + 브라우저 저장**으로 대체했습니다. 별도 주간 processor와 분리한 정규화 데이터, 분자 우선 화면을 새 실행 `20261017-web-03`으로 기록합니다. 원문 PDF는 게시하지 않으며 예시 12개는 검토가 필요한 초안입니다.
+
+[초기 root 계획](runs/20261017-web-03/round-01/planning.md)은 구현 전 작성됐고 별도 Planning addendum은 구현 후 요청되었습니다. 앞선 사용량 오류는 이력으로 남기며, 초기화 안내 시각을 지난 뒤 기존 QA·Revision의 정상 재개가 진행 중입니다. 실제 최종 보고서 전에는 독립 승인을 기록하지 않습니다. 공개 게시 역시 정확한 소스 marker의 실제 HTTP 확인 전에는 접근 가능으로 확정하지 않습니다. 주간 cron은 기본 브랜치 반영 전 미활성이고 PC 설치 스크립트는 사용자가 직접 실행해야 합니다.
+
+## 2026-10-17 · web round-01 검수 거절·외부 게시 차단
+
+[QA 전체 원문](runs/20261017-web-03/round-01/qa.md)과 [Revision 전체 원문](runs/20261017-web-03/round-01/revision.md)을 그대로 보존했습니다. 두 역할은 소스 `e424b34653fb96b911f5ee5708286c92baddfe5f`를 초기화 이후 정상 재개해 검수했고 **CHANGES REQUESTED / MEDIUM 4건**을 확정했습니다. 현재 결과는 usage-limit으로 미검수한 상태가 아니며 source-time placeholder를 소급 수정하지 않습니다.
+
+1. malformed advanced JSON shape가 저장 전 editor/app 전체를 unmount하는 문제.
+2. processor가 성공 export한 v1 데이터가 browser 계약에서 거절되는 불일치.
+3. weekly PDF cap 뒤 알려진 eligible work가 checkpoint 진행과 함께 영구 누락되는 문제.
+4. collection 데이터 커밋 이후에도 trigger SHA로 공개 marker를 만들어 실제 built data identity가 사라지는 문제.
+
+[Planning 인계](runs/20261017-web-03/round-01/handoff.md)에 각 수정 계약과 검사를 전달했습니다. 별도 Pages 설정 403 `Resource not accessible by integration`은 [불변 영수증/로그](runs/20261017-web-03/round-01/web/manifest.json)로 확인됐고 소유자 설정 응답을 기다립니다. CI 테스트 237 PASS/1 SKIP·웹 빌드·브라우저는 PASS이나 배포와 실제 HTTP 확인은 NOT RUN, URL도 없습니다. 앱 검사 성공을 접근 가능·독립 승인으로 바꾸지 않습니다.
+
+새 source/data identity를 고정해 수정 검사와 두 독립 검토 및 실제 게시 응답을 확인하기 전에는 완료로 전달하지 않습니다. 기존 과학 draft/미확정 구조, 비활성 주간 cron, 미설치 PC 작업, 브라우저 로컬 저장 및 이전 Windows 기록의 한계를 유지합니다.

@@ -1,0 +1,64 @@
+{
+  "commit": "e424b34653fb96b911f5ee5708286c92baddfe5f",
+  "built_commit": "e424b34653fb96b911f5ee5708286c92baddfe5f",
+  "run_id": "39062568338",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39062568338",
+  "reported_at": "2026-10-17T19:30:01.812998+00:00",
+  "status": "blocked",
+  "terminal": true,
+  "phase": "terminal",
+  "page_url": null,
+  "facts": {
+    "build": {
+      "result": "success",
+      "outputs": {
+        "facts": "{\n  \"collection\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"tests\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"app\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"browser\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  }\n}"
+      }
+    },
+    "publish": {
+      "result": "failure",
+      "outputs": {
+        "facts": "{\n  \"config\": {\n    \"outputs\": {},\n    \"outcome\": \"failure\",\n    \"conclusion\": \"failure\"\n  },\n  \"deployment\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"access\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  }\n}"
+      }
+    }
+  },
+  "independent_qa": "BLOCKED_USAGE_LIMIT; preview only",
+  "phases": [
+    {
+      "phase": "dependencies",
+      "at": "2026-10-17T19:27:56.423740+00:00"
+    },
+    {
+      "phase": "tests",
+      "at": "2026-10-17T19:28:45.548109+00:00"
+    },
+    {
+      "phase": "browser-build",
+      "at": "2026-10-17T19:28:55.408421+00:00"
+    },
+    {
+      "phase": "browser-checks",
+      "at": "2026-10-17T19:29:01.957580+00:00"
+    },
+    {
+      "phase": "upload-pages-artifact",
+      "at": "2026-10-17T19:29:26.551563+00:00"
+    },
+    {
+      "phase": "build-finished",
+      "at": "2026-10-17T19:29:31.186397+00:00"
+    },
+    {
+      "phase": "configure-pages",
+      "at": "2026-10-17T19:29:47.976083+00:00"
+    },
+    {
+      "phase": "publish-finished",
+      "at": "2026-10-17T19:29:51.574323+00:00"
+    },
+    {
+      "phase": "terminal",
+      "at": "2026-10-17T19:30:01.813036+00:00"
+    }
+  ]
+}

@@ -1,3 +1,19 @@
+# Chembrain browser preview
+
+The current app starts with only the molecular library. Select a molecule to see directly related reactions; optionally include steps from that target’s synthesis route. There is no initial all-reactions/category panel. Edits are stored in the current browser, with JSON backup/import and no account sync. The app uses no AI API key or Python runtime in the browser.
+
+The starter contains three uploaded total-synthesis papers and 12 draft curated reaction records. Numbered intermediates remain paper-specific; unknown SMILES/stereochemistry, amounts, concentrations and unreported conditions stay empty. Two target thumbnails are individual chemical diagrams from the supplied schemes, with provenance in `public/structures/provenance.json`; small-molecule SVGs are generated from encoded SMILES. Full PDFs and page text are excluded. Stage-specific solutions, multi-step yields, salts and uncertain ranges retain their context. These draft facts are not full substrate scopes or independently reproduced procedures.
+
+`npm ci` then `CHEMBRAIN_BASE=/chembrain/ npm run build:web` builds the static Pages app; `scripts/web_smoke.py` checks its real browser workflows at the repository subpath. The Pages workflow builds/tests, publishes an explicit preview and verifies its actual public source marker over HTTPS. A URL is not considered live merely because a workflow was created. A repository/account Pages restriction may require its owner to enable Actions-based Pages in Settings → Pages. No personal token is requested.
+
+The **separate** [paper processor](paper_pipeline/README.md) runs weekly via GitHub Actions or on a local scheduler, archives supported OA papers outside the app, creates local review candidates and exports only normalized `papers`, `chemicals`, `solutions`, and `reactions`. JACS is the enabled default; additional ISSNs are configurable. Other publisher PDFs require an appropriate supported resolver or local ingestion; subscription credentials are not automated. Public metadata updates are separate from reviewed chemical extraction. Raw paper archives/review text never enter Pages. The schedule is Monday 15:00 UTC (09:00 CST / 10:00 CDT), but GitHub only activates it after the workflow is installed on the default branch. No main merge was made. The local Windows installer is an alternative that the user must run explicitly.
+
+Independent agent capacity hit a usage limit during the previous diagnostics; **new web changes are a preview with independent QA/Revision pending**, not an approved release. Previous approvals apply only to their recorded commits. Source tests and browser checks are reported separately from those missing reviews. The legacy desktop build remains available via manual Windows workflow dispatch.
+
+---
+
+## Legacy desktop documentation
+
 # Chembrain
 
 A local chemistry workspace that connects molecules, reaction conditions and paper citations in an interactive reaction map. The interface and bundled examples are in English. Papers open through DOI links; no full-text reader or paper downloads are needed.
