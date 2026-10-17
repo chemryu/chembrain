@@ -12,6 +12,7 @@ __pycache__/
 *.tsbuildinfo
 playwright-report/
 test-results/
+jacs-gateway.json
 
 release/
 build/

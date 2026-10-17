@@ -2373,6 +2373,31 @@ a.evidence-card {
   margin-top: 10px;
   overflow-wrap: anywhere;
 }
+.evidence-card small.reference-provenance {
+  display: block;
+  margin-top: 8px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.jacs-collection {
+  margin-bottom: 24px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.jacs-collection > p, .collection-result {
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.collection-result { display: grid; gap: 5px; margin: 14px 0; }
+.collection-result ul { padding-left: 18px; }
+.collection-schedule { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; margin-top: 18px; }
+.collection-schedule label { display: flex; flex-direction: column; gap: 7px; font-size: 11px; }
+.collection-schedule .check-label { flex-direction: row; align-items: center; align-self: center; }
+.collection-schedule input[type="time"], .collection-schedule select { min-width: 0; max-width: 100%; }
+.jacs-collection .section-toolbar { flex-wrap: wrap; }
 .source-doi {
   overflow-wrap: anywhere;
 }

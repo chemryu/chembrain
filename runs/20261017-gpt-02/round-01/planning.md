@@ -1,26 +1,49 @@
-# Planning 초안 — 20261017-gpt-02 / round-01
+# Planning — 20261017-gpt-02 / round-01
 
-- 상태: **PRELIMINARY / AWAITING_INPUT**. 확정 구현 계획이나 검수 승인이 아닙니다.
-- 요청: 구독 접근권이 있는 사용자 PC에서 지정 저널의 새 논문을 매주 확인하고, 이용 가능한 논문을 내려받아 ChemBrain DB에 반영합니다.
-- 앱 기준 소스: `3f102821649ff13b5581ebdff18274ef46602322` — 이번 요청으로 변경하지 않았습니다.
-- 공용 기록: GitHub `codex/gpt-workflow-records`. 이전 앱의 검수 완료 상태와 이번 미구현 기능을 구분합니다.
+- Status: READY FOR DEVELOPMENT; not implementation or review approval.
+- Baseline application SHA: `3f102821649ff13b5581ebdff18274ef46602322`.
+- Source: `codex/gpt-agent-workflow`; reports/wiki: `codex/gpt-workflow-records`.
+- Confirmed user scope: JACS (Journal of the American Chemical Society), all papers without a subject filter; bibliography plus OPEN-ACCESS PDFs ONLY. A university subscription does not expand this scope. No institutional login, cookies, VPN authentication or subscription-only downloads.
+- Additional requirement: one displayed reaction reference per paper; preserve main-article/SI provenance and every locator.
+- Planning GPT role only. No source edits, paid model calls or download execution.
 
-## 사용자 입력 대기
+## Behavior and boundaries
 
-주 에이전트가 저널명·관심 주제 및 이용 경로(교내망/VPN, 도서관 프록시, 출판사 기관 로그인 등)를 질문했습니다. 아직 답변을 받지 않았습니다. 해당 정보와 실제 PC 접근 경로를 확인한 뒤 지원 범위·주기 설정·완료 기준을 확정합니다. 구독이 있다는 사실만으로 모든 출판사의 무인 다운로드 가능 여부를 확정하지 않습니다.
+The Windows PC collects public JACS metadata, registers DOI citations, and retrieves a PDF only with explicit currently applicable open-license evidence and a matching article-PDF link. Unknown license, embargo, missing link, download denial and invalid PDF are separate recorded outcomes, not automatic claims of a paywall. No GPT/Claude API key or model call is needed.
 
-## 검토 중인 구성
+Default schedule is Monday 09:00 in the PC's local timezone, editable by the user. Manual collection and headless packaged `--sync-jacs` work without leaving the app open. Scheduling is explicitly activated on the PC, reversible, current-user, without administrator privileges or stored credentials. PC power and a logged-in user are required; `StartWhenAvailable` handles missed runs but does not imply waking or signed-out execution.
 
-1. ISSN 기반 Crossref 또는 저널 RSS로 신규 메타데이터를 탐색하고 정규화 DOI로 중복을 제거합니다. 저널과 날짜 범위의 실제 제공 품질은 검증해야 합니다.
-2. PDF 첨부를 공통 원자적 처리로 구현해 기존 DOI source의 ID와 사용자 편집 내용을 보존합니다. DOI 등록과 일반 파일 업로드 서비스를 따로 호출해 동일 논문의 source가 중복 생성되지 않도록 합니다.
-3. 패키징된 EXE의 `--sync-once` 실행 경로와 현재 Windows 사용자 계정의 작업 스케줄러를 조합하는 방안을 검토합니다. PC에서 실행되는 예약 작업이며 클라우드 상시 에이전트가 아닙니다.
-4. 합법적으로 이용 가능한 기존 PC 인증 경로만 사용합니다. 재로그인이 필요하면 `NEEDS_LOGIN`으로 기록하고 사용자가 처리하도록 합니다. 기관 인증·세션을 클라우드로 전달하지 않습니다.
-5. PDF는 사용자 로컬에 보관하고, 앱의 논문 표시는 기존 DOI 링크 중심 요구를 유지합니다. 일반 텍스트에서 추출한 후보만으로 검수 완료 화학 반응을 자동 생성하지 않습니다.
+Preserve English DOI-only UI, source IDs, user bibliographic edits/notes, independent main/SI evidence, reaction statuses, routes, persistence and text-free exports. No new full-paper reader, automatic chemistry approval, cloud database or broad publisher crawler.
 
-## 이후 확정할 검사
+## Development work
 
-저널/기간 필터, DOI 중복 제거, 재실행 멱등성, 기존 source ID·메모·사용자 수정 보존, PDF 첨부 실패 시 원자성, 로그인 필요 상태, 수동 실행과 Windows 예약 실행을 검증 대상으로 삼습니다. 실제 지원 출판사와 인증 경로가 정해진 뒤 테스트 계획을 확정합니다. 구현·Windows 증거·독립 QA·Revision 없이 기능 완료로 기록하지 않습니다.
+1. **Public discovery:** query Crossref using verified JACS ISSNs `0002-7863` / `1520-5126`; validate returned journal/ISSN and DOI. Use Crossref `journal-article`, which covers JACS research articles, communications and reviews without a subject filter; exclude unrelated Crossref object types such as datasets. Store the returned type. Query a fixed publication-date window with `from-pub-date` / `until-pub-date`, initially 14 days and then the previous completed checkpoint with a 7-day overlap. This deliberately follows newly published papers rather than treating old papers re-indexed this week as new publications. State publication-date/indexing semantics and acknowledge that delayed metadata beyond the overlap is not guaranteed complete coverage. Use pagination, timeouts, retry/backoff and resumable cursor/window progress. A page/item cap leaves continuation; mark a window complete only after exhaustion. Persist last attempt/success, counts/outcomes and one shared CLI/UI/scheduled-run lock.
+2. **Atomic registration:** common store/service path for collector and ordinary reference creation; do not chain independent upload + metadata writes. Normalize DOI prefix/case/whitespace; reuse DOI plus document role atomically across concurrent writers. Preserve existing IDs, main/SI distinction and all user edits. Report pre-existing duplicate matches without destructive merging.
+3. **Separate attachments:** stage and verify PDFs under generated filenames in local app data; expose attachment metadata only after success. Preserve references on parse/write/download failure, clean partial files, and reuse verified DOI/hash attachments. Crucially, do not mutate a DOI-only source's `kind`, `page_count`, `pages` or citation evidence to the downloaded PDF model. Printed/SI page locators can exceed main-PDF length and must remain valid. Keep attachment hash/page count/status separate; omit private paths/full text from UI summaries and exports. Do not store PDF files in GitHub/Box records.
+4. **OA verification:** require recognized explicit license applicable now to the matching article/version, plus a matching PDF link supplied in metadata. Accept declared `application/pdf`; known ACS metadata with omitted/unspecified content type may also qualify only when its supplied trusted ACS `/doi/pdf/<exact DOI>` URL matches the article DOI and the version matches the explicit license. Do not construct missing URLs or accept a link declared HTML. In either path actual PDF bytes and successful parsing are mandatory before attachment. Generic publisher/TDM terms, future embargo/license start or guessed PDF URLs are insufficient. Keep license URL/start/version and fetch time. Unknown/ambiguous evidence is OA_UNVERIFIED or equivalent, never a claim that the paper is paywalled. Restrict HTTPS retrieval to approved ACS publisher origins/paths; validate every redirect and reject private/loopback or unexpected targets. No cookies, institutional credentials or challenge bypass. Bound bytes/pages/time; validate PDF magic, parsing and SHA-256. HTML/login pages, corruption, oversize and 401/403/429/network outcomes must be recorded honestly. No molecule/reaction creation or reviewed approval from heuristics.
+5. **Headless packaged operation:** add early `--sync-jacs` mode using the normal data directory, meaningful exit results and no Uvicorn/browser startup. Preserve ordinary launch and `--smoke-test`. Scheduler install/update/status/remove must quote executable/data paths, support spaces/non-ASCII, copy the installed EXE to a stable local scheduler location, use interactive current user, StartWhenAvailable and no-overlap. Query actual OS state; never treat a request as proof of registration. Remove only ChemBrain's own task. Cloud does not install a task on the user's PC.
+6. **English collection UI:** paper-library status, last attempt/success, added/reused/downloaded/skipped/error counts, manual run, scheduling settings/status. Prevent duplicate submission; preserve completed imports on failure. Merely opening the app must not silently register a scheduled task.
+7. **One reference per paper:** group reaction detail evidence by normalized DOI, falling back to source ID without DOI. Main+SI sharing DOI become one card; distinct DOI and unrelated DOI-less sources remain separate. Show every page-numbering label/locator and source role/title, prefer a main title, and expose one canonical DOI link. Both ReactionDetail counters count grouped papers. Grouping is presentation-only: preserve all source/evidence records and separate editor entries; removing one locator must not discard another provenance record.
 
-## 현재 수행 범위
+## Required meaningful checks
 
-예비 설계와 기록만 작성했습니다. 코드·DB·테스트·CI를 변경하지 않았고 논문 다운로드, 사용자 PC 예약 작업 설치, 인증 연결 또는 자격 증명 이전을 수행하지 않았습니다. 이 문서는 Development 착수 승인이나 모든 출판사 자동 다운로드 지원을 뜻하지 않습니다.
+| Area | Checks |
+| --- | --- |
+| Discovery | Both ISSNs, JACS journal-article types without topic filtering, unrelated journal/object rejection, DOI normalization, fixed publication-date window and 7-day overlap boundaries, pagination, provider errors, capped continuation, resumable checkpoints and repeat-run idempotence. |
+| Data/PDF | Existing ID/user-edit preservation, concurrent duplicates, main/SI distinction, PDF reuse, failed stage/parse/write preservation and partial cleanup. A printed/SI citation beyond downloaded PDF length must remain unchanged and save successfully. |
+| OA scope | Active recognized license + matching version/PDF accepted; declared PDF and omitted/unspecified type with supplied trusted ACS exact-DOI PDF path tested separately. Declared HTML, unknown path/version, future/unknown/TDM-only license rejected/skipped; actual bytes/parse required. No invented URLs; wrong host/private redirect rejected; denial/HTML/oversize/corrupt outcomes accurate. No auth/cookie/model-call path. |
+| Reference grouping | Browser fixture with main+SI same DOI, DOI case/prefix variation, repeated source, multiple locators, different DOI and DOI-less sources. Assert grouped card/count, retained role/locator text, canonical link and unchanged editor/storage evidence. |
+| UI/CLI | Fixture-driven manual collection/status, failure/retry, duplicate-submit prevention, persistence, headless success/failure exits and spaced data paths. Normal launch/browser/export regressions stay green. |
+| Windows scheduler | Generated arguments/XML, local weekday/time edits, interactive user, stable copied EXE, missed-run/no-overlap flags, actual status and safe uninstall. Windows CI uses a uniquely named temporary task with a strictly future weekly trigger, inspects it and removes it in finally; never invoke the task or allow its trigger to occur during CI, and never collect from publishers through this scheduler check. Dry-run remains an additional argument/configuration check. |
+| Public connectivity | One bounded read-only JACS metadata probe; record endpoint/result and example DOI/license/link fields. Public metadata/live OA are separate observational checks: network policy or provider refusal is UNAVAILABLE/NOT RUN, and unsupported license/link metadata is UNSUPPORTED/OA_UNVERIFIED, never PASS. Optional live PDF fetch requires an explicitly eligible sample. Keep observed live integration limits distinct from deterministic fixture checks. |
+| Package/regression | Full Python suite, production frontend build, source browser tests; exact-SHA Windows build/smoke, zero-argument launch, packaged UI, actual restart data preservation, restricted runtime PATH and packaged collector/schedule dry-run. |
+
+Development records exact commands and outcomes. Fixture success is not live publisher success. Preserve existing DOI-deletion guards and their regression coverage.
+
+## Review loop and delivery
+
+Development commits final executable/build/test inputs on the source branch. Separate Independent QA and Revision inspect the same full SHA and required evidence. Wiki retains complete reports and returns every unresolved finding to Planning; completed records go on the records branch so documentation does not change inspected source.
+
+Deliver only with zero unresolved findings from both reviewers, required deterministic/local/Windows checks PASS, and candidate ZIP/hash/Windows receipt matching the inspected SHA. Code changes invalidate old approval and affected checks. No release publication or user-PC task installation occurs from this cloud.
+
+Delivery instructions distinguish all JACS bibliography from verified OA PDFs and explain local storage, lookback/date semantics, Monday 09:00 PC-local scheduling, activation/edit/removal, PC on/logged-in requirement, manual run and skipped/error states. Actual user-PC task registration, clean Windows VM and user default-browser integration remain NOT RUN until performed. No API keys or institutional login are required for this chosen scope.

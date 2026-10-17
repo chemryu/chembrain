@@ -20,6 +20,84 @@ from playwright.sync_api import expect, sync_playwright
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def exercise_collection_controls(browser, base_url):
+    """Check controls with local API fixtures; never schedule or download live papers."""
+    page = browser.new_page()
+    schedules = []
+    collections = []
+    workspace_requests = []
+    requests_to_fail = {'status': 1, 'schedule': 1}
+    status = {
+        'journal': 'Journal of the American Chemical Society', 'policy': 'open_access_only',
+        'running': False, 'last_run': {
+            'started_at': '2026-10-16T14:00:00+00:00', 'finished_at': '2026-10-16T14:01:00+00:00',
+            'status': 'completed', 'discovered': 0, 'added': 0, 'existing': 0, 'pdfs_saved': 0, 'errors': [],
+        }, 'totals': {'articles': 0, 'pdfs': 0},
+        'schedule': {'supported': True, 'enabled': False, 'weekday': 'Monday', 'time': '09:00'},
+    }
+
+    def respond(route):
+        request = route.request
+        if request.url.endswith('/schedule'):
+            if requests_to_fail['schedule']:
+                requests_to_fail['schedule'] -= 1
+                route.fulfill(status=500, json={'detail': 'Schedule fixture failure'})
+                return
+            payload = request.post_data_json
+            schedules.append(payload)
+            status['schedule'].update(payload)
+            route.fulfill(json=status['schedule'])
+        elif request.url.endswith('/run'):
+            collections.append(request.post_data_json)
+            status['totals'] = {'articles': 2, 'pdfs': 1}
+            status['last_run'] = {
+                'started_at': '2026-10-17T14:00:00+00:00', 'finished_at': '2026-10-17T14:01:00+00:00',
+                'status': 'completed', 'discovered': 2, 'added': 2, 'existing': 0, 'pdfs_saved': 1, 'errors': [],
+            }
+            route.fulfill(status=202, json={'started': True})
+        else:
+            if requests_to_fail['status']:
+                requests_to_fail['status'] -= 1
+                route.fulfill(status=503, json={'detail': 'Temporary status fixture failure'})
+                return
+            route.fulfill(json=status)
+
+    page.route(re.compile(r'/api/collection/jacs(?:/run|/schedule)?$'), respond)
+    page.on('request', lambda request: workspace_requests.append(request.url) if request.url.endswith('/api/workspace') else None)
+    page.goto(base_url, wait_until='networkidle')
+    page.get_by_role('button', name='Paper library').click()
+    collect = page.get_by_role('button', name='Collect now', exact=True)
+    expect(page.locator('.jacs-collection').get_by_role('alert')).to_contain_text('Temporary status fixture failure')
+    with page.expect_request(re.compile(r'/api/workspace$')):
+        expect(collect).to_be_enabled()
+    expect(page.locator('.jacs-collection').get_by_role('alert')).to_have_count(0)
+    assert not collections, 'Opening the library must not collect papers'
+    initially_refreshed = len(workspace_requests)
+    page.get_by_role('checkbox', name='Weekly collection', exact=True).check()
+    page.get_by_label('Collection day', exact=True).select_option('Friday')
+    page.get_by_label('Collection local time', exact=True).fill('13:20')
+    # A status poll must not overwrite an unsaved schedule choice.
+    page.wait_for_timeout(2700)
+    expect(page.get_by_label('Collection day', exact=True)).to_have_value('Friday')
+    assert len(workspace_requests) == initially_refreshed, 'The same completed run must not cause a refresh loop'
+    page.get_by_role('button', name='Save weekly schedule', exact=True).click()
+    expect(page.locator('.jacs-collection').get_by_role('alert')).to_contain_text('Schedule fixture failure')
+    page.wait_for_timeout(2700)
+    expect(page.locator('.jacs-collection').get_by_role('alert')).to_contain_text('Schedule fixture failure')
+    page.get_by_role('button', name='Save weekly schedule', exact=True).click()
+    expect(page.get_by_role('button', name='Save weekly schedule', exact=True)).to_be_enabled()
+    expect(page.locator('.jacs-collection').get_by_role('alert')).to_have_count(0)
+    assert schedules == [{'enabled': True, 'weekday': 'Friday', 'time': '13:20'}], schedules
+    before = len(workspace_requests)
+    collect.click()
+    expect(page.locator('.collection-result')).to_contain_text('2 found · 2 added · 0 already in library · 1 PDFs saved')
+    expect(page.locator('.collection-totals')).to_contain_text('2 collected papers · 1 open-access PDFs')
+    expect(collect).to_be_enabled()
+    assert collections == [{}], collections
+    assert len(workspace_requests) > before, 'Completed collection must reload the paper workspace'
+    page.close()
+
+
 def exercise_ui(base_url: str, screenshot_dir=None):
     """Run the same UI checks against either a source server or a packaged EXE."""
     with sync_playwright() as playwright:
@@ -33,7 +111,14 @@ def exercise_ui(base_url: str, screenshot_dir=None):
         expect(page.locator(".reaction-node")).to_have_count(6)
         assert not re.search('[가-힣]', page.locator('body').inner_text())
         evidence_links = page.locator('.inspector a.evidence-card')
+        expect(evidence_links).to_have_count(1)
         expect(evidence_links.first).to_have_attribute('href', re.compile(r'https://doi.org/10\.1126/'))
+        expect(page.locator('.inspector .reference-provenance')).to_have_count(4)
+        expect(evidence_links.first).to_contain_text('Main article: Nicewicz 2008 · Main article')
+        expect(evidence_links.first).to_contain_text('Supporting information: Nicewicz 2008 · SI')
+        expect(evidence_links.first).to_contain_text('Entry 3 procedure: 7 h, 105 mg, 93% yield, 91% ee')
+        expect(evidence_links.first).to_contain_text('Table 1; 23 °C, yields and ee checked visually in table image')
+        expect(page.locator('.inspector .badge-row')).to_contain_text('1 reference')
         expect(page.locator('blockquote, .source-text')).to_have_count(0)
         page.get_by_label('Paper filter', exact=True).select_option('10.1038/nature17431')
         expect(page.locator('.reaction-node')).to_have_count(2)
@@ -41,9 +126,13 @@ def exercise_ui(base_url: str, screenshot_dir=None):
         page.get_by_label('Paper filter', exact=True).select_option('all')
         if screenshot_dir: page.screenshot(path=str(Path(screenshot_dir) / 'chembrain-english.png'), full_page=True)
         page.get_by_role('button', name='Paper library').click()
+        expect(page.get_by_role('heading', name='JACS weekly collection', exact=True)).to_be_visible()
+        expect(page.get_by_role('button', name='Collect now', exact=True)).to_be_visible()
+        expect(page.locator('.jacs-collection')).to_contain_text('Subscription PDFs are not downloaded automatically.')
         expect(page.locator('.source-card')).to_have_count(6)
         expect(page.locator('.source-card a.source-doi')).to_have_count(6)
         page.locator('.source-card').first.get_by_role('button', name='Reference details').click()
+        expect(page.locator('.jacs-collection')).to_have_count(0)
         expect(page.get_by_role('link', name='Open DOI', exact=True)).to_be_visible()
         expect(page.locator('.source-text, pre, iframe')).to_have_count(0)
         page.get_by_role('button', name='All papers', exact=True).click()
@@ -157,8 +246,9 @@ def exercise_ui(base_url: str, screenshot_dir=None):
         assert mobile.evaluate('document.documentElement.scrollWidth <= 390'), 'Mobile paper library overflows'
         if screenshot_dir: mobile.screenshot(path=str(Path(screenshot_dir) / 'chembrain-english-mobile.png'),full_page=True)
         assert not errors, errors
+        exercise_collection_controls(browser, base_url)
         browser.close()
-        print(json.dumps({'status':'passed','checks':['English interface','14-molecule literature starter','DOI links without full text','paper filter','DOI reference creation','DOI deletion rejected without losing the citation','nested molecule creation','molecule metadata editing','DOI citation reaction create/edit','photochemical conditions','route search and draft exclusion','DOI-only Markdown export','persistent reload','mobile layouts','no JS errors']}))
+        print(json.dumps({'status':'passed','checks':['English interface','14-molecule literature starter','one reaction reference per paper with all main/SI provenance','DOI links without full text','JACS open-access collection panel','paper filter','DOI reference creation','DOI deletion rejected without losing the citation','nested molecule creation','molecule metadata editing','DOI citation reaction create/edit','photochemical conditions','route search and draft exclusion','DOI-only Markdown export','persistent reload','mobile layouts','no JS errors']}))
 
 
 def verify_restarted_ui(base_url: str):

@@ -2,6 +2,26 @@
 
 ## 현재 상태
 
+**CHANGES_REQUESTED — 20261017-gpt-02 / round-01, 미해결 4건·round-02 Planning 인계**
+
+- 날짜/시간대: 2026-10-17 (America/Chicago)
+- 확정 범위: JACS 전체 논문, 주제 필터 없음, **서지정보 + OA PDF만**
+- 추가 요구: 본문·SI 참조 카드를 정규화 논문 DOI별 하나로 묶고 locator·원래 evidence 보존
+- 역할: round-01 Planning·Development·Independent QA·Revision·Wiki 기록 완료, 다음 round-02 Planning 대기
+- 고정된 새 소스 SHA: `36fde22d2791475062565161bf986b88f035b2da` — 소스 브랜치에 푸시됨
+- 회차 시작 기준 SHA: `3f102821649ff13b5581ebdff18274ef46602322` — 이전 승인은 신규 변경에 승계하지 않음
+- 기록 원본: GitHub `codex/gpt-workflow-records`; 실행 소스 `codex/gpt-agent-workflow`
+- 새 기능 QA·Revision 최종 결과: 둘 다 **CHANGES REQUESTED / 미해결 4건 / 전달 승인 없음**
+- 정확한 SHA의 Windows CI: PENDING — 성공해도 이 소스의 검수 거절은 해소되지 않음
+- 다음 Planning: [round-01 인계](runs/20261017-gpt-02/round-01/handoff.md)를 읽고 round-02 계획 작성
+- 로컬 검사: Python 210 PASS / Windows 전용 DPAPI 1 SKIP, 프런트엔드·실제 브라우저·소스 시작/재실행 PASS
+- 클라우드 공개 공급자 관찰: **UNAVAILABLE** (네트워크/DNS 제한) — 실제 다운로드 PASS가 아님
+- 새 기능 전달 여부: **아니오**. 사용자 PC 예약 작업 설치: **아직 없음**
+- Box 직접 저장·자동 동기화: 미구성. 기관 인증의 클라우드 이전·개인 외부 AI API 호출: 없음
+- 이전 검수 후보 승인은 아래 기록과 기존 회차 보고서에 보존하며 신규 변경에 승계하지 않음
+
+## 이전 실행 완료 상태 — 20261016-gpt-01
+
 **READY_REVIEWED_CANDIDATE — 다섯 역할 완료, 남은 지적 0건**
 
 - 실행 ID / 회차: `20261016-gpt-01` / `round-01`
@@ -119,3 +139,28 @@ Development가 실행 소스를 `3f102821649ff13b5581ebdff18274ef46602322`로 �
 [새 회차 Planning 초안](runs/20261017-gpt-02/round-01/planning.md)에 ISSN/Crossref·RSS 메타데이터 탐색과 DOI 중복 제거, source ID·사용자 편집을 보존하는 원자적 PDF 첨부, EXE `--sync-once`와 현재 사용자 Windows 작업 스케줄러, `NEEDS_LOGIN` 상태를 포함한 예비 구성을 기록했습니다. PDF는 로컬 보관하고 UI는 DOI 중심으로 유지하며, 일반 텍스트 후보에서 검수 완료 반응을 자동 생성하지 않습니다.
 
 이전 앱의 **READY_REVIEWED_CANDIDATE**와 소스 `3f102821649ff13b5581ebdff18274ef46602322`에 대한 검수는 그대로 유지됩니다. 그 승인은 새 주간 수집 기능의 구현·인증·예약 실행을 포함하지 않습니다. 이번 요청으로 코드를 변경하거나 논문을 다운로드하거나 PC에 예약 작업을 설치하지 않았으며, 기관 인증을 클라우드에 이전하지 않았습니다. 확정 구현 계획은 사용자 입력과 지원 접근 경로 확인 이후 작성합니다.
+
+## 2026-10-17 · 입력 확정 및 구현 착수
+
+사용자가 **JACS 전체 논문, 주제 제한 없음, 서지정보와 OA PDF만**으로 범위를 확정했습니다. 캠퍼스 네트워크/VPN 구독 접근권이 있더라도 비공개 PDF 수집으로 범위를 확장하지 않습니다. 본문·SI가 같은 논문이면 반응 참조 카드를 정규화 DOI별 하나로 묶되, underlying evidence와 모든 locator를 보존하는 요구도 추가되었습니다.
+
+Planning이 최종 계획을 작성하고 Development가 수집기·UI 보조 에이전트와 구현을 시작합니다. 보조 에이전트는 Development 역할이며 독립 QA를 대신하지 않습니다. 별도 Independent QA와 Revision은 구현·정확한 SHA의 증거 준비 후 수행합니다. 현재 새 기능은 미검증·미전달이며 사용자 PC에 스케줄을 설치하거나 Box에 직접 기록하지 않았습니다. 이전 실행의 승인·SHA·영수증은 역사로 보존합니다.
+
+## 2026-10-17 · gpt-02 소스 고정 및 독립 검수 시작
+
+Development가 새 실행 소스를 `36fde22d2791475062565161bf986b88f035b2da`로 고정·푸시했습니다. [Development 원문](runs/20261017-gpt-02/round-01/development.md)에 구현·명령·검사·제한을 보존합니다. Planning과 구현·로컬 검사는 완료했으며 Independent QA 및 Revision의 사전 검토가 진행 중입니다. Windows CI는 이 정확한 SHA의 결과를 기다리고 있습니다.
+
+로컬 전체 Python 검사는 210 PASS와 Windows 전용 DPAPI 1 SKIP, 프런트엔드 빌드·실제 Chromium·일반 시작과 실제 재실행 저장 유지는 PASS입니다. 이는 Windows 결과나 두 독립 최종 승인을 대신하지 않습니다. 공개 공급자 직접 관찰은 네트워크/DNS 제한으로 **UNAVAILABLE**이며 실제 공개 PDF 수집 성공으로 기록하지 않습니다. Windows 관찰과 원본 증거는 별도로 확인합니다.
+
+새 기능은 아직 검수 완료·전달 상태가 아닙니다. 사용자 PC의 수집/예약 작업 설치·기관 인증 이전·Box 직접 기록·개인 외부 AI API 호출을 수행하지 않았습니다. 깨끗한 Windows VM·실제 기본 브라우저 검사는 계속 NOT RUN입니다. 기존 검수 회차의 승인과 모든 SHA/영수증은 보존하지만 새 소스 검수에 전용하지 않습니다.
+
+## 2026-10-17 · gpt-02 round-01 검수 거절 및 Planning 환류
+
+[QA 원문](runs/20261017-gpt-02/round-01/qa.md)과 [Revision 원문](runs/20261017-gpt-02/round-01/revision.md)은 모두 소스 `36fde22d2791475062565161bf986b88f035b2da`에 대해 **CHANGES REQUESTED**, 미해결 **4건**을 기록했습니다. Wiki는 두 원문을 그대로 보존하고 [수정 작업 인계](runs/20261017-gpt-02/round-01/handoff.md)를 작성해 **round-02 Planning**으로 넘깁니다.
+
+1. **HIGH:** 같은 출판사 리다이렉트가 다른 논문/경로로 이동해도 원래 DOI와 라이선스로 PDF가 첨부될 수 있음.
+2. **MEDIUM:** 검증에 사용한 라이선스 유효일·버전·제공 PDF 링크 및 Crossref type이 provenance에서 누락됨.
+3. **MEDIUM:** PDF 바이트 제한 외 최대 페이지 수가 없어 매우 큰 페이지 문서를 허용함.
+4. **MEDIUM:** 기존 DOI 중복 기록을 보존하지만 중복 개수·source ID를 사용자 상태에 알리지 않음.
+
+이 후보의 전달 승인은 없습니다. 기존 검사 PASS나 이후 Windows CI 성공은 네 지적의 수정을 대신하지 않습니다. 다음 회차에서는 수정된 새 SHA에 대해 필수 검사와 QA·Revision을 다시 수행하며, OA 한정·기존 데이터 보존·실제 공급자 UNAVAILABLE 등 범위와 한계를 유지합니다.

@@ -26,6 +26,8 @@ import {
 import { api, json } from "./api";
 import { Graph } from "./Graph";
 import { SourceMetadataForm, documentRoles, doiUrl } from "./SourceMetadata";
+import { groupPaperReferences } from "./references";
+import { JacsCollection } from "./JacsCollection";
 import {
   availability,
   evidencePageLabel,
@@ -505,6 +507,7 @@ function App() {
                 loading={sourceLoading}
                 onOpen={openSource}
                 onBack={() => setSource(null)}
+                onCollected={reload}
                 onUpdated={async (detail) => {
                   setSource(detail);
                   await reload();
@@ -729,6 +732,7 @@ function ReactionDetail({
   onSelect: (id: string) => void;
   onEdit: () => void;
 }) {
+  const references = groupPaperReferences(r.evidence, workspace.sources);
   return (
     <>
       <div className="inspector-heading">
@@ -753,7 +757,7 @@ function ReactionDetail({
               {r.status === "reviewed" ? "Record reviewed" : "Draft"}
             </span>
           )}
-          <span className="muted">{r.evidence.length} references</span>
+          <span className="muted">{references.length} {references.length === 1 ? "reference" : "references"}</span>
         </div>
       </div>
       <div className="inspector-section">
@@ -808,31 +812,32 @@ function ReactionDetail({
       </div>
       <div className="inspector-section">
         <h4>
-          References <span>{r.evidence.length}</span>
+          References <span>{references.length}</span>
         </h4>
-        {r.evidence.map((e, i) => {
-          const reference = workspace.sources.find((s) => s.id === e.source_id);
+        {references.map((group) => {
+          const reference = group.source;
           const content = (
             <>
               <div>
                 <BookOpen size={14} />
-                {reference?.title}
+                {reference?.title || "Reference metadata unavailable"}
                 <ExternalLink size={12} />
               </div>
-              <small>
-                {evidencePageLabel(e, reference)}
-                {e.locator && ` · ${e.locator}`}
-              </small>
+              {group.citations.map(({ evidence, source }, index) => <small className="reference-provenance" key={index}>
+                {source ? `${documentRoles[source.document_role || "other"]}: ${source.title}` : `Source: ${evidence.source_id}`}
+                {" · "}{evidencePageLabel(evidence, source)}
+                {evidence.locator && ` · ${evidence.locator}`}
+              </small>)}
               <span className="source-doi">
-                {reference?.doi || "Reference metadata"}
+                {group.doi || "Reference metadata"}
               </span>
             </>
           );
-          return reference?.doi ? (
+          return group.doi ? (
             <a
               className="evidence-card"
-              key={i}
-              href={doiUrl(reference.doi)}
+              key={group.key}
+              href={doiUrl(group.doi)}
               target="_blank"
               rel="noreferrer"
             >
@@ -841,8 +846,8 @@ function ReactionDetail({
           ) : (
             <button
               className="evidence-card"
-              key={i}
-              onClick={() => onSource(e.source_id)}
+              key={group.key}
+              onClick={() => onSource(group.citations[0].evidence.source_id)}
             >
               {content}
             </button>
@@ -958,6 +963,7 @@ function Sources({
   onOpen,
   onBack,
   onUpdated,
+  onCollected,
 }: {
   workspace: Workspace;
   source: SourceDetail | null;
@@ -965,6 +971,7 @@ function Sources({
   onOpen: (id: string) => void;
   onBack: () => void;
   onUpdated: (source: SourceDetail) => Promise<void>;
+  onCollected: () => Promise<unknown>;
 }) {
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
@@ -1105,6 +1112,7 @@ function Sources({
   const papers = workspace.sources.filter((s) => !s.is_demo);
   return (
     <>
+      <JacsCollection onCollected={onCollected} />
       <form className="source-metadata-form" onSubmit={addReference}>
         <h2>Add a paper by DOI</h2>
         <p className="subtle-text">
