@@ -1,0 +1,157 @@
+name: Publish Chembrain browser preview
+on:
+  push:
+    branches: [codex/gpt-agent-workflow, main]
+  workflow_dispatch:
+    inputs:
+      collect:
+        type: boolean
+        default: false
+        description: Collect public journal metadata and supported OA PDFs before publishing
+  schedule:
+    - cron: '0 15 * * 1'
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: chembrain-pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    outputs:
+      facts: ${{ toJSON(steps) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record start
+        env: { WEB_PHASE: dependencies }
+        run: python scripts/report_web_build.py
+      - uses: actions/setup-node@v4
+        with: { node-version: '24', cache: npm }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12', cache: pip }
+      - name: Install dependencies
+        run: |
+          python -m pip install --require-hashes -r requirements.lock
+          npm ci
+          python -m pip install playwright==1.62.0
+          python -m playwright install --with-deps chromium
+      - uses: actions/cache@v4
+        if: github.event_name == 'schedule' || inputs.collect == true
+        with:
+          path: ${{ runner.temp }}/chembrain-paper-processor
+          key: chembrain-paper-processor-${{ github.run_id }}
+          restore-keys: chembrain-paper-processor-
+      - name: Weekly separate paper processor
+        id: collection
+        if: github.event_name == 'schedule' || inputs.collect == true
+        continue-on-error: true
+        timeout-minutes: 5
+        run: |
+          python -m paper_pipeline weekly --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --out public/library.json
+      - name: Preserve only normalized weekly data
+        if: github.event_name == 'schedule' || inputs.collect == true
+        run: |
+          python -m paper_pipeline export --curated public/library.json --out public/library.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/library.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update compact public journal bibliography'
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+      - name: Tests
+        id: tests
+        timeout-minutes: 4
+        env: { WEB_PHASE: tests }
+        run: |
+          set -euo pipefail
+          python scripts/report_web_build.py
+          python -m pytest -q 2>&1 | tee web-tests.log
+      - name: Build browser app
+        id: app
+        timeout-minutes: 3
+        env:
+          CHEMBRAIN_BASE: /${{ github.event.repository.name }}/
+          WEB_PHASE: browser-build
+        run: |
+          set -euo pipefail
+          python scripts/report_web_build.py
+          npm run build:web 2>&1 | tee web-build.log
+          python -c 'import json,os;from pathlib import Path;Path("dist/version.json").write_text(json.dumps({"commit":os.environ["GITHUB_SHA"]}))'
+      - name: Browser workflow and persistence
+        id: browser
+        timeout-minutes: 3
+        env: { WEB_PHASE: browser-checks }
+        run: |
+          set -euo pipefail
+          python scripts/report_web_build.py
+          python scripts/web_smoke.py 2>&1 | tee web-browser.log
+      - name: Record artifact stage
+        env: { WEB_PHASE: upload-pages-artifact }
+        run: python scripts/report_web_build.py
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: dist }
+      - name: Record validated build
+        if: always()
+        env:
+          WEB_PHASE: build-finished
+          WEB_FACTS: ${{ toJSON(steps) }}
+        run: python scripts/report_web_build.py
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+      facts: ${{ toJSON(steps) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record configuration stage
+        env: { WEB_PHASE: configure-pages }
+        run: python scripts/report_web_build.py
+      - name: Configure Actions-based Pages
+        id: config
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python scripts/ensure_pages.py | tee pages-config.log
+      - name: Record deployment stage
+        env: { WEB_PHASE: deploying-pages }
+        run: python scripts/report_web_build.py
+      - uses: actions/deploy-pages@v4
+        id: deployment
+      - name: Verify actual public HTTP
+        id: access
+        env: { PAGE_URL: '${{ steps.deployment.outputs.page_url }}' }
+        run: |
+          set -euo pipefail
+          python scripts/check_published_web.py "$PAGE_URL" "$GITHUB_SHA" | tee web-access.log
+      - name: Record publish state
+        if: always()
+        env:
+          WEB_PHASE: publish-finished
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          WEB_FACTS: ${{ toJSON(steps) }}
+        run: python scripts/report_web_build.py
+  terminal:
+    if: always()
+    needs: [build, publish]
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish authoritative preview outcome
+        env:
+          WEB_TERMINAL: '1'
+          WEB_PHASE: terminal
+          WEB_RESULT: ${{ needs.build.result == 'success' && needs.publish.result == 'success' && 'success' || 'blocked' }}
+          PAGE_URL: ${{ needs.publish.outputs.page_url }}
+          WEB_FACTS: ${{ toJSON(needs) }}
+        run: python scripts/report_web_build.py

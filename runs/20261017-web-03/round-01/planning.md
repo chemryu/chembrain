@@ -1,0 +1,9 @@
+# Planning snapshot — browser architecture
+
+Latest user authorization: GitHub Pages + browser-local storage; publish normalized example information without PDFs. Separate weekly journal processor, molecule-first view with no reaction/category panel populated until a molecule is chosen. Main graph/category UI stays only in the legacy desktop build.
+
+Implement public v1 papers/chemicals/solutions/reactions with stable IDs, DOI/InChIKey normalization, per-paper unknown compound labels, stage-specific solvents/solutes and source locators. Preserve missing values and draft status. Curate a bounded 12-reaction starter from the three supplied papers; no claim to complete OCR or complete total-synthesis extraction. Paper processor archives/candidates outside source/site, public metadata + explicitly licensed ACS OA only, other configured journals DOI metadata/local PDF ingestion. Candidates require manual review before export.
+
+Browser: no backend/AI credentials/Python; validate/import compact packages, preserve edited records, local backups, unique DOI reference cards, optional synthesis-route expansion, mobile layout, no automatic selection after reload. Exact public source marker must be verified before reporting the site as accessible. Hosting/account restrictions remain external blockers. GitHub schedules activate only on default branch; no automatic main merge or user-PC task installation.
+
+Workflow limitation: a separate GPT agent returned an actual usage-limit error while working on prior diagnostics. No retries/model switching are used to evade it. Root performs implementation and checks; independent QA/Revision of these new changes remains BLOCKED. User explicitly authorized a labelled preview, not a claim of independent release approval. Keep that distinction in UI and records.

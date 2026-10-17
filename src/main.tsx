@@ -42,6 +42,7 @@ import {
   type Workspace,
 } from "./types";
 import "./styles.css";
+import { MolecularLibrary } from "./MolecularLibrary";
 
 type View = "graph" | "sources" | "routes" | "molecules";
 type Modal =
@@ -2079,6 +2080,6 @@ function ReactionForm({
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    {import.meta.env.VITE_WEB_LIBRARY === "1" ? <MolecularLibrary /> : <App />}
   </React.StrictMode>,
 );
