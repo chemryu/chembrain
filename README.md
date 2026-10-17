@@ -22,6 +22,25 @@ Current automated validation checks ordinary zero-argument startup, a captured b
 - Reaction records with method-specific conditions, yields and page/figure/procedure locators. New DOI citations record manual review; they do not claim an automatic text match.
 - Bounded route search that retains all reactant branches and excludes drafts by default.
 - Markdown export with ID-based backlinks and DOI citations. Original PDF page indices, printed pages and unspecified numbering are distinguished. Full paper text and source excerpts are omitted.
+- Reaction references are grouped by normalized DOI: a paper's main article and SI appear in one card with all individual evidence locations retained. Editing and original records keep their separate provenance.
+
+## Weekly JACS collection
+
+Open **Paper library → JACS weekly collection** to collect Journal of the American Chemical Society articles. **Collect now** fetches public Crossref bibliography, checks normalized DOIs against existing references and preserves user edits. The first run covers the previous 14 days of publication; later runs overlap the previous collection window and catch up after missed runs. Bounded pagination resumes on the next collection when necessary. No chemistry record is automatically marked reviewed.
+
+Only PDFs with a currently effective, recognized Creative Commons/public-domain license and matching ACS PDF metadata are downloaded. A PDF link alone is insufficient. This conservative policy can leave some open papers without a downloaded file when metadata or a supported link is absent. Subscription PDFs are not fetched using your institutional entitlement. Use **Open DOI** on your campus network or VPN to access those papers normally. No campus credentials, AI API key or publisher cookie is requested.
+
+PDFs are saved separately in `%LOCALAPPDATA%\Chembrain\jacs_pdfs`; attaching them does not replace original documents or alter citation page numbering. The app continues showing DOI links rather than full papers. Network failures and incomplete collections appear in the panel and retain retry/checkpoint state.
+
+In the Windows EXE, enable **Weekly collection**, choose the day/time and click **Save weekly schedule**. The default is Monday 09:00 in your PC's local time. A current-user Windows task runs a stable copy of the EXE without opening the app UI. Keep the PC on, online and logged in; missed runs are configured to start when available, and simultaneous collectors are prevented. Disable the checkbox and save to remove the task. Nothing is installed on your PC merely by generating this package in the cloud.
+
+For a one-time command-line collection without opening the app:
+
+```powershell
+.\Chembrain.exe --sync-jacs
+```
+
+`--metadata-only`, `--days 7` and `--max-pages 1` support bounded metadata inspection/backfill. Public-provider availability and actual downloads from your PC remain distinct from fixture tests; CI retains a separate public metadata connectivity observation, never treating an unavailable provider as a successful live download.
 
 The desktop app starts with **14 molecules and 6 representative reactions from 3 papers**. Four records are reviewed; two Nicewicz entries remain drafts because article and SI yields disagree. This is partial assisted curation, not independent experimental reproduction or a complete substrate-scope database. Inventory and purchasing status are unknown.
 

@@ -1,4 +1,5 @@
 import json
+import re
 from contextlib import contextmanager
 import sqlite3
 from pathlib import Path
@@ -45,3 +46,42 @@ class Store:
     def mark_initialized(self):
         with self.connect() as db:
             db.execute("INSERT OR IGNORE INTO metadata VALUES('initialized','1')")
+
+    def get_metadata(self, key: str, default=None):
+        with self.connect() as db:
+            row = db.execute("SELECT value FROM metadata WHERE key=?", (key,)).fetchone()
+            return json.loads(row[0]) if row else default
+
+    def set_metadata(self, key: str, value):
+        with self.connect() as db:
+            db.execute("INSERT INTO metadata(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (key, json.dumps(value, ensure_ascii=False)))
+
+    @staticmethod
+    def _doi(value: str) -> str:
+        return re.sub(r"^https?://(?:dx\.)?doi\.org/", "", value.strip(), flags=re.I).casefold()
+
+    def create_reference(self, record: dict):
+        """Atomic manual insert: DOI + document role identify a reference, not an SI."""
+        with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            for row in db.execute("SELECT data FROM records WHERE kind='source'"):
+                previous = json.loads(row[0])
+                if self._doi(previous.get("doi", "")) == self._doi(record.get("doi", "")) and previous.get("document_role", "other") == record.get("document_role", "other"):
+                    raise ValueError("This DOI and document type are already in your library.")
+            db.execute("INSERT INTO records(kind,id,data) VALUES('source',?,?)", (record["id"], json.dumps(record, ensure_ascii=False)))
+        return record
+
+    def import_jacs_reference(self, record: dict) -> tuple[dict, bool]:
+        """Use an existing main/unspecified record; preserve uploads and all user metadata."""
+        with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            candidates = []
+            for row in db.execute("SELECT data FROM records WHERE kind='source'"):
+                previous = json.loads(row[0])
+                if self._doi(previous.get("doi", "")) == self._doi(record["doi"]) and previous.get("document_role", "other") in ("main", "other"):
+                    candidates.append(previous)
+            if candidates:
+                candidates.sort(key=lambda item: item.get("document_role") != "main")
+                return candidates[0], False
+            db.execute("INSERT INTO records(kind,id,data) VALUES('source',?,?)", (record["id"], json.dumps(record, ensure_ascii=False)))
+            return record, True

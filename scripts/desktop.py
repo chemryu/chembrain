@@ -23,8 +23,41 @@ def main():
     parser = argparse.ArgumentParser(description="Chembrain local desktop launcher")
     parser.add_argument("--data-dir", type=Path, default=default_data_dir())
     parser.add_argument("--no-browser", action="store_true")
-    parser.add_argument("--smoke-test", action="store_true", help="Verify the packaged API, structures, DOI examples and UI, then exit")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--smoke-test", action="store_true", help="Verify the packaged API, structures, DOI examples and UI, then exit")
+    modes.add_argument("--sync-jacs", action="store_true", help="Collect JACS bibliography and verified open PDFs, then exit without opening the app")
+    modes.add_argument("--install-jacs-schedule", action="store_true")
+    modes.add_argument("--remove-jacs-schedule", action="store_true")
+    parser.add_argument("--weekday", default="Monday", choices=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+    parser.add_argument("--time", dest="schedule_time", default="09:00")
+    parser.add_argument("--metadata-only", action="store_true")
+    parser.add_argument("--days", type=int)
+    parser.add_argument("--max-pages", type=int, default=20)
     args = parser.parse_args()
+    if args.metadata_only and not args.sync_jacs:
+        parser.error("--metadata-only requires --sync-jacs")
+    if args.days is not None and not 1 <= args.days <= 366:
+        parser.error("--days must be between 1 and 366")
+    if not 1 <= args.max_pages <= 20:
+        parser.error("--max-pages must be between 1 and 20")
+    if args.sync_jacs or args.install_jacs_schedule or args.remove_jacs_schedule:
+        if not getattr(sys, "frozen", False):
+            sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from server.store import Store
+        store = Store(args.data_dir)
+        if args.sync_jacs:
+            from server.jacs_collection import collect_jacs, CollectionBusy
+            try:
+                result = collect_jacs(store, metadata_only=args.metadata_only, days=args.days, max_pages=args.max_pages)
+            except CollectionBusy:
+                print(json.dumps({"status":"already_running"}), flush=True)
+                return 0
+            print(json.dumps(result, ensure_ascii=True), flush=True)
+            return 0 if result['status'] == 'success' else 1
+        from server.collection_schedule import configure_schedule
+        result = configure_schedule(store, args.install_jacs_schedule, args.weekday, args.schedule_time)
+        print(json.dumps(result), flush=True)
+        return 0
     if args.smoke_test:
         with tempfile.TemporaryDirectory(prefix="chembrain-packaged-smoke-") as temporary:
             run(Path(temporary), no_browser=True, smoke_test=True)
@@ -105,10 +138,10 @@ def serve(data_dir: Path, no_browser: bool, smoke_test: bool):
 
 if __name__ == "__main__":
     try:
-        main()
+        raise SystemExit(main() or 0)
     except Exception as error:
         logging.exception("Chembrain failed to start")
         print(f"Chembrain could not start: {error}", file=sys.stderr)
-        if getattr(sys, "frozen", False) and "--smoke-test" not in sys.argv:
+        if getattr(sys, "frozen", False) and not any(arg in sys.argv for arg in ("--smoke-test", "--sync-jacs", "--install-jacs-schedule", "--remove-jacs-schedule")):
             input("Press Enter to close...")
         raise SystemExit(1)

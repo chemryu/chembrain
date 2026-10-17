@@ -3,6 +3,8 @@ import io
 import json
 import os
 import re
+import subprocess
+import threading
 import uuid
 import zipfile
 from datetime import datetime, timezone
@@ -19,6 +21,7 @@ from .routes import find_routes
 from .seed import seed
 from .literature import seed_literature, translate_known_records
 from .store import Store
+from . import jacs_collection, collection_schedule
 
 ROOT = Path(__file__).resolve().parent.parent
 MAX_UPLOAD = 20 * 1024 * 1024
@@ -82,6 +85,47 @@ def create_app(data_dir: Path | None = None, demo: bool | None = None) -> FastAP
     @app.get("/api/workspace")
     def workspace():
         return {"molecules": store.all("molecule"), "reactions": store.all("reaction"), "sources": [source_summary(s) for s in store.all("source")]}
+
+    collector_start_lock = threading.Lock()
+    collector_thread = None
+
+    @app.get("/api/collection/jacs")
+    def jacs_status():
+        return {**jacs_collection.collection_status(store), "schedule": collection_schedule.schedule_status(store)}
+
+    @app.post("/api/collection/jacs/run", status_code=202)
+    def start_jacs_collection():
+        nonlocal collector_thread
+        with collector_start_lock:
+            if (collector_thread and collector_thread.is_alive()) or jacs_collection.collection_status(store)["running"]:
+                raise HTTPException(409, "A JACS collection is already running.")
+            def collect():
+                try:
+                    jacs_collection.collect_jacs(store)
+                except jacs_collection.CollectionBusy:
+                    pass  # A scheduled process acquired the same data-directory lock first.
+                except Exception:
+                    # An interrupted run remains visible in collector status; never dump credentials or environment.
+                    import logging
+                    logging.getLogger(__name__).error("JACS collection stopped unexpectedly.")
+            collector_thread = threading.Thread(target=collect, name="jacs-collection", daemon=True)
+            collector_thread.start()
+        return {"started": True}
+
+    @app.post("/api/collection/jacs/schedule")
+    def set_jacs_schedule(body: dict):
+        enabled = body.get("enabled")
+        weekday, time = body.get("weekday", "Monday"), body.get("time", "09:00")
+        if not isinstance(enabled, bool) or not isinstance(weekday, str) or not isinstance(time, str):
+            raise HTTPException(422, "Choose whether to enable the schedule, a weekday and local time.")
+        if jacs_collection.collection_status(store)["running"]:
+            raise HTTPException(409, "Wait for the current JACS collection before changing its schedule.")
+        try:
+            return collection_schedule.configure_schedule(store, enabled, weekday, time)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        except (RuntimeError, OSError, subprocess.SubprocessError) as exc:
+            raise HTTPException(503, "Windows could not update the weekly collection schedule.") from exc
 
     @app.post("/api/molecules", status_code=201)
     def add_molecule(body: MoleculeInput):
@@ -232,12 +276,13 @@ def create_app(data_dir: Path | None = None, demo: bool | None = None) -> FastAP
         if body.related_source_ids:
             for sid in body.related_source_ids:
                 get_record("source", sid)
-        if any(s.get("doi", "").lower() == body.doi.lower() and s.get("document_role") == body.document_role for s in store.all("source")):
-            raise HTTPException(409, "This DOI and document type are already in your library.")
         result = {**body.model_dump(), "id": uuid.uuid4().hex, "filename": "", "kind": "reference", "is_demo": False,
                   "page_count": 0, "pages": [], "candidates": [], "text_characters": 0, "sha256": "reference-" + uuid.uuid4().hex,
                   "created_at": datetime.now(timezone.utc).isoformat()}
-        store.put("source", result)
+        try:
+            store.create_reference(result)
+        except ValueError as exc:
+            raise HTTPException(409, "This DOI and document type are already in your library.") from exc
         return source_summary(result)
 
     @app.get("/api/sources/{sid}")
