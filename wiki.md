@@ -2,6 +2,23 @@
 
 ## 현재 상태
 
+**INDEPENDENT_REVIEW_AND_PAGES_CI_PENDING — web round-02 소스 고정·검수 진행**
+
+- 날짜/시간대: 2026-10-17 (America/Chicago)
+- 실행/회차: `20261017-web-03 / round-02`
+- 고정·푸시된 소스: `d423c718ca3c0b7d1dd090a362ba02990d7e223a`; 이전 거절 소스 `e424b34653fb96b911f5ee5708286c92baddfe5f`
+- 순서: round-01 인계 기록 `128c3fca84fbc222043c5aaaddcc126bcc62c172` 게시 → 별도 round-02 Planning → Development 구현/로컬 검사 완료
+- Independent QA·Revision: 새 SHA 검토 중, **최종 승인 없음**. 이전 4건은 구현 완료·독립 검증 대기
+- 구현 측 검사: Python 253 PASS / Windows 전용 DPAPI 1 SKIP, build:web·실제 Chromium PASS, malformed editor 42종·Python export→import 포함
+- 새 CI 영수증·Pages 배포·실제 공개 source/data marker: **PENDING / 미검증**, URL 없음
+- 이전 Pages 403은 실제 과거 증거로 유지. 소유자 Source 설정 질문은 응답 대기이며 새 결과로 간주하지 않음
+- durable state branch는 공개 DOI/queue/checkpoint whitelist metadata만 저장, PDF·private review는 제외. Raw archive cache는 best effort로 영구 보관 아님
+- 주간 dispatcher는 fail-closed·미설정 검토 artifact뿐이며 **미설치·주간 비활성**. 사용자 PC 작업도 미설치
+- 미리보기만 사용자 명시 허용; 새 앱/production 승인 없음. 브라우저 로컬 저장·정규화 데이터·초기 빈 반응 패널·과학 draft 한계 유지
+- 기록: [round-02 Wiki](runs/20261017-web-03/round-02/wiki-record.md). Box 직접 저장·기관 인증 이전·개인 외부 AI API 호출 없음
+
+## 이전 웹 검수 거절 상태 — 20261017-web-03 / round-01
+
 **CHANGES_REQUESTED — 웹 round-01 미해결 4건 + 별도 Pages 403 차단**
 
 - 날짜/시간대: 2026-10-17 (America/Chicago)
@@ -229,3 +246,9 @@ live Crossref의 첫 관찰이 실패하면 packaged `--sync-jacs` 호출도 생
 [Planning 인계](runs/20261017-web-03/round-01/handoff.md)에 각 수정 계약과 검사를 전달했습니다. 별도 Pages 설정 403 `Resource not accessible by integration`은 [불변 영수증/로그](runs/20261017-web-03/round-01/web/manifest.json)로 확인됐고 소유자 설정 응답을 기다립니다. CI 테스트 237 PASS/1 SKIP·웹 빌드·브라우저는 PASS이나 배포와 실제 HTTP 확인은 NOT RUN, URL도 없습니다. 앱 검사 성공을 접근 가능·독립 승인으로 바꾸지 않습니다.
 
 새 source/data identity를 고정해 수정 검사와 두 독립 검토 및 실제 게시 응답을 확인하기 전에는 완료로 전달하지 않습니다. 기존 과학 draft/미확정 구조, 비활성 주간 cron, 미설치 PC 작업, 브라우저 로컬 저장 및 이전 Windows 기록의 한계를 유지합니다.
+
+## 2026-10-17 · web round-02 고정 소스 검수 시작
+
+[Planning](runs/20261017-web-03/round-02/planning.md)과 [Development](runs/20261017-web-03/round-02/development.md)를 읽고 소스 `d423c718ca3c0b7d1dd090a362ba02990d7e223a`의 중간 상태를 기록했습니다. 세 Development 보조 기록은 같은 역할의 구현 증거이며 QA·Revision의 독립 승인을 대신하지 않습니다. 네 이전 지적의 해결 여부는 실제 두 보고서가 나온 뒤 기록합니다. 새 CI 및 실제 Pages 접근 역시 아직 미확인입니다.
+
+공개 DOI/재시도 state의 Git 내구성과 private PDF/review cache의 best effort를 구분합니다. 미설정 dispatcher artifact는 실제 예약 설치가 아니며, 이전 Pages 403 및 소유자 설정 응답 대기를 성공으로 바꾸지 않습니다. 모든 이전 회차의 승인·거절·외부 차단을 보존합니다.

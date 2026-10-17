@@ -1,0 +1,56 @@
+# REVIEW ARTIFACT ONLY. Not an active workflow. Install as the sole default-branch
+# .github/workflows/web-library.yml only AFTER review/hosting gates and replacing
+# REVIEWED_SOURCE below with the full approved feature-source commit.
+name: Dispatch reviewed Chembrain weekly processor
+on:
+  schedule:
+    - cron: '0 15 * * 1'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/web-library.yml]
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: chembrain-weekly-dispatch
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      REVIEWED_SOURCE: REPLACE_WITH_FULL_INDEPENDENTLY_REVIEWED_SOURCE_SHA
+      TARGET_BRANCH: codex/gpt-agent-workflow
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/gpt-agent-workflow
+          fetch-depth: 0
+      - name: Verify reviewed code and dispatch exact branch snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, re, subprocess, urllib.request
+          baseline=os.environ['REVIEWED_SOURCE']
+          if not re.fullmatch('[0-9a-f]{40}',baseline):
+              raise SystemExit('Scheduler artifact is unconfigured; no workflow dispatched')
+          def git(*args):
+              return subprocess.check_output(['git',*args],text=True).strip()
+          current=git('rev-parse','HEAD')
+          if git('merge-base','--is-ancestor',baseline,current):
+              raise SystemExit('Unexpected ancestry output')
+          changes=git('diff','--name-only',baseline,current).splitlines()
+          if any(p!='public/library.json' for p in changes):
+              raise SystemExit('Code changed after review; scheduler needs a reviewed baseline')
+          url='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/workflows/web-library.yml/dispatches'
+          payload={'ref':os.environ['TARGET_BRANCH'],'inputs':{'collect':True,'expected_source':current}}
+          request=urllib.request.Request(url,data=json.dumps(payload).encode(),method='POST',headers={
+              'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+              'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
+          with urllib.request.urlopen(request,timeout=20) as response:
+              if response.status!=204:raise SystemExit('Dispatch not acknowledged')
+          print(json.dumps({'status':'DISPATCH_ACCEPTED_NOT_BUILD_APPROVAL','dispatcher_commit':os.environ['GITHUB_SHA'],'reviewed_source':baseline,'expected_workflow_source':current}))
+          PY

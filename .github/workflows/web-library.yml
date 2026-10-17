@@ -8,6 +8,10 @@ on:
         type: boolean
         default: false
         description: Collect public journal metadata and supported OA PDFs before publishing
+      expected_source:
+        type: string
+        default: ""
+        description: Optional exact commit guard for the reviewed weekly dispatcher
   schedule:
     - cron: '0 15 * * 1'
 permissions:
@@ -23,8 +27,17 @@ jobs:
     timeout-minutes: 18
     outputs:
       facts: ${{ toJSON(steps) }}
+      provenance: ${{ steps.identity.outputs.value }}
     steps:
       - uses: actions/checkout@v4
+      - name: Guard dispatched source
+        env:
+          EXPECTED_SOURCE: ${{ inputs.expected_source }}
+        run: |
+          if [ -n "$EXPECTED_SOURCE" ] && [ "$EXPECTED_SOURCE" != "$GITHUB_SHA" ]; then
+            echo "Dispatch target changed after scheduler verification"
+            exit 1
+          fi
       - name: Record start
         env: { WEB_PHASE: dependencies }
         run: python scripts/report_web_build.py
@@ -44,6 +57,9 @@ jobs:
           path: ${{ runner.temp }}/chembrain-paper-processor
           key: chembrain-paper-processor-${{ github.run_id }}
           restore-keys: chembrain-paper-processor-
+      - name: Restore durable public DOI retry state
+        if: github.event_name == 'schedule' || inputs.collect == true
+        run: python scripts/paper_state.py restore --work-dir "$RUNNER_TEMP/chembrain-paper-processor"
       - name: Weekly separate paper processor
         id: collection
         if: github.event_name == 'schedule' || inputs.collect == true
@@ -51,6 +67,9 @@ jobs:
         timeout-minutes: 5
         run: |
           python -m paper_pipeline weekly --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --out public/library.json
+      - name: Preserve durable public DOI retry state
+        if: always() && (steps.collection.outcome == 'success' || steps.collection.outcome == 'failure') && (github.event_name == 'schedule' || inputs.collect == true)
+        run: python scripts/paper_state.py save --work-dir "$RUNNER_TEMP/chembrain-paper-processor"
       - name: Preserve only normalized weekly data
         if: github.event_name == 'schedule' || inputs.collect == true
         run: |
@@ -62,6 +81,12 @@ jobs:
             git commit -m 'Update compact public journal bibliography'
             git push origin HEAD:${{ github.ref_name }}
           fi
+      - name: Capture actual build identity
+        id: identity
+        run: |
+          python scripts/web_provenance.py --workflow-commit "$GITHUB_SHA" --out "$RUNNER_TEMP/web-provenance.json"
+          echo "value=$(cat "$RUNNER_TEMP/web-provenance.json")" >> "$GITHUB_OUTPUT"
+          echo "WEB_PROVENANCE=$(cat "$RUNNER_TEMP/web-provenance.json")" >> "$GITHUB_ENV"
       - name: Tests
         id: tests
         timeout-minutes: 4
@@ -80,7 +105,7 @@ jobs:
           set -euo pipefail
           python scripts/report_web_build.py
           npm run build:web 2>&1 | tee web-build.log
-          python -c 'import json,os;from pathlib import Path;Path("dist/version.json").write_text(json.dumps({"commit":os.environ["GITHUB_SHA"]}))'
+          cp "$RUNNER_TEMP/web-provenance.json" dist/version.json
       - name: Browser workflow and persistence
         id: browser
         timeout-minutes: 3
@@ -104,6 +129,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 6
+    env:
+      WEB_PROVENANCE: ${{ needs.build.outputs.provenance }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -132,7 +159,7 @@ jobs:
         env: { PAGE_URL: '${{ steps.deployment.outputs.page_url }}' }
         run: |
           set -euo pipefail
-          python scripts/check_published_web.py "$PAGE_URL" "$GITHUB_SHA" | tee web-access.log
+          python scripts/check_published_web.py "$PAGE_URL" "$WEB_PROVENANCE" | tee web-access.log
       - name: Record publish state
         if: always()
         env:
@@ -149,6 +176,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Publish authoritative preview outcome
         env:
+          WEB_PROVENANCE: ${{ needs.build.outputs.provenance }}
           WEB_TERMINAL: '1'
           WEB_PHASE: terminal
           WEB_RESULT: ${{ needs.build.result == 'success' && needs.publish.result == 'success' && 'success' || 'blocked' }}

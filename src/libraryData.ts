@@ -7,28 +7,30 @@ export const emptyLibrary:Library={schema_version:1,papers:[],chemicals:[],solut
 export const normalizeDoi=(s:string)=>s.trim().replace(/^(?:https?:\/\/(?:dx\.)?doi\.org\/|doi:\s*)/i,'').toLowerCase();
 const fail=(s:string):never=>{throw new Error(s);};
 export function validateLibrary(value:unknown):Library {
+ const object=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v);
  const d=structuredClone(value) as Library;
- if(!d||d.schema_version!==1||JSON.stringify(d).length>5_000_000)fail('Use a Chembrain v1 package smaller than 5 MB.');
+ if(!object(d)||d.schema_version!==1||new TextEncoder().encode(JSON.stringify(d)).length>5_000_000)fail('Use a Chembrain v1 package smaller than 5 MB.');
  if(Object.keys(d).some(k=>!['schema_version','generated_at','papers','chemicals','solutions','reactions'].includes(k)))fail('Only normalized library tables may be imported.');
  const string=(v:unknown):v is string=>typeof v==='string'&&v.length<=3000;
  const strings=(v:unknown):v is string[]=>Array.isArray(v)&&v.every(string);
  const ids:Record<string,Set<string>>={};
  for(const kind of ['papers','chemicals','solutions','reactions'] as const){
   if(!Array.isArray(d[kind]))fail('Missing '+kind+' table.');ids[kind]=new Set();
-  for(const r of d[kind]){if(!r||!string(r.id)||! /^[A-Za-z0-9][A-Za-z0-9._:-]{0,120}$/.test(r.id)||ids[kind].has(r.id))fail('Invalid or duplicate '+kind+' ID.');ids[kind].add(r.id);}
+  for(const r of d[kind]){if(!object(r)||!string(r.id)||! /^[A-Za-z0-9][A-Za-z0-9._:-]{0,120}$/.test(r.id)||ids[kind].has(r.id))fail('Invalid or duplicate '+kind+' ID.');ids[kind].add(r.id);}
  }
  const optionalString=(v:unknown)=>v==null||string(v);
+ if(!optionalString(d.generated_at))fail('Invalid generated_at metadata.');
  const seen=new Set<string>();
  for(const p of d.papers){if(!string(p.doi)||!string(p.title)||!p.title||!string(p.journal)||!strings(p.authors)||!optionalString(p.notes)||(p.year!=null&&(!Number.isInteger(p.year)||p.year<1500||p.year>3000)))fail('Paper title, journal, DOI and authors are required.');p.doi=normalizeDoi(p.doi);if(!/^10\.\d{4,9}\/[^\s<>?#]+$/.test(p.doi)||seen.has(p.doi))fail('Each paper needs a unique valid DOI.');seen.add(p.doi);}
- for(const c of d.chemicals)if(!string(c.name)||!c.name||!['compound','reagent','solvent','catalyst'].includes(c.kind)||!strings(c.aliases)||(c.smiles!=null&&!string(c.smiles))||(c.inchikey!=null&&!string(c.inchikey))||!optionalString(c.formula)||!optionalString(c.notes))fail('Invalid chemical metadata.');
- for(const s of d.solutions)if(!strings(s.solvents)||s.solvents.some(id=>!ids.chemicals.has(id))||!Array.isArray(s.solutes)||s.solutes.some(c=>!c||!ids.chemicals.has(c.chemical_id)||!string(c.role)||(c.amount!==null&&(typeof c.amount!=='number'||!Number.isFinite(c.amount)||c.amount<0))||(c.unit!==null&&!string(c.unit)))||(s.concentration!==null&&(typeof s.concentration!=='number'||!Number.isFinite(s.concentration)||s.concentration<0))||(s.concentration_unit!==null&&!string(s.concentration_unit)))fail('A solution references an unknown chemical or invalid amount.');
+ for(const c of d.chemicals)if(!string(c.name)||!c.name||!['compound','reagent','solvent','catalyst'].includes(c.kind)||!strings(c.aliases)||(c.smiles!=null&&!string(c.smiles))||(c.inchikey!=null&&!string(c.inchikey))||!optionalString(c.formula)||!optionalString(c.notes)||(c.molecular_weight!=null&&(typeof c.molecular_weight!=='number'||!Number.isFinite(c.molecular_weight)||c.molecular_weight<0)))fail('Invalid chemical metadata.');
+ for(const s of d.solutions)if(!strings(s.solvents)||s.solvents.some(id=>!ids.chemicals.has(id))||!Array.isArray(s.solutes)||s.solutes.some(c=>!object(c)||!ids.chemicals.has(c.chemical_id)||!string(c.role)||(c.amount!==null&&(typeof c.amount!=='number'||!Number.isFinite(c.amount)||c.amount<0))||(c.unit!==null&&!string(c.unit)))||(s.concentration!==null&&(typeof s.concentration!=='number'||!Number.isFinite(s.concentration)||s.concentration<0))||(s.concentration_unit!==null&&!string(s.concentration_unit)))fail('A solution references an unknown chemical or invalid amount.');
  for(const r of d.reactions){
   if(!string(r.name)||!r.name||!optionalString(r.notes)||!optionalString(r.yield_basis)||!['draft','reviewed'].includes(r.status)||!strings(r.reactants)||!r.reactants.length||!strings(r.products)||!r.products.length||!strings(r.targets)||[...r.reactants,...r.products,...r.targets].some(id=>!ids.chemicals.has(id)))fail('Invalid reaction participants.');
   if(r.yield_percent!==null&&(typeof r.yield_percent!=='number'||!Number.isFinite(r.yield_percent)||r.yield_percent<0||r.yield_percent>100))fail('Yield must be 0–100 or null.');
-  if(!Array.isArray(r.steps)||r.steps.some(s=>!s||!ids.solutions.has(s.solution_id)||['temperature','time','notes'].some(k=>(s as Record<string,unknown>)[k]!=null&&!string((s as Record<string,unknown>)[k]))))fail('Invalid reaction solution/conditions.');
-  if(!Array.isArray(r.evidence)||!r.evidence.length||r.evidence.some(e=>!e||!ids.papers.has(e.paper_id)||!Number.isInteger(e.page)||e.page<1||!string(e.locator)||!e.locator))fail('Reaction DOI evidence and PDF page/locator are required.');
+  if(!Array.isArray(r.steps)||r.steps.some(s=>!object(s)||!ids.solutions.has(s.solution_id)||['temperature','time','notes'].some(k=>(s as Record<string,unknown>)[k]!=null&&!string((s as Record<string,unknown>)[k]))))fail('Invalid reaction solution/conditions.');
+  if(!Array.isArray(r.evidence)||!r.evidence.length||r.evidence.some(e=>!object(e)||!ids.papers.has(e.paper_id)||!Number.isInteger(e.page)||e.page<1||!string(e.locator)||!e.locator))fail('Reaction DOI evidence and PDF page/locator are required.');
  }
- const compact=(v:unknown):void=>{if(typeof v==='string'&&!string(v))fail('Text field exceeds compact package limit.');if(Array.isArray(v))v.forEach(compact);else if(v&&typeof v==='object')for(const [k,x]of Object.entries(v)){if(['pdf','pages','full_text','text','quote','candidate_text','svg','image','base64'].includes(k))fail('PDF text and images belong in the separate processor.');compact(x);}};compact(d);
+ const compact=(v:unknown):void=>{if(typeof v==='number'&&!Number.isFinite(v))fail('Numbers must be finite.');if(typeof v==='string'&&!string(v))fail('Text field exceeds compact package limit.');if(Array.isArray(v))v.forEach(compact);else if(v&&typeof v==='object')for(const [k,x]of Object.entries(v)){if(['pdf','pages','full_text','text','quote','candidate_text','svg','image','base64'].includes(k))fail('PDF text and images belong in the separate processor.');compact(x);}};compact(d);
  return structuredClone(d);
 }
 export function mergeLibrary(current:Library,incoming:Library):Library {

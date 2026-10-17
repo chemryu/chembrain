@@ -2,6 +2,7 @@
 import json,os,subprocess,tempfile
 from datetime import datetime,timezone
 from pathlib import Path
+from web_provenance import resolve_identity
 
 def git(cwd,*args,check=True):return subprocess.run(['git',*args],cwd=cwd,capture_output=True,check=check,timeout=45)
 def main():
@@ -12,7 +13,9 @@ def main():
   if old.get('commit')!=os.environ['GITHUB_SHA'] or old.get('run_id')!=run:raise ValueError('Web receipt source/run mismatch')
  terminal=os.environ.get('WEB_TERMINAL')=='1';status=os.environ.get('WEB_RESULT','running') if terminal else 'running';phase=os.environ.get('WEB_PHASE','starting')
  url=os.environ.get('PAGE_URL') or None
- d={'commit':os.environ['GITHUB_SHA'],'built_commit':git(w,'rev-parse','HEAD').stdout.decode().strip(),'run_id':run,'run_url':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{run}",'reported_at':datetime.now(timezone.utc).isoformat(),'status':status,'terminal':terminal,'phase':phase,'page_url':url,'facts':json.loads(os.environ.get('WEB_FACTS') or '{}'),'independent_qa':'BLOCKED_USAGE_LIMIT; preview only','phases':(old.get('phases',[])+[{'phase':phase,'at':datetime.now(timezone.utc).isoformat()}])[-40:]}
+ current=json.loads(os.environ['WEB_PROVENANCE']) if os.environ.get('WEB_PROVENANCE') else None
+ identity=resolve_identity(current,old.get('provenance'),os.environ['GITHUB_SHA'])
+ d={'commit':os.environ['GITHUB_SHA'],'built_commit':identity['built_commit'] if identity else None,'provenance':identity,'run_id':run,'run_url':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{run}",'reported_at':datetime.now(timezone.utc).isoformat(),'status':status,'terminal':terminal,'phase':phase,'page_url':url,'facts':json.loads(os.environ.get('WEB_FACTS') or '{}'),'independent_qa':'SEPARATE_REVIEW_REQUIRED; preview only','phases':(old.get('phases',[])+[{'phase':phase,'at':datetime.now(timezone.utc).isoformat()}])[-40:]}
  with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as temp:
   p=Path(temp);(p/'status.json').write_text(json.dumps(d,indent=2))
   for name in ('web-build.log','web-tests.log','web-browser.log','web-access.log','pages-config.log','pages-config.json'):
