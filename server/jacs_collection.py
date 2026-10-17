@@ -6,6 +6,7 @@ Bibliographic records and downloaded files are unreviewed research inputs.
 from __future__ import annotations
 
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 import hashlib
@@ -34,6 +35,7 @@ CHECKPOINT = "jacs_collection_checkpoint"
 ARTICLES = "jacs_collection_articles"
 RESUME = "jacs_collection_resume"
 MAX_PDF_BYTES = 30 * 1024 * 1024
+MAX_PDF_PAGES = 400
 
 
 def canonical_doi(value: str) -> str:
@@ -58,6 +60,10 @@ class CollectionBusy(RuntimeError):
     pass
 
 
+class PDFPageLimitError(ValueError):
+    pass
+
+
 class CollectionHTTPError(RuntimeError):
     def __init__(self, status: int):
         self.status = status
@@ -65,7 +71,7 @@ class CollectionHTTPError(RuntimeError):
 
 
 def _failure(stage: str, exc: Exception) -> str:
-    suffix = f"HTTP {exc.status}" if isinstance(exc, CollectionHTTPError) else type(exc).__name__
+    suffix = f"HTTP {exc.status}" if isinstance(exc, CollectionHTTPError) else f"PDF exceeds {MAX_PDF_PAGES} pages" if isinstance(exc, PDFPageLimitError) else type(exc).__name__
     return f"{stage} failed ({suffix})"
 
 
@@ -116,6 +122,8 @@ def collection_lock(store: Store):
 
 
 def _public_url(url: str, hosts: set[str], *, resolve: bool = True):
+    if any(ord(character) < 32 or ord(character) == 127 for character in url):
+        raise ValueError("Invalid collection URL characters")
     parsed = urllib.parse.urlsplit(url)
     if parsed.scheme != "https" or parsed.hostname not in hosts or parsed.username or parsed.password or parsed.port not in (None, 443):
         raise ValueError("Untrusted collection URL")
@@ -127,13 +135,47 @@ def _public_url(url: str, hosts: set[str], *, resolve: bool = True):
             raise ValueError("Non-public collection destination")
 
 
+@dataclass(frozen=True)
+class LicensedPDF:
+    doi: str
+    supplied_url: str
+    license_url: str
+    license_start: str
+    license_end: str | None
+    content_version: str
+    upstream_type: str
+
+
+@dataclass(frozen=True)
+class _PDFPolicy:
+    expected_doi: str
+    content_version: str
+
+    def validate(self, url: str, *, resolve: bool = True):
+        if self.content_version not in ("vor", "am"):
+            raise ValueError("Unsupported licensed PDF version")
+        _public_url(url, {"pubs.acs.org"}, resolve=resolve)
+        path = urllib.parse.unquote(urllib.parse.urlsplit(url).path)
+        match = re.fullmatch(r"/doi/(?:pdf|epdf)/(10\.\d{4,9}/.+)", path)
+        if not match or any(part in (".", "..") for part in path.split("/")):
+            raise ValueError("Unapproved article PDF route")
+        if canonical_doi(match.group(1)) != canonical_doi(self.expected_doi):
+            raise ValueError("PDF URL does not match licensed article")
+
+
 class _Redirect(urllib.request.HTTPRedirectHandler):
-    def __init__(self, hosts):
+    def __init__(self, hosts, pdf_policy: _PDFPolicy | None = None):
         super().__init__()
         self.hosts = hosts
+        self.pdf_policy = pdf_policy
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        _public_url(newurl, self.hosts)
+        if "pubs.acs.org" in self.hosts:
+            if self.pdf_policy is None:
+                raise ValueError("PDF redirect requires immutable article policy")
+            self.pdf_policy.validate(newurl)
+        else:
+            _public_url(newurl, self.hosts)
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
@@ -143,11 +185,16 @@ class CrossrefClient:
         self._last = 0.0
         self.until = until or _utc().date().isoformat()
 
-    def _get(self, url: str, hosts: set[str], limit: int) -> bytes:
+    def _get(self, url: str, hosts: set[str], limit: int, *, pdf_policy: _PDFPolicy | None = None) -> bytes:
         parsed = urllib.parse.urlsplit(url)
         # Crossref pagination has public, controller-generated query parameters.
-        _public_url(urllib.parse.urlunsplit(parsed._replace(query="")), hosts)
-        opener = urllib.request.build_opener(_Redirect(hosts))
+        if "pubs.acs.org" in hosts:
+            if pdf_policy is None:
+                raise ValueError("PDF retrieval requires immutable article policy")
+            pdf_policy.validate(url)
+        else:
+            _public_url(urllib.parse.urlunsplit(parsed._replace(query="")), hosts)
+        opener = urllib.request.build_opener(_Redirect(hosts, pdf_policy))
         for attempt in range(2):
             time.sleep(max(0, 0.5 - (time.monotonic() - self._last)))
             self._last = time.monotonic()
@@ -178,12 +225,14 @@ class CrossrefClient:
             raise ValueError("Invalid Crossref response")
         return result["message"]
 
-    def pdf(self, url: str) -> bytes:
-        _public_url(url, {"pubs.acs.org"})
-        return self._get(url, {"pubs.acs.org"}, MAX_PDF_BYTES)
+    def pdf(self, candidate: LicensedPDF) -> bytes:
+        if not isinstance(candidate, LicensedPDF):
+            raise ValueError("A verified OA candidate is required")
+        policy = _PDFPolicy(candidate.doi, candidate.content_version)
+        return self._get(candidate.supplied_url, {"pubs.acs.org"}, MAX_PDF_BYTES, pdf_policy=policy)
 
 
-def _licensed_pdf(item: dict, now: datetime) -> tuple[str, str] | None:
+def _licensed_pdf(item: dict, now: datetime) -> LicensedPDF | None:
     """A PDF link alone is not OA evidence; require a current matching CC license."""
     licenses = {}
     for license in item.get("license", []):
@@ -207,6 +256,7 @@ def _licensed_pdf(item: dict, now: datetime) -> tuple[str, str] | None:
                 effective = datetime(*values[:3], tzinfo=timezone.utc)
             if effective > now:
                 continue
+            expires = None
             end = license.get("end")
             if end:
                 if end.get("date-time"):
@@ -215,25 +265,22 @@ def _licensed_pdf(item: dict, now: datetime) -> tuple[str, str] | None:
                     expires = datetime(*end["date-parts"][0][:3], tzinfo=timezone.utc)
                 if expires <= now:
                     continue
-        except (KeyError, TypeError, ValueError, IndexError):
+        except (KeyError, TypeError, ValueError, IndexError, AttributeError):
             continue
-        licenses[version] = url
+        licenses[version] = {"url": url, "start": effective.isoformat(), "end": expires.isoformat() if expires is not None else None}
     for link in item.get("link", []):
         if not isinstance(link, dict) or link.get("content-type") not in (None, "unspecified", "application/pdf") or link.get("content-version") not in licenses:
             continue
         url = str(link.get("URL", ""))
         try:
-            _public_url(url, {"pubs.acs.org"}, resolve=False)
-            path = urllib.parse.urlsplit(url).path
-            if not path.startswith(("/doi/pdf/", "/doi/epdf/")):
-                continue
-            # Do not attach a different article's link to this DOI.
-            linked = canonical_doi(urllib.parse.unquote(path.split("/", 3)[3]))
-            if linked != canonical_doi(item["DOI"]):
-                continue
+            doi = canonical_doi(item["DOI"])
+            _PDFPolicy(doi, link["content-version"]).validate(url, resolve=False)
         except (ValueError, KeyError):
             continue
-        return url, licenses[link["content-version"]]
+        evidence = licenses[link["content-version"]]
+        return LicensedPDF(doi=doi, supplied_url=url, license_url=evidence["url"],
+                           license_start=evidence["start"], license_end=evidence["end"],
+                           content_version=link["content-version"], upstream_type=str(item.get("type", "")))
     return None
 
 
@@ -254,10 +301,13 @@ def _reference(item: dict, started_at: str) -> dict:
             "document_role": "main", "related_source_ids": [], "notes": "", "filename": "",
             "kind": "reference", "is_demo": False, "page_count": 0, "pages": [], "candidates": [],
             "text_characters": 0, "sha256": "reference-" + uuid.uuid4().hex, "created_at": started_at,
-            "collection": {"journal": JOURNAL, "authors": authors, "publication_date": publication_date, "provider": "Crossref"}}
+            "collection": {"journal": JOURNAL, "authors": authors, "publication_date": publication_date, "provider": "Crossref", "type": item["type"]}}
 
 
-def _save_pdf(store: Store, doi: str, data: bytes, license_url: str, source_id: str, now: str):
+def _save_pdf(store: Store, doi: str, data: bytes, candidate: LicensedPDF, source_id: str, now: str):
+    if canonical_doi(doi) != candidate.doi:
+        raise ValueError("Attachment candidate DOI mismatch")
+    _PDFPolicy(candidate.doi, candidate.content_version).validate(candidate.supplied_url, resolve=False)
     if not isinstance(data, bytes) or len(data) > MAX_PDF_BYTES or not data.startswith(b"%PDF-"):
         raise ValueError("Invalid or oversized open-access PDF")
     try:
@@ -265,6 +315,10 @@ def _save_pdf(store: Store, doi: str, data: bytes, license_url: str, source_id: 
             if document.is_encrypted or len(document) == 0:
                 raise ValueError("Encrypted or empty PDF")
             page_count = len(document)
+            if page_count > MAX_PDF_PAGES:
+                raise PDFPageLimitError("PDF page ceiling exceeded")
+    except PDFPageLimitError:
+        raise
     except Exception:
         raise ValueError("Open-access download is not a readable PDF") from None
     folder = store.directory / "jacs_pdfs"
@@ -284,7 +338,10 @@ def _save_pdf(store: Store, doi: str, data: bytes, license_url: str, source_id: 
     attachments[doi] = {"source_id": source_id, "filename": "jacs_pdfs/" + filename,
                         "size_bytes": file_stat.st_size, "mtime_ns": file_stat.st_mtime_ns,
                         "sha256": hashlib.sha256(data).hexdigest(), "page_count": page_count,
-                        "license": license_url, "downloaded_at": now, "policy": "open_access_only"}
+                        "license": candidate.license_url, "license_start": candidate.license_start,
+                        "license_end": candidate.license_end, "content_version": candidate.content_version,
+                        "supplied_url": candidate.supplied_url, "upstream_type": candidate.upstream_type,
+                        "downloaded_at": now, "policy": "open_access_only"}
     store.set_metadata(ATTACHMENTS, attachments)
 
 
@@ -331,7 +388,7 @@ def collect_jacs(store: Store, *, client=None, metadata_only: bool = False, days
         now = _utc()
         started_at = now.isoformat()
         result = {"started_at": started_at, "finished_at": None, "status": "running", "discovered": 0,
-                  "added": 0, "existing": 0, "pdfs_saved": 0, "errors": [], "oa_unconfirmed": 0,
+                  "added": 0, "existing": 0, "pdfs_saved": 0, "errors": [], "notices": [], "oa_unconfirmed": 0,
                   "metadata_only": metadata_only}
         store.set_metadata(STATE, result)
         checkpoint = store.get_metadata(CHECKPOINT)
@@ -354,6 +411,7 @@ def collect_jacs(store: Store, *, client=None, metadata_only: bool = False, days
                 cursor = str(resume["cursor"])
                 processed = int(resume.get("processed", 0))
                 result["errors"] = [value for value in resume.get("errors", []) if isinstance(value, str)][:100]
+                result["notices"] = [notice for notice in resume.get("notices", []) if isinstance(notice, dict) and notice.get("code") == "duplicate_doi_matches"]
             except (ValueError, TypeError):
                 cursor = "*"
                 processed = 0
@@ -384,10 +442,10 @@ def collect_jacs(store: Store, *, client=None, metadata_only: bool = False, days
                             continue
                         seen.add(doi)
                         result["discovered"] += 1
-                        source, added = store.import_jacs_reference(record)
+                        source, added = store.import_jacs_reference(record, notices=result["notices"])
                         result["added" if added else "existing"] += 1
                         articles = store.get_metadata(ARTICLES, {})
-                        articles[doi] = {"source_id": source["id"], "last_seen": started_at}
+                        articles[doi] = {"source_id": source["id"], "last_seen": started_at, "type": item["type"], "provider": "Crossref"}
                         store.set_metadata(ARTICLES, articles)
                         attachment = store.get_metadata(ATTACHMENTS, {}).get(doi)
                         if metadata_only:
@@ -400,8 +458,7 @@ def collect_jacs(store: Store, *, client=None, metadata_only: bool = False, days
                             result["oa_unconfirmed"] += 1
                         elif pdf_attempts < max_pdfs:
                             pdf_attempts += 1
-                            url, license_url = candidate
-                            _save_pdf(store, doi, gateway.pdf(url), license_url, source["id"], started_at)
+                            _save_pdf(store, doi, gateway.pdf(candidate), candidate, source["id"], started_at)
                             result["pdfs_saved"] += 1
                         else:
                             raise ValueError("Open-access PDF limit reached; repeat collection to continue")
@@ -423,7 +480,8 @@ def collect_jacs(store: Store, *, client=None, metadata_only: bool = False, days
                 cursor = next_cursor
                 if not metadata_errors:
                     store.set_metadata(RESUME, {"cursor": cursor, "start": start.date().isoformat(), "until": until,
-                                               "started_at": crawl_started, "processed": processed, "errors": result["errors"][:100]})
+                                               "started_at": crawl_started, "processed": processed, "errors": result["errors"][:100],
+                                               "notices": result["notices"]})
             else:
                 result["errors"].append("Metadata page limit reached; collection checkpoint retained")
         except Exception as exc:

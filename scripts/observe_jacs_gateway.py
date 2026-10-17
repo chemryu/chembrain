@@ -34,11 +34,11 @@ def main():
         result['verified_oa_pdf_links'] = len(candidates)
         result['live_pdf'] = 'NO_VERIFIED_LINK_IN_OBSERVED_PAGE'
         if candidates:
-            paper,(url,license_url) = candidates[0]
+            paper,candidate = candidates[0]
             try:
-                pdf = CrossrefClient().pdf(url)
+                pdf = CrossrefClient().pdf(candidate)
                 with tempfile.TemporaryDirectory(prefix='Chembrain public PDF probe ') as temporary:
-                    _save_pdf(Store(Path(temporary)),canonical_doi(paper['DOI']),pdf,license_url,'probe',datetime.now(timezone.utc).isoformat())
+                    _save_pdf(Store(Path(temporary)),canonical_doi(paper['DOI']),pdf,candidate,'probe',datetime.now(timezone.utc).isoformat())
                 result.update(live_pdf='PASS', live_pdf_bytes=len(pdf), requested_pdfs=True)
             except Exception as error:
                 result.update(live_pdf='UNAVAILABLE', live_pdf_reason=type(error).__name__, requested_pdfs=True)

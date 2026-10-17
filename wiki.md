@@ -2,23 +2,23 @@
 
 ## 현재 상태
 
-**CHANGES_REQUESTED — 20261017-gpt-02 / round-01, 미해결 4건·round-02 Planning 인계**
+**INDEPENDENT_QA_WAITING_WINDOWS — 20261017-gpt-02 / round-02, 수정 소스 고정·독립 검수 진행**
 
 - 날짜/시간대: 2026-10-17 (America/Chicago)
 - 확정 범위: JACS 전체 논문, 주제 필터 없음, **서지정보 + OA PDF만**
 - 추가 요구: 본문·SI 참조 카드를 정규화 논문 DOI별 하나로 묶고 locator·원래 evidence 보존
-- 역할: round-01 Planning·Development·Independent QA·Revision·Wiki 기록 완료, 다음 round-02 Planning 대기
-- 고정된 새 소스 SHA: `36fde22d2791475062565161bf986b88f035b2da` — 소스 브랜치에 푸시됨
-- 회차 시작 기준 SHA: `3f102821649ff13b5581ebdff18274ef46602322` — 이전 승인은 신규 변경에 승계하지 않음
-- 기록 원본: GitHub `codex/gpt-workflow-records`; 실행 소스 `codex/gpt-agent-workflow`
-- 새 기능 QA·Revision 최종 결과: 둘 다 **CHANGES REQUESTED / 미해결 4건 / 전달 승인 없음**
-- 정확한 SHA의 Windows CI: PENDING — 성공해도 이 소스의 검수 거절은 해소되지 않음
-- 다음 Planning: [round-01 인계](runs/20261017-gpt-02/round-01/handoff.md)를 읽고 round-02 계획 작성
-- 로컬 검사: Python 210 PASS / Windows 전용 DPAPI 1 SKIP, 프런트엔드·실제 브라우저·소스 시작/재실행 PASS
+- 역할: round-02 Planning·Development 구현/로컬 검사 완료, Independent QA·Revision·Wiki 진행 중
+- 고정된 새 소스 SHA: `c96c210a89a077869da78e7e570f06c80768cc16` — 소스 브랜치에 푸시됨
+- 이전 거절 SHA: `36fde22d2791475062565161bf986b88f035b2da` — 계속 거절 상태이며 [round-01 보고서](runs/20261017-gpt-02/round-01/) 보존
+- 이전 거절 기록 게시: `27ad901ccd0183f018d840d78259ebd4158bb728`
+- 회차 시작 기반: `3f102821649ff13b5581ebdff18274ef46602322` — 이전 승인은 신규 변경에 승계하지 않음
+- 이전 지적 4건: 수정 구현 완료·**독립 검증 대기**, 해결 승인 아님
+- 새 기능 QA·Revision 최종 승인: 아직 없음. 정확한 SHA의 Windows CI: PENDING
+- 로컬 검사: Python 227 PASS / Windows 전용 DPAPI 1 SKIP, collector 64 PASS, 빌드·실제 브라우저·소스 시작/재실행·스모크 PASS
 - 클라우드 공개 공급자 관찰: **UNAVAILABLE** (네트워크/DNS 제한) — 실제 다운로드 PASS가 아님
-- 새 기능 전달 여부: **아니오**. 사용자 PC 예약 작업 설치: **아직 없음**
-- Box 직접 저장·자동 동기화: 미구성. 기관 인증의 클라우드 이전·개인 외부 AI API 호출: 없음
-- 이전 검수 후보 승인은 아래 기록과 기존 회차 보고서에 보존하며 신규 변경에 승계하지 않음
+- 전달 가능 여부: **아니오**, 승인된 새 artifact 없음. 사용자 PC 예약 작업 설치: **아직 없음**
+- 기록 원본: GitHub `codex/gpt-workflow-records`; 실행 소스 `codex/gpt-agent-workflow`
+- Box 직접 저장·자동 동기화: 미구성. 기관 인증 이전·개인 외부 AI API 호출: 없음
 
 ## 이전 실행 완료 상태 — 20261016-gpt-01
 
@@ -164,3 +164,11 @@ Development가 새 실행 소스를 `36fde22d2791475062565161bf986b88f035b2da`�
 4. **MEDIUM:** 기존 DOI 중복 기록을 보존하지만 중복 개수·source ID를 사용자 상태에 알리지 않음.
 
 이 후보의 전달 승인은 없습니다. 기존 검사 PASS나 이후 Windows CI 성공은 네 지적의 수정을 대신하지 않습니다. 다음 회차에서는 수정된 새 SHA에 대해 필수 검사와 QA·Revision을 다시 수행하며, OA 한정·기존 데이터 보존·실제 공급자 UNAVAILABLE 등 범위와 한계를 유지합니다.
+
+## 2026-10-17 · gpt-02 round-02 소스 고정
+
+Wiki가 원문을 보존한 round-01 거절·4건 수정 인계는 기록 커밋 `27ad901ccd0183f018d840d78259ebd4158bb728`에 게시되었습니다. [round-02 Planning](runs/20261017-gpt-02/round-02/planning.md)이 범위를 확정했고, Development가 네 수정을 구현해 소스 `c96c210a89a077869da78e7e570f06c80768cc16`를 고정·푸시했습니다. [Development 원문](runs/20261017-gpt-02/round-02/development.md)에 실제 명령과 결과를 보관합니다.
+
+수정은 PDF 각 리다이렉트의 원래 DOI/경로 결속, OA 유효일·버전·제공 링크/type provenance, 400페이지 상한, 기존 중복 DOI의 비파괴 notice 보고입니다. Development 로컬 전체 검사는 227 PASS / Windows 전용 DPAPI 1 SKIP, collector 집중 검사는 64 PASS이며 빌드·실제 Chromium·소스 일반 시작/실제 재실행·네트워크 없는 collector 스모크도 PASS입니다. 이 결과는 **구현 증거**이며 네 지적의 독립 해결 판정은 아직 아닙니다.
+
+QA·Revision은 새 전체 SHA를 검토 중이고 Windows CI는 PENDING입니다. 이전 거절 후보 `36fde22d2791475062565161bf986b88f035b2da`는 승인되지 않은 상태로 보존하며, 다른 SHA의 빌드나 과거 앱 승인을 가져오지 않습니다. 최종 보고서와 필수 증거가 완료되기 전에는 새 artifact를 승인하거나 전달하지 않습니다. 공개 공급자의 cloud UNAVAILABLE 관찰과 깨끗한 Windows VM/실제 기본 브라우저 NOT RUN, 사용자 PC 예약·Box 미설치 한계를 유지합니다.

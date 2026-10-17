@@ -10,6 +10,7 @@ type CollectionStatus = {
   last_run: null | {
     started_at: string; finished_at: string | null; status: string;
     discovered: number; added: number; existing: number; pdfs_saved: number; errors: string[];
+    notices?: { code: "duplicate_doi_matches"; doi: string; source_ids: string[]; selected_source_id: string }[];
   };
   totals: { articles: number; pdfs: number };
   schedule: Schedule;
@@ -103,7 +104,16 @@ export function JacsCollection({ onCollected }: { onCollected: () => Promise<unk
         <strong>Last collection: {status.last_run.status}</strong>
         <span>{status.last_run.discovered} found · {status.last_run.added} added · {status.last_run.existing} already in library · {status.last_run.pdfs_saved} PDFs saved</span>
         <span>{new Date(status.last_run.started_at).toLocaleString()}</span>
-        {!!status.last_run.errors.length && <details><summary>Collection notices ({status.last_run.errors.length})</summary><ul>{status.last_run.errors.map((item, index) => <li key={index}>{item}</li>)}</ul></details>}
+        {!!status.last_run.notices?.length && <details className="collection-notices">
+          <summary>Duplicate DOI matches ({status.last_run.notices.length})</summary>
+          <p>These matches do not stop collection. Existing records remain separate.</p>
+          <ul>{status.last_run.notices.map((notice, index) => <li key={`${notice.doi}-${index}`}>
+            <strong>DOI: {notice.doi}</strong>
+            <p>{notice.source_ids.length} existing records retained. Selected source: <code>{notice.selected_source_id}</code></p>
+            <p>Retained source IDs: {notice.source_ids.map((id, position) => <span key={position}>{position > 0 && ", "}<code>{id}</code></span>)}</p>
+          </li>)}</ul>
+        </details>}
+        {!!status.last_run.errors.length && <details className="collection-errors"><summary>Collection errors ({status.last_run.errors.length})</summary><ul>{status.last_run.errors.map((item, index) => <li key={index}>{item}</li>)}</ul></details>}
       </div>}
       <form className="collection-schedule" onSubmit={saveSchedule}>
         <label className="check-label"><input type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} disabled={!status.schedule.supported || saving} />Weekly collection</label>

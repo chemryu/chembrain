@@ -71,7 +71,7 @@ class Store:
             db.execute("INSERT INTO records(kind,id,data) VALUES('source',?,?)", (record["id"], json.dumps(record, ensure_ascii=False)))
         return record
 
-    def import_jacs_reference(self, record: dict) -> tuple[dict, bool]:
+    def import_jacs_reference(self, record: dict, *, notices: list[dict] | None = None) -> tuple[dict, bool]:
         """Use an existing main/unspecified record; preserve uploads and all user metadata."""
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -81,7 +81,12 @@ class Store:
                 if self._doi(previous.get("doi", "")) == self._doi(record["doi"]) and previous.get("document_role", "other") in ("main", "other"):
                     candidates.append(previous)
             if candidates:
-                candidates.sort(key=lambda item: item.get("document_role") != "main")
+                candidates.sort(key=lambda item: (item.get("document_role") != "main", item["id"]))
+                if notices is not None and len(candidates) > 1:
+                    notice = {"code": "duplicate_doi_matches", "doi": self._doi(record["doi"]),
+                              "source_ids": [item["id"] for item in candidates], "selected_source_id": candidates[0]["id"]}
+                    if notice not in notices:
+                        notices.append(notice)
                 return candidates[0], False
             db.execute("INSERT INTO records(kind,id,data) VALUES('source',?,?)", (record["id"], json.dumps(record, ensure_ascii=False)))
             return record, True
