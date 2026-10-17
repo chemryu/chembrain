@@ -1,0 +1,31 @@
+{
+  "source": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+  "receipt_commit": "4fb229121ebd4597c51bae7dec30cf37dc759d61",
+  "run_id": "39063636131",
+  "files": {
+    "pages-config.json": {
+      "sha256": "d5f4c7ca7e87f504320eaa47a94d7103ff611a138891713ab577410df78e8a97",
+      "bytes": 102
+    },
+    "pages-config.log": {
+      "sha256": "2133ccf2720c2e773774e8eb645b17387c8a13de3fe7d05ede7c3641a0c06187",
+      "bytes": 95
+    },
+    "status.json": {
+      "sha256": "f85ee2fc93937bc4dda6f77ca5226a510a6f824267ba0636419a5fe81233d07f",
+      "bytes": 3194
+    },
+    "web-browser.log": {
+      "sha256": "ee84d0d01f73761ec0bdbdf6f06a2c5243c5d42a856387e778f4137ce5e9cf5c",
+      "bytes": 267
+    },
+    "web-build.log": {
+      "sha256": "9479ebb04d0efff7f7cf8ffce07913b1eb0dc2e1f7c2103c319f17f32376f661",
+      "bytes": 452
+    },
+    "web-tests.log": {
+      "sha256": "572e9ee171bd3c3e27961844003e6111d4a4327726e4edff6d7280ea1c5570de",
+      "bytes": 901
+    }
+  }
+}

@@ -2,16 +2,27 @@
 
 ## 현재 상태
 
-**INDEPENDENT_REVIEW_AND_PAGES_CI_PENDING — web round-02 소스 고정·검수 진행**
+**사용자 요청으로 작업 일시중지 — 새벽 12:05 이후 재개 요청**
+
+- 최신 요청이 이전 즉시 시작 요청보다 우선합니다. 소스 d423c718은 그대로 보존했습니다.
+- 앞선 중부시간 문맥에 따라 2026-10-18 00:05 America/Chicago로 잠정 이해했습니다. 실제 한도 초기화 시각을 확인한 것은 아닙니다.
+- 이 세션에는 예약 자동 재개 도구가 없어 **예약되지 않았습니다**. 사용자 재접속 또는 실제 지원되는 클라이언트 작업으로 재개해야 합니다.
+- 다음 지점: [재개 체크포인트](runs/20261017-web-03/RESUME.md) → 별도 round-03 Planning. 구현은 아직 시작하지 않았습니다.
+- 아래 round-02 최종 검수·외부 차단과 모든 과거 기록을 그대로 유지합니다.
+
+
+**CHANGES_REQUESTED — web round-02 이전 4건 해결·신규 내구성 순서 1건 + Pages 403**
 
 - 날짜/시간대: 2026-10-17 (America/Chicago)
 - 실행/회차: `20261017-web-03 / round-02`
 - 고정·푸시된 소스: `d423c718ca3c0b7d1dd090a362ba02990d7e223a`; 이전 거절 소스 `e424b34653fb96b911f5ee5708286c92baddfe5f`
 - 순서: round-01 인계 기록 `128c3fca84fbc222043c5aaaddcc126bcc62c172` 게시 → 별도 round-02 Planning → Development 구현/로컬 검사 완료
-- Independent QA·Revision: 새 SHA 검토 중, **최종 승인 없음**. 이전 4건은 구현 완료·독립 검증 대기
+- Independent QA·Revision 최종: **CHANGES REQUESTED / 신규 WEB-QA-05·WEB-REV-05 1건**. 이전 네 지적은 모두 RESOLVED
+- 다음 단계: [round-02 인계](runs/20261017-web-03/round-02/handoff.md) → 좁은 내구성 순서 보완 round-03 Planning
 - 구현 측 검사: Python 253 PASS / Windows 전용 DPAPI 1 SKIP, build:web·실제 Chromium PASS, malformed editor 42종·Python export→import 포함
-- 새 CI 영수증·Pages 배포·실제 공개 source/data marker: **PENDING / 미검증**, URL 없음
-- 이전 Pages 403은 실제 과거 증거로 유지. 소유자 Source 설정 질문은 응답 대기이며 새 결과로 간주하지 않음
+- 새 CI: 불변 영수증 `4fb229121ebd4597c51bae7dec30cf37dc759d61`, 실행 `39063636131` — 253 PASS/1 SKIP·웹/실제 브라우저 PASS, workflow/built SHA와 library hash 보존
+- 새 실제 Pages 설정: **403 Resource not accessible by integration**, 배포·실제 HTTPS/source-data marker **NOT RUN**, URL 없음
+- 이전 403을 가정한 것이 아니라 새 SHA에서도 실제 403을 확인. 소유자 Source 설정 응답은 별도 대기
 - durable state branch는 공개 DOI/queue/checkpoint whitelist metadata만 저장, PDF·private review는 제외. Raw archive cache는 best effort로 영구 보관 아님
 - 주간 dispatcher는 fail-closed·미설정 검토 artifact뿐이며 **미설치·주간 비활성**. 사용자 PC 작업도 미설치
 - 미리보기만 사용자 명시 허용; 새 앱/production 승인 없음. 브라우저 로컬 저장·정규화 데이터·초기 빈 반응 패널·과학 draft 한계 유지
@@ -252,3 +263,11 @@ live Crossref의 첫 관찰이 실패하면 packaged `--sync-jacs` 호출도 생
 [Planning](runs/20261017-web-03/round-02/planning.md)과 [Development](runs/20261017-web-03/round-02/development.md)를 읽고 소스 `d423c718ca3c0b7d1dd090a362ba02990d7e223a`의 중간 상태를 기록했습니다. 세 Development 보조 기록은 같은 역할의 구현 증거이며 QA·Revision의 독립 승인을 대신하지 않습니다. 네 이전 지적의 해결 여부는 실제 두 보고서가 나온 뒤 기록합니다. 새 CI 및 실제 Pages 접근 역시 아직 미확인입니다.
 
 공개 DOI/재시도 state의 Git 내구성과 private PDF/review cache의 best effort를 구분합니다. 미설정 dispatcher artifact는 실제 예약 설치가 아니며, 이전 Pages 403 및 소유자 설정 응답 대기를 성공으로 바꾸지 않습니다. 모든 이전 회차의 승인·거절·외부 차단을 보존합니다.
+
+## 2026-10-17 · web round-02 최종 거절·신규 한 문제 인계
+
+최종 [QA 원문](runs/20261017-web-03/round-02/qa.md)과 [Revision 원문](runs/20261017-web-03/round-02/revision.md)은 기존 네 문제를 독립적으로 해결 확인했지만, **신규 WEB-QA-05/WEB-REV-05 MEDIUM 1건**으로 CHANGES REQUESTED를 기록했습니다. 일부 preliminary 지적 0건 초안은 최종 승인으로 사용하지 않습니다.
+
+신규 문제는 최종 bibliography output보다 metadata 완료 checkpoint·page cursor가 먼저 저장되고, CI에서는 feed commit/push보다 remote state가 먼저 저장되는 순서입니다. output 실패 뒤 다음 window/cursor 재개에서 이미 발견한 서지정보가 사라지는 경우가 독립 재현됐습니다. [round-03 Planning 인계](runs/20261017-web-03/round-02/handoff.md)는 output→state와 origin이 인정한 feed→remote progress의 내구성 경계 및 실패/재시도·Git publication guard 회귀만 보완합니다. 이전 네 해결 계약을 다시 열거나 기능 범위를 넓히지 않습니다.
+
+새 불변 영수증 `4fb229121ebd4597c51bae7dec30cf37dc759d61`은 253 PASS/1 SKIP·웹 빌드·실제 브라우저 PASS와 정확한 library digest를 유지했지만, Pages 설정은 실제 403이며 배포/공개 HTTPS는 NOT RUN입니다. 원문·영수증을 보존하고 승인·URL을 주장하지 않으며 소유자 외부 설정 응답은 별도로 기다립니다. 주간 dispatcher와 PC 작업도 아직 미설치·미활성입니다.

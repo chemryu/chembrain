@@ -1,0 +1,71 @@
+{
+  "commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+  "built_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+  "provenance": {
+    "schema_version": 1,
+    "workflow_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+    "built_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+    "library_sha256": "25e98df9810b686e9da2c3c3b3f7f5da627dd2186ab3b00533b28d34072aef8c"
+  },
+  "run_id": "39063636131",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39063636131",
+  "reported_at": "2026-10-17T19:44:55.995502+00:00",
+  "status": "blocked",
+  "terminal": true,
+  "phase": "terminal",
+  "page_url": null,
+  "facts": {
+    "build": {
+      "result": "success",
+      "outputs": {
+        "facts": "{\n  \"collection\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"identity\": {\n    \"outputs\": {\n      \"value\": \"{\\\"schema_version\\\":1,\\\"workflow_commit\\\":\\\"d423c718ca3c0b7d1dd090a362ba02990d7e223a\\\",\\\"built_commit\\\":\\\"d423c718ca3c0b7d1dd090a362ba02990d7e223a\\\",\\\"library_sha256\\\":\\\"25e98df9810b686e9da2c3c3b3f7f5da627dd2186ab3b00533b28d34072aef8c\\\"}\"\n    },\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"tests\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"app\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"browser\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  }\n}",
+        "provenance": "{\"schema_version\":1,\"workflow_commit\":\"d423c718ca3c0b7d1dd090a362ba02990d7e223a\",\"built_commit\":\"d423c718ca3c0b7d1dd090a362ba02990d7e223a\",\"library_sha256\":\"25e98df9810b686e9da2c3c3b3f7f5da627dd2186ab3b00533b28d34072aef8c\"}"
+      }
+    },
+    "publish": {
+      "result": "failure",
+      "outputs": {
+        "facts": "{\n  \"config\": {\n    \"outputs\": {},\n    \"outcome\": \"failure\",\n    \"conclusion\": \"failure\"\n  },\n  \"deployment\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"access\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  }\n}"
+      }
+    }
+  },
+  "independent_qa": "SEPARATE_REVIEW_REQUIRED; preview only",
+  "phases": [
+    {
+      "phase": "dependencies",
+      "at": "2026-10-17T19:42:52.369813+00:00"
+    },
+    {
+      "phase": "tests",
+      "at": "2026-10-17T19:43:47.645553+00:00"
+    },
+    {
+      "phase": "browser-build",
+      "at": "2026-10-17T19:43:58.121878+00:00"
+    },
+    {
+      "phase": "browser-checks",
+      "at": "2026-10-17T19:44:03.780379+00:00"
+    },
+    {
+      "phase": "upload-pages-artifact",
+      "at": "2026-10-17T19:44:30.060640+00:00"
+    },
+    {
+      "phase": "build-finished",
+      "at": "2026-10-17T19:44:34.036551+00:00"
+    },
+    {
+      "phase": "configure-pages",
+      "at": "2026-10-17T19:44:44.540094+00:00"
+    },
+    {
+      "phase": "publish-finished",
+      "at": "2026-10-17T19:44:47.214788+00:00"
+    },
+    {
+      "phase": "terminal",
+      "at": "2026-10-17T19:44:55.995533+00:00"
+    }
+  ]
+}

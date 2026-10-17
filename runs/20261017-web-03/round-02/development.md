@@ -22,3 +22,9 @@ Current docs now record normal post-reset independent roles and the first candid
 - Compile checks, git diff --check and YAML parsing of actual workflow + dispatcher artifact: **PASS**. PyYAML was a temporary external validation tool, not added to application requirements.
 
 New exact-source GitHub CI/publish evidence is pending at this handoff. The prior e424 run's 403 is retained as historical actual evidence, not assumed to be the outcome of this source. Owner Pages Source-setting response is pending; no actual public URL or HTTP success is claimed. Weekly activation remains unfinished while the dispatcher is only an artifact. No user-PC task, Box synchronization, model API keys or automatic reviewed chemical extraction is claimed.
+
+## New source-bound CI observation
+
+Run https://github.com/chemryu/chembrain/actions/runs/39063636131 reached an authoritative terminal receipt `4fb229121ebd4597c51bae7dec30cf37dc759d61` for exactly `d423c718ca3c0b7d1dd090a362ba02990d7e223a`. Build result success: tests **253 passed / 1 skipped**, production web build and full Chromium smoke PASS. Workflow/built commit both equal d423 in this non-collection run; library SHA-256 `25e98df9810b686e9da2c3c3b3f7f5da627dd2186ab3b00533b28d34072aef8c` is retained through final reporting. Code A/data B behavior was exercised by controlled real-Git tests rather than misrepresented as live collection.
+
+New actual Pages configuration result is HTTP **403** `Resource not accessible by integration`. Deployment and public HTTP verification are **SKIPPED / NOT RUN**, URL null. The new result is not inferred from the prior run. Original byte-exact receipt files with SHA-256/byte manifest are preserved in `web/`; independent agents received the actual evidence. The owner-setting answer is still pending; no public availability or weekly activation is claimed.
