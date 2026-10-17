@@ -1,5 +1,5 @@
 """Real-browser checks for the standalone Pages app at a repository subpath."""
-import json,os,shutil,threading
+import json,os,shutil,subprocess,sys,tempfile,threading
 from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
@@ -11,6 +11,94 @@ class Handler(SimpleHTTPRequestHandler):
    self.send_error(404);return
   self.path=self.path[len('/chembrain'):];super().do_GET()
  def log_message(self,*args):pass
+
+def check_malformed_editor_drafts(page, errors):
+ # Exercise the real React editor, not just a validator function. Each malformed
+ # draft must remain visible and editable without changing browser persistence.
+ store="localStorage.getItem('chembrain.normalized-library.v1')"
+ for kind, button in [('chemical','Edit molecule'),('paper','Edit citation'),('reaction','Edit record'),('solution','Edit solution')]:
+  page.get_by_role('button',name=button,exact=True).first.click()
+  dialog=page.get_by_role('dialog',name='Edit normalized record')
+  dialog.get_by_text('Advanced normalized JSON',exact=True).click()
+  raw=dialog.get_by_label('Normalized record JSON')
+  original=json.loads(raw.input_value())
+  malformed=[None,[], 'draft', 7, False]
+  key={'chemical':'aliases','paper':'authors','reaction':'steps','solution':'solutes'}[kind]
+  malformed.extend([{**original,key:v} for v in [None,{},[None],[False]]])
+  if kind in ('chemical','paper'):
+   malformed.append({**original,key:['valid',{}]})
+  elif kind=='reaction':
+   malformed.extend([{**original,'reactants':None},{**original,'steps':[{**original['steps'][0],'temperature':{}}]}])
+  else:
+   malformed.extend([{**original,'solvents':{}},{**original,'solutes':[{**original['solutes'][0],'role':{}}]}])
+  for i,bad in enumerate(malformed):
+   before=page.evaluate(store)
+   draft=json.dumps(bad,indent=1)
+   raw.fill(draft)
+   expect(dialog.get_by_role('alert').first).to_contain_text('Advanced JSON:')
+   expect(raw).to_have_value(draft)
+   dialog.get_by_role('button',name='Validate & save').click()
+   expect(dialog).to_be_visible()
+   assert page.evaluate(store)==before, (kind,i,'invalid save replaced browser data')
+   assert not errors,errors
+   # Both correction/save and cancel/reopen must recover from a bad draft.
+   if i%2:
+    dialog.get_by_role('button',name='Close editor').click()
+    assert page.evaluate(store)==before, (kind,i,'cancel replaced browser data')
+    page.get_by_role('button',name=button,exact=True).first.click()
+    dialog.get_by_text('Advanced normalized JSON',exact=True).click()
+   else:
+    raw.fill(json.dumps(original))
+    dialog.get_by_role('button',name='Validate & save').click()
+    expect(dialog).to_have_count(0)
+    assert page.evaluate(store)==before, (kind,i,'corrected unchanged draft replaced record')
+    page.get_by_role('button',name=button,exact=True).first.click()
+    dialog.get_by_text('Advanced normalized JSON',exact=True).click()
+   raw=dialog.get_by_label('Normalized record JSON')
+  # Invalid JSON syntax is also retained; changing it back restores the form.
+  before=page.evaluate(store)
+  raw.fill('{')
+  expect(dialog.get_by_role('alert').first).to_contain_text('JSON syntax')
+  raw.fill(json.dumps(original))
+  if kind=='chemical':
+   name=dialog.get_by_label('Molecule name',exact=True)
+   name.fill('')
+   expect(name).to_be_visible()  # no full semantic validation on every keystroke
+   dialog.get_by_role('button',name='Validate & save').click()
+   expect(dialog).to_be_visible()
+   assert page.evaluate(store)==before
+   name.fill(original['name'])
+  dialog.get_by_role('button',name='Validate & save').click()
+  expect(dialog).to_have_count(0)
+  assert page.evaluate(store)==before
+
+def check_processor_export_import(page):
+ # Exercise the real independent processor CLI and browser importer together.
+ # All temporary files live outside the app/dist; no PDF or review text is used.
+ with tempfile.TemporaryDirectory(prefix='chembrain-portable-browser-') as folder:
+  temporary=Path(folder)
+  source=json.loads((ROOT/'examples/total-synthesis.json').read_text())
+  paper={'id':'processor-export-smoke','doi':'10.5555/chembrain-export-smoke',
+         'title':'Processor/browser contract smoke fixture','journal':'Test fixture',
+         'authors':['Browser contract fixture']}
+  source['papers'].append(paper)
+  curated=temporary/'curated.json';exported=temporary/'normalized.json'
+  curated.write_text(json.dumps(source),encoding='utf-8')
+  result=subprocess.run([sys.executable,'-m','paper_pipeline','export','--curated',str(curated),'--out',str(exported)],
+                        cwd=ROOT,capture_output=True,text=True,timeout=60)
+  assert result.returncode==0, result.stderr
+  payload=exported.read_bytes()
+  assert json.loads(payload)['schema_version']==1
+  before=json.loads(page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')"))
+  assert not any(p['id']==paper['id'] for p in before['papers'])
+  page.get_by_label('Import normalized library').set_input_files({'name':'processor-normalized.json','mimeType':'application/json','buffer':payload})
+  expect(page.get_by_role('status')).to_contain_text('Import complete')
+  after=json.loads(page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')"))
+  assert any(p['doi']==paper['doi'] and p['title']==paper['title'] for p in after['papers'])
+  for table in ('papers','chemicals','solutions','reactions'):
+   for old in before[table]:
+    assert next(row for row in after[table] if row['id']==old['id'])==old, (table,old['id'],'processor import overwrote existing edit')
+  expect(page.locator('.reaction-summary').filter(has_text='User curated coupling')).to_have_count(1)
 
 def main():
  server=ThreadingHTTPServer(('127.0.0.1',0),partial(Handler,directory=str(ROOT/'dist')))
@@ -39,10 +127,12 @@ def main():
    expect(page.get_by_role('alert')).to_contain_text('Missing');assert page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")==before
    page.get_by_label('Import normalized library').set_input_files(str(ROOT/'public/library.json'))
    expect(page.get_by_role('status')).to_contain_text('Import complete');expect(page.locator('.reaction-summary').filter(has_text='User curated coupling')).to_have_count(1)
+   check_processor_export_import(page)
    page.get_by_role('checkbox',name='Include synthesis-route steps').check();expect(page.locator('.web-reaction')).to_have_count(8)
    page.locator('.molecule-tile').filter(has_text='Doxycycline').click();expect(page.locator('.web-reaction')).to_have_count(1)
    page.locator('.reaction-summary').click();expect(page.locator('.paper-reference a')).to_have_attribute('href','https://doi.org/10.1126/science.1109755')
    page.get_by_role('button',name='Edit citation',exact=True).click();page.get_by_label('Authors (separate with semicolons)').fill('Author correction; Andrew G. Myers');page.get_by_role('button',name='Validate & save').click();expect(page.locator('.paper-reference')).to_contain_text('Author correction')
+   check_malformed_editor_drafts(page,errors)
    with page.expect_download() as downloaded:page.get_by_role('button',name='Backup JSON',exact=True).click()
    assert downloaded.value.suggested_filename=='chembrain-library.json'
    page.set_viewport_size({'width':390,'height':844});page.screenshot(path='/tmp/chembrain-web-mobile.png',full_page=True)
@@ -50,6 +140,6 @@ def main():
    assert not errors,errors
    assert not any('/api/' in r or not r.startswith(url.split('/chembrain')[0]) for r in requests),requests
    browser.close()
-   print('WEB_LIBRARY_BROWSER_PASS: empty initial panel, molecule-related records, stage solutions, one DOI reference, edit/reload/import preservation, backup, subpath assets and mobile; no backend API.')
+   print('WEB_LIBRARY_BROWSER_PASS: empty initial panel, molecule-related records, stage solutions, one DOI reference, edit/reload/import preservation, malformed-editor correction/cancel/storage, Python-export browser import, backup, subpath assets and mobile; no backend API.')
  finally:server.shutdown();server.server_close()
 if __name__=='__main__':main()
