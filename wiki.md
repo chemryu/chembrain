@@ -12,8 +12,9 @@
 - 이전 거절 SHA: `36fde22d2791475062565161bf986b88f035b2da` — 계속 거절 상태이며 [round-01 보고서](runs/20261017-gpt-02/round-01/) 보존
 - 이전 거절 기록 게시: `27ad901ccd0183f018d840d78259ebd4158bb728`
 - 회차 시작 기반: `3f102821649ff13b5581ebdff18274ef46602322` — 이전 승인은 신규 변경에 승계하지 않음
-- 이전 지적 4건: 수정 구현 완료·**독립 검증 대기**, 해결 승인 아님
-- 새 기능 QA·Revision 최종 승인: 아직 없음. 정확한 SHA의 Windows CI: PENDING
+- 이전 지적 4건: QA가 로컬 독립 재현으로 **모두 해결 확인**, 현재 로컬 미해결 지적 0건. 최종 전달 승인 아님
+- 새 기능 QA·Revision 최종 승인: 아직 없음. QA는 정확한 Windows 증거 대기, Revision도 QA 최종 판단·CI 대기
+- 정확한 SHA의 Windows CI: **RUNNING**, [실행](https://github.com/chemryu/chembrain/actions/runs/39011910077) — 실행 중 영수증 `65a2dcf…`, 최종 로그·artifact 없음
 - 로컬 검사: Python 227 PASS / Windows 전용 DPAPI 1 SKIP, collector 64 PASS, 빌드·실제 브라우저·소스 시작/재실행·스모크 PASS
 - 클라우드 공개 공급자 관찰: **UNAVAILABLE** (네트워크/DNS 제한) — 실제 다운로드 PASS가 아님
 - 전달 가능 여부: **아니오**, 승인된 새 artifact 없음. 사용자 PC 예약 작업 설치: **아직 없음**
@@ -172,3 +173,9 @@ Wiki가 원문을 보존한 round-01 거절·4건 수정 인계는 기록 커밋
 수정은 PDF 각 리다이렉트의 원래 DOI/경로 결속, OA 유효일·버전·제공 링크/type provenance, 400페이지 상한, 기존 중복 DOI의 비파괴 notice 보고입니다. Development 로컬 전체 검사는 227 PASS / Windows 전용 DPAPI 1 SKIP, collector 집중 검사는 64 PASS이며 빌드·실제 Chromium·소스 일반 시작/실제 재실행·네트워크 없는 collector 스모크도 PASS입니다. 이 결과는 **구현 증거**이며 네 지적의 독립 해결 판정은 아직 아닙니다.
 
 QA·Revision은 새 전체 SHA를 검토 중이고 Windows CI는 PENDING입니다. 이전 거절 후보 `36fde22d2791475062565161bf986b88f035b2da`는 승인되지 않은 상태로 보존하며, 다른 SHA의 빌드나 과거 앱 승인을 가져오지 않습니다. 최종 보고서와 필수 증거가 완료되기 전에는 새 artifact를 승인하거나 전달하지 않습니다. 공개 공급자의 cloud UNAVAILABLE 관찰과 깨끗한 Windows VM/실제 기본 브라우저 NOT RUN, 사용자 PC 예약·Box 미설치 한계를 유지합니다.
+
+## 2026-10-17 · round-02 로컬 독립 검증 완료·Windows 진행 중
+
+[QA 중간 보고서](runs/20261017-gpt-02/round-02/qa.md)는 소스 `c96c210a89a077869da78e7e570f06c80768cc16`의 이전 4건을 로컬에서 독립 재현해 해결을 확인했고, **로컬 미해결 지적 0건 / 정확한 Windows 증거 대기**로 기록했습니다. 별도 Revision의 보완 로컬 검사도 현재 지적 0건으로 보고되었으나 QA 최종 보고서와 Windows 결과를 기다립니다. 두 역할의 최종 승인이나 전달 승인이 완료된 상태가 아닙니다.
+
+새 SHA의 [Windows 실행](https://github.com/chemryu/chembrain/actions/runs/39011910077)은 RUNNING이며 현재 영수증 `65a2dcf…`는 실행 중 상태만 나타냅니다. 최종 필수 로그·공급자 관찰·artifact·체크섬을 확인하기 전에는 통과로 기록하지 않습니다. 이전 `36fde22…` 거절 및 네 지적 원문/인계는 그대로 보존하며, 클라우드 공급자 UNAVAILABLE를 실제 다운로드 성공으로 변경하지 않습니다. 새 코드 변경은 없고 사용자 PC 작업/Box 설치도 수행하지 않았습니다.

@@ -16,7 +16,7 @@
   "five_role_run_started": true,
   "source_commit": "c96c210a89a077869da78e7e570f06c80768cc16",
   "source_modified_this_preparation": false,
-  "unresolved_findings": 4,
+  "unresolved_findings": 0,
   "independent_qa_complete": false,
   "revision_approved": false,
   "deliverable_ready": false,
@@ -33,8 +33,8 @@
   "roles": {
     "Planning": "COMPLETE",
     "Development": "IMPLEMENTATION_AND_LOCAL_CHECKS_COMPLETE",
-    "Independent QA": "RUNNING",
-    "Revision": "RUNNING",
+    "Independent QA": "LOCAL_COMPLETE_AWAITING_EXACT_WINDOWS_FINAL_VERDICT",
+    "Revision": "LOCAL_COMPLEMENTARY_COMPLETE_AWAITING_FINAL_QA_AND_WINDOWS",
     "Wiki": "RUNNING"
   },
   "source_modified_this_round": true,
@@ -46,7 +46,7 @@
   "new_source_commit_pending": false,
   "baseline_source_commit": "3f102821649ff13b5581ebdff18274ef46602322",
   "source_commit_pushed": true,
-  "windows_ci_status": "PENDING",
+  "windows_ci_status": "RUNNING",
   "known_doi_finding_status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
   "local_checks": {
     "python": {
@@ -66,8 +66,8 @@
   },
   "clean_windows_vm": "NOT RUN",
   "actual_user_default_browser": "NOT RUN",
-  "independent_qa_verdict": "RUNNING_NO_FINAL_APPROVAL",
-  "revision_verdict": "RUNNING_NO_FINAL_APPROVAL",
+  "independent_qa_verdict": "LOCAL_ZERO_FINDINGS_PENDING_EXACT_WINDOWS",
+  "revision_verdict": "LOCAL_COMPLEMENTARY_ZERO_FINDINGS_PENDING_FINAL_QA_AND_WINDOWS",
   "deliverable_scope": "NEW_CANDIDATE_NOT_APPROVED",
   "initial_records_commit": "4224102580de88e3d10fa679c2457502044a8434",
   "windows_receipt_commit": null,
@@ -75,7 +75,7 @@
     "status": "NOT RUN"
   },
   "planning_handoff": "ROUND_02_PLAN_COMPLETE_AWAITING_REVIEW",
-  "required_automated_checks": "PENDING_EXACT_SOURCE_WINDOWS_AND_INDEPENDENT_REVIEWS",
+  "required_automated_checks": "LOCAL_PASS_PENDING_EXACT_SOURCE_WINDOWS_AND_FINAL_INDEPENDENT_VERDICTS",
   "candidate_artifact_url": null,
   "candidate_inner_zip": null,
   "candidate_inner_zip_sha256": null,
@@ -196,25 +196,25 @@
     {
       "id": "QA-01/REV-01",
       "severity": "HIGH",
-      "status": "IMPLEMENTED_AWAITING_INDEPENDENT_VERIFICATION",
+      "status": "RESOLVED_IN_INDEPENDENT_LOCAL_QA_FINAL_GATE_PENDING",
       "summary": "PDF redirect loses original DOI and approved route/version binding"
     },
     {
       "id": "QA-02/REV-02",
       "severity": "MEDIUM",
-      "status": "IMPLEMENTED_AWAITING_INDEPENDENT_VERIFICATION",
+      "status": "RESOLVED_IN_INDEPENDENT_LOCAL_QA_FINAL_GATE_PENDING",
       "summary": "OA effective dates, version, supplied PDF link and Crossref type missing from provenance"
     },
     {
       "id": "QA-03/REV-03",
       "severity": "MEDIUM",
-      "status": "IMPLEMENTED_AWAITING_INDEPENDENT_VERIFICATION",
+      "status": "RESOLVED_IN_INDEPENDENT_LOCAL_QA_FINAL_GATE_PENDING",
       "summary": "Downloaded PDF page count has no maximum bound"
     },
     {
       "id": "QA-04/REV-04",
       "severity": "MEDIUM",
-      "status": "IMPLEMENTED_AWAITING_INDEPENDENT_VERIFICATION",
+      "status": "RESOLVED_IN_INDEPENDENT_LOCAL_QA_FINAL_GATE_PENDING",
       "summary": "Pre-existing duplicate DOI source IDs/count not reported"
     }
   ],
@@ -275,5 +275,9 @@
     }
   ],
   "previous_rejected_source_commit": "36fde22d2791475062565161bf986b88f035b2da",
-  "prior_findings_status": "IMPLEMENTED_AWAITING_INDEPENDENT_VERIFICATION"
+  "prior_findings_status": "RESOLVED_BY_INDEPENDENT_LOCAL_QA_FINAL_WINDOWS_GATE_PENDING",
+  "local_unresolved_findings": 0,
+  "windows_run_url": "https://github.com/chemryu/chembrain/actions/runs/39011910077",
+  "windows_running_receipt_prefix": "65a2dcf",
+  "revision_local_unresolved_findings": 0
 }
