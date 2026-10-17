@@ -81,6 +81,49 @@ def run(data_dir: Path, no_browser: bool, smoke_test: bool = False):
         handler.close()
 
 
+def collector_fixture_smoke(data_dir: Path):
+    """Exercise the bundled collector without publisher access or user data."""
+    import pymupdf
+    from server.jacs_collection import ATTACHMENTS, collect_jacs, collection_status
+    from server.store import Store
+
+    doi = "10.1021/jacs.packaging-fixture"
+    article = {
+        "DOI": doi, "type": "journal-article", "ISSN": ["0002-7863"],
+        "title": ["Local packaging fixture"],
+        "published": {"date-parts": [[2026, 1, 1]]},
+        "license": [{"URL": "https://creativecommons.org/licenses/by/4.0/",
+                     "content-version": "vor", "start": {"date-time": "2020-01-01T00:00:00Z"}}],
+        "link": [{"URL": "https://pubs.acs.org/doi/pdf/" + doi,
+                  "content-type": "application/pdf", "content-version": "vor"}],
+    }
+    with pymupdf.open() as document:
+        document.new_page().insert_text((50, 50), "Local collector fixture")
+        pdf = document.tobytes()
+
+    class FixtureClient:
+        def page(self, start, cursor):
+            return {"items": [article], "total-results": 1}
+
+        def pdf(self, candidate):
+            return pdf
+
+    store = Store(data_dir / "collector-fixture")
+    result = collect_jacs(store, client=FixtureClient())
+    assert result["status"] == "success" and result["added"] == result["pdfs_saved"] == 1
+    assert store.all("source")[0]["doi"] == doi
+    attachment = store.get_metadata(ATTACHMENTS)[doi]
+    assert attachment["page_count"] == 1
+    assert attachment["supplied_url"] == article["link"][0]["URL"]
+    assert attachment["license"] == article["license"][0]["URL"]
+    assert attachment["license_start"] and attachment["license_end"] is None
+    assert attachment["content_version"] == "vor" and attachment["upstream_type"] == "journal-article"
+    assert collection_status(store)["totals"] == {"articles": 1, "pdfs": 1}
+    repeat = collect_jacs(store, client=FixtureClient())
+    assert repeat["status"] == "success" and repeat["existing"] == 1 and repeat["pdfs_saved"] == 0
+    print("JACS_COLLECTOR_FIXTURE_PASS: bundled metadata, licensed PDF and idempotent storage; no network.", flush=True)
+
+
 def serve(data_dir: Path, no_browser: bool, smoke_test: bool):
     if not getattr(sys, "frozen", False):
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -116,6 +159,7 @@ def serve(data_dir: Path, no_browser: bool, smoke_test: bool):
                     assert b'<html lang="en"' in get("/")
                     for asset in (Path(__import__('server.app', fromlist=['ROOT']).ROOT) / "dist/assets").iterdir():
                         assert get("/assets/" + asset.name)
+                    collector_fixture_smoke(data_dir)
                     print("Packaged smoke test passed: English UI, RDKit SVG, 14 molecules, 6 reactions, DOI-only references.", flush=True)
                     server.should_exit = True
                 else:

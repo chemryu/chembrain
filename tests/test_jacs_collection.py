@@ -43,8 +43,8 @@ class Client:
             raise value
         return value
 
-    def pdf(self, url):
-        self.downloads.append(url)
+    def pdf(self, candidate):
+        self.downloads.append(candidate.supplied_url)
         if isinstance(self.data, Exception):
             raise self.data
         return self.data
@@ -364,3 +364,199 @@ def test_acs_explicit_pdf_path_with_unspecified_content_type(tmp_path, content_t
     assert result["status"] == "success"
     assert result["pdfs_saved"] == (0 if content_type == "text/html" else 1)
     assert bool(client.downloads) == (content_type != "text/html")
+
+
+@pytest.mark.parametrize("target, allowed", [
+    ("https://pubs.acs.org/doi/epdf/10.1021/JACS.6B00001", True),
+    ("https://pubs.acs.org/doi/pdf/10.1021%2Fjacs.6b00001", True),
+    ("https://pubs.acs.org/doi/pdf/10.1021/different-paper", False),
+    ("https://pubs.acs.org/doi/suppl/10.1021/jacs.6b00001", False),
+    ("https://pubs.acs.org/not-a-pdf/10.1021/jacs.6b00001", False),
+    ("https://pubs.acs.org/doi/pdf/10.1021/jacs.6b00001/suppl_file/si.pdf", False),
+    ("https://other.invalid/doi/pdf/10.1021/jacs.6b00001", False),
+    ("http://pubs.acs.org/doi/pdf/10.1021/jacs.6b00001", False),
+    ("https://user:secret@pubs.acs.org/doi/pdf/10.1021/jacs.6b00001", False),
+    ("https://pubs.acs.org/doi/pdf/10.1021/jacs.6b00001?token=secret", False),
+])
+def test_actual_pdf_transport_redirect_keeps_original_article_policy(monkeypatch, target, allowed):
+    from email.message import Message
+    from io import BytesIO
+    import urllib.request
+    from urllib.response import addinfourl
+    from server.jacs_collection import CrossrefClient
+    monkeypatch.setattr("server.jacs_collection.socket.getaddrinfo", lambda *args, **kwargs: [(2, 1, 6, "", ("8.8.8.8", 443))])
+    monkeypatch.setattr("server.jacs_collection.time.sleep", lambda _: None)
+    candidate = _licensed_pdf(article(), datetime.now(timezone.utc))
+    data = pdf_bytes()
+    outgoing = []
+    class FakeHTTPS(urllib.request.BaseHandler):
+        handler_order = 0
+        def https_open(self, req):
+            outgoing.append(req.full_url)
+            headers = Message()
+            if len(outgoing) == 1:
+                headers["Location"] = target
+                response = addinfourl(BytesIO(b""), headers, req.full_url, 302)
+                response.msg = "Found"
+                return response
+            response = addinfourl(BytesIO(data), headers, req.full_url, 200)
+            response.msg = "OK"
+            return response
+    original_builder = urllib.request.build_opener
+    monkeypatch.setattr("server.jacs_collection.urllib.request.build_opener", lambda *handlers: original_builder(*handlers, FakeHTTPS()))
+    if allowed:
+        assert CrossrefClient().pdf(candidate) == data
+        assert outgoing == [candidate.supplied_url, target]
+    else:
+        with pytest.raises(ValueError):
+            CrossrefClient().pdf(candidate)
+        assert outgoing == [candidate.supplied_url]
+
+
+def test_actual_pdf_transport_revalidates_second_redirect_and_initial_url(monkeypatch):
+    from dataclasses import replace
+    from email.message import Message
+    from io import BytesIO
+    import urllib.request
+    from urllib.response import addinfourl
+    from server.jacs_collection import CrossrefClient
+    monkeypatch.setattr("server.jacs_collection.socket.getaddrinfo", lambda *args, **kwargs: [(2, 1, 6, "", ("8.8.8.8", 443))])
+    monkeypatch.setattr("server.jacs_collection.time.sleep", lambda _: None)
+    candidate = _licensed_pdf(article(), datetime.now(timezone.utc))
+    outgoing = []
+    class FakeHTTPS(urllib.request.BaseHandler):
+        handler_order = 0
+        def https_open(self, req):
+            outgoing.append(req.full_url)
+            headers = Message()
+            headers["Location"] = "https://pubs.acs.org/doi/epdf/" + (candidate.doi if len(outgoing) == 1 else "10.1021/another")
+            response = addinfourl(BytesIO(b""), headers, req.full_url, 302)
+            response.msg = "Found"
+            return response
+    original_builder = urllib.request.build_opener
+    monkeypatch.setattr("server.jacs_collection.urllib.request.build_opener", lambda *handlers: original_builder(*handlers, FakeHTTPS()))
+    with pytest.raises(ValueError, match="licensed article"):
+        CrossrefClient().pdf(candidate)
+    assert len(outgoing) == 2
+    with pytest.raises(ValueError, match="licensed article"):
+        CrossrefClient().pdf(replace(candidate, supplied_url="https://pubs.acs.org/doi/pdf/10.1021/another"))
+    assert len(outgoing) == 2
+
+
+def test_pdf_transport_rejects_private_address_even_for_original_article(monkeypatch):
+    from server.jacs_collection import CrossrefClient
+    monkeypatch.setattr("server.jacs_collection.socket.getaddrinfo", lambda *args, **kwargs: [(2, 1, 6, "", ("10.0.0.1", 443))])
+    with pytest.raises(ValueError, match="Non-public"):
+        CrossrefClient().pdf(_licensed_pdf(article(), datetime.now(timezone.utc)))
+
+
+def test_retained_oa_decision_and_upstream_type_preserve_user_record(tmp_path):
+    from server.jacs_collection import ARTICLES
+    store = Store(tmp_path)
+    original = {"id": "original", "doi": article()["DOI"].upper(), "title": "My edited title", "notes": "Mine", "kind": "pdf", "page_count": 4, "pages": [{"text": "Original upload"}], "document_role": "main", "stored_filename": "original.pdf"}
+    store.put("source", original)
+    item = article()
+    item["license"][0]["start"]["date-time"] = "2020-02-03T04:05:06-06:00"
+    item["license"][0]["end"] = {"date-time": "2099-01-01T00:00:00Z"}
+    result = collect_jacs(store, client=Client(pages(item)))
+    assert result["pdfs_saved"] == 1
+    attachment = store.get_metadata(ATTACHMENTS)[item["DOI"]]
+    assert attachment["license"] == item["license"][0]["URL"]
+    assert attachment["license_start"] == "2020-02-03T10:05:06+00:00"
+    assert attachment["license_end"] == "2099-01-01T00:00:00+00:00"
+    assert attachment["content_version"] == "vor"
+    assert attachment["supplied_url"] == item["link"][0]["URL"]
+    assert attachment["upstream_type"] == "journal-article"
+    assert store.get_metadata(ARTICLES)[item["DOI"]]["type"] == "journal-article"
+    assert store.get("source", "original") == original
+    second = article("10.1021/jacs.6b00002")
+    assert collect_jacs(store, client=Client(pages(second)))["added"] == 1
+    imported = next(reference for reference in store.all("source") if reference["id"] != "original")
+    assert imported["collection"]["type"] == "journal-article"
+    assert store.get_metadata(ATTACHMENTS)[second["DOI"]]["license_end"] is None
+
+
+def test_pdf_page_boundary_and_rejection_preserve_previous_attachment(tmp_path):
+    from server.jacs_collection import MAX_PDF_PAGES, PDFPageLimitError, _save_pdf
+    store = Store(tmp_path)
+    item = article()
+    candidate = _licensed_pdf(item, datetime.now(timezone.utc))
+    collect_jacs(store, client=Client(pages(item)))
+    reference = copy.deepcopy(store.all("source")[0])
+    reaction = {"id": "reaction", "evidence": [{"source_id": reference["id"], "page": 1, "citation_only": True}]}
+    store.put("reaction", reaction)
+    with fitz.open() as document:
+        for _ in range(MAX_PDF_PAGES):
+            document.new_page()
+        at_limit = document.tobytes()
+        document.new_page()
+        over_limit = document.tobytes()
+    _save_pdf(store, item["DOI"], at_limit, candidate, reference["id"], datetime.now(timezone.utc).isoformat())
+    previous = copy.deepcopy(store.get_metadata(ATTACHMENTS))
+    attachment = previous[item["DOI"]]
+    assert attachment["page_count"] == MAX_PDF_PAGES
+    vault = tmp_path / attachment["filename"]
+    with pytest.raises(PDFPageLimitError):
+        _save_pdf(store, item["DOI"], over_limit, candidate, reference["id"], datetime.now(timezone.utc).isoformat())
+    assert vault.read_bytes() == at_limit
+    assert store.get_metadata(ATTACHMENTS) == previous
+    assert store.get("source", reference["id"]) == reference
+    assert store.get("reaction", "reaction") == reaction
+    assert not list(vault.parent.glob(".download-*"))
+    new_store = Store(tmp_path / "fresh")
+    rejected = collect_jacs(new_store, client=Client(pages(item), pdf=over_limit))
+    assert rejected["status"] == "partial" and rejected["added"] == 1
+    assert any("exceeds 400 pages" in error for error in rejected["errors"])
+    assert new_store.get_metadata(ATTACHMENTS) is None
+    assert not (new_store.directory / "jacs_pdfs").exists()
+
+
+def test_encrypted_pdf_rejected_without_installation(tmp_path):
+    with fitz.open() as document:
+        document.new_page()
+        data = document.tobytes(encryption=fitz.PDF_ENCRYPT_AES_256, owner_pw="owner", user_pw="reader")
+    store = Store(tmp_path)
+    result = collect_jacs(store, client=Client(pages(article()), pdf=data))
+    assert result["status"] == "partial" and result["added"] == 1
+    assert store.get_metadata(ATTACHMENTS) is None
+    assert not (tmp_path / "jacs_pdfs").exists()
+
+
+def test_duplicate_matches_reported_deterministically_without_changing_records(tmp_path):
+    store = Store(tmp_path)
+    originals = [
+        {"id": "z-main", "doi": "HTTPS://DOI.ORG/10.1021/JACS.6B00001", "document_role": "main", "title": "User Z", "notes": "Z notes"},
+        {"id": "a-main", "doi": article()["DOI"], "document_role": "main", "title": "User A", "page_count": 99},
+        {"id": "unspecified", "doi": article()["DOI"], "title": "Other upload"},
+        {"id": "supplement", "doi": article()["DOI"], "document_role": "supplement", "title": "SI"},
+    ]
+    for original in originals:
+        store.put("source", original)
+    expected = {"code": "duplicate_doi_matches", "doi": article()["DOI"], "source_ids": ["a-main", "z-main", "unspecified"], "selected_source_id": "a-main"}
+    for _ in range(2):
+        result = collect_jacs(store, client=Client(pages(article(), article())), metadata_only=True)
+        assert result["status"] == "success" and not result["errors"]
+        assert result["notices"] == [expected]
+        assert store.get_metadata(STATE)["notices"] == [expected]
+        assert store.get_metadata(CHECKPOINT)
+        assert store.all("source") == originals
+    def importer(index):
+        notices = []
+        record, added = store.import_jacs_reference({"id": str(index), "doi": article()["DOI"], "document_role": "main"}, notices=notices)
+        return record["id"], added, notices
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        results = list(executor.map(importer, range(20)))
+    assert all(result == ("a-main", False, [expected]) for result in results)
+    assert store.all("source") == originals
+
+
+
+def test_duplicate_notices_remain_visible_when_bounded_crawl_resumes(tmp_path):
+    store = Store(tmp_path)
+    for source_id in ("a", "b"):
+        store.put("source", {"id": source_id, "doi": article()["DOI"], "document_role": "main"})
+    first = collect_jacs(store, client=Client([{"items": [article()], "next-cursor": "next", "total-results": 2}]), max_pages=1, metadata_only=True)
+    second = collect_jacs(store, client=Client([{"items": [article("10.1021/jacs.6b00002")], "next-cursor": "next", "total-results": 2}]), metadata_only=True)
+    assert second["status"] == "success"
+    assert second["notices"] == first["notices"]
+    assert store.get_metadata(STATE)["notices"] == first["notices"]

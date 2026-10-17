@@ -20,7 +20,10 @@ If the browser does not open, use the local address printed in the console windo
 
 JACS weekly collection:
 Open Paper library. Collect now retrieves public bibliography and only PDFs with
-verified current open licenses and supported ACS links. Some open PDFs may lack
+verified current open licenses and same-DOI ACS links (including redirects).
+Downloads are capped at 30 MB and 400 pages; license provenance is kept locally.
+Duplicate existing main records are preserved and reported in collection notices.
+Some open PDFs may lack
 the metadata needed for automatic collection. Subscription PDFs remain DOI links
 for normal campus/VPN access; this collector does not request your credentials.
 Saved open PDFs: %LOCALAPPDATA%\Chembrain\jacs_pdfs

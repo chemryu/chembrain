@@ -53,6 +53,8 @@ def exercise_collection_controls(browser, base_url):
             status['last_run'] = {
                 'started_at': '2026-10-17T14:00:00+00:00', 'finished_at': '2026-10-17T14:01:00+00:00',
                 'status': 'completed', 'discovered': 2, 'added': 2, 'existing': 0, 'pdfs_saved': 1, 'errors': [],
+                'notices': [{'code': 'duplicate_doi_matches', 'doi': '10.1021/jacs.fixture',
+                             'source_ids': ['kept-main-a', 'kept-main-b'], 'selected_source_id': 'kept-main-a'}],
             }
             route.fulfill(status=202, json={'started': True})
         else:
@@ -71,6 +73,7 @@ def exercise_collection_controls(browser, base_url):
     with page.expect_request(re.compile(r'/api/workspace$')):
         expect(collect).to_be_enabled()
     expect(page.locator('.jacs-collection').get_by_role('alert')).to_have_count(0)
+    expect(page.locator('.collection-notices')).to_have_count(0)  # Legacy run without a notices field.
     assert not collections, 'Opening the library must not collect papers'
     initially_refreshed = len(workspace_requests)
     page.get_by_role('checkbox', name='Weekly collection', exact=True).check()
@@ -92,6 +95,14 @@ def exercise_collection_controls(browser, base_url):
     collect.click()
     expect(page.locator('.collection-result')).to_contain_text('2 found · 2 added · 0 already in library · 1 PDFs saved')
     expect(page.locator('.collection-totals')).to_contain_text('2 collected papers · 1 open-access PDFs')
+    expect(collect).to_be_enabled()
+    page.get_by_text('Duplicate DOI matches (1)', exact=True).click()
+    notices = page.locator('.collection-notices')
+    expect(notices).to_contain_text('DOI: 10.1021/jacs.fixture')
+    expect(notices).to_contain_text('2 existing records retained. Selected source: kept-main-a')
+    expect(notices).to_contain_text('Retained source IDs: kept-main-a, kept-main-b')
+    expect(notices).to_contain_text('These matches do not stop collection.')
+    expect(page.locator('.collection-errors')).to_have_count(0)
     expect(collect).to_be_enabled()
     assert collections == [{}], collections
     assert len(workspace_requests) > before, 'Completed collection must reload the paper workspace'
