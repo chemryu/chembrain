@@ -2,7 +2,7 @@
 
 - Role: separate GPT Independent QA; no application, test, workflow or source-history edits.
 - Frozen source: `c96c210a89a077869da78e7e570f06c80768cc16` on `codex/gpt-agent-workflow`.
-- Local verdict: **0 unresolved findings; required exact-source Windows evidence pending**. This is not final approval or delivery authorization yet.
+- Final round verdict: **BLOCKED_REQUIRED_WINDOWS_EVIDENCE**. **0 unresolved application-code findings**, but mandatory Windows evidence is unavailable. There is no final QA approval or delivery authorization.
 - Previous source `36fde22d2791475062565161bf986b88f035b2da` remains rejected. Its eventual tests/artifact cannot approve this source.
 - No institutional authentication, subscription retrieval or personal model API calls were used during QA.
 
@@ -30,11 +30,13 @@ The first browser attempt overlapped the production rebuild and could not load i
 
 ## Windows and live-provider gates
 
-**PENDING** at this checkpoint: receipt, packaged tests/fixture, zero-argument EXE startup, rendered packaged UI, true restart, restricted runtime PATH, actual temporary scheduler registration/inspection/removal, artifact checksum and public-provider observation for exact source `c96c210a89a077869da78e7e570f06c80768cc16`.
+**BLOCKED / NOT VERIFIED**: final receipt, packaged tests/fixture, zero-argument EXE startup, rendered packaged UI, true restart, restricted runtime PATH, actual temporary scheduler registration/inspection/removal, artifact checksum and public-provider observation for exact source `c96c210a89a077869da78e7e570f06c80768cc16`.
 
-Root has now observed that exact source's running receipt and run <https://github.com/chemryu/chembrain/actions/runs/39011910077>. A running job has not passed its gates; final logs/artifact remain pending.
+Root captured the actual available evidence in [windows-pending/last-observed-status.json](windows-pending/last-observed-status.json) and [windows-pending/observation.json](windows-pending/observation.json). At `2026-10-17T07:35:21.810849Z`, the latest immutable receipt was still Git commit `65a2dcf538f6ce8ef11fce32ee9615a6c38ad35f`, published at `2026-10-17T07:04:12Z`. It identifies this exact source and run <https://github.com/chemryu/chembrain/actions/runs/39011910077>, but contains only `status: running`, empty stage results and a null artifact URL. It has not supplied final logs or a checksum.
 
-Root coordinates shared receipt fetching/capture to avoid reference races. QA will independently inspect the copied immutable receipt/logs and update this report before a final decision. A receipt for `36fde22d…`, `3f102821…` or another SHA is not acceptable.
+More than the workflow's configured 30-minute job budget elapsed after that published start receipt without a newer observable result. **The actual current job state is UNKNOWN**. This observation does not prove that the job timed out, failed, stopped or is still running. The cloud's GitHub Actions API requests remain Forbidden, including Root's post-environment-reconnect retry, so the stale start receipt cannot be reconciled with an authoritative live Actions state here.
+
+No required Windows check is recorded as PASS from that receipt. Passing local checks do not replace packaged/scheduler evidence, and no artifact is approved or delivered. A receipt for `36fde22d…`, `3f102821…` or another SHA is not acceptable.
 
 The cloud's previously observed public metadata connectivity was **UNAVAILABLE**, according to Development. These deterministic fixtures are not a live provider or live OA-PDF success. Windows gateway observation must retain its actual outcome, including refusal or unavailable service. No live publisher PDF was downloaded by QA in this round.
 
@@ -45,4 +47,15 @@ The cloud's previously observed public metadata connectivity was **UNAVAILABLE**
 - User-PC collection/schedule installation, Box local writes or synchronization: **NOT RUN**.
 - No release, deployment, permission change, institutional login or perpetual GPT background process is claimed or authorized.
 
-No new code finding currently returns to Planning. The next step is exact-source Windows evidence, followed by the separate Revision decision and Wiki record; final handoff remains blocked until those gates complete.
+## Concrete next-round handoff
+
+The four application repairs remain independently resolved. The new blocker returns through **Revision → Wiki → Planning** for round-03: repair CI evidence observability without changing the collector's scope or weakening any gate.
+
+Recommended bounded work:
+
+1. Persist source/run-bound timestamps and before/after status around dependency installation, frontend/API checks, packaging, packaged smoke/collector fixture, ordinary launch/UI/restart/PATH, temporary scheduler check, gateway observation and artifact upload. Preserve useful bounded diagnostic logs at checkpoints; avoid exposing credentials or environments.
+2. Add a timeout/cancellation-safe final evidence path independent of a final step inside the potentially interrupted build job. It should distinguish authoritative terminal results from missing/unavailable observations; it must not invent a timeout or success from elapsed time alone.
+3. Keep every required Windows test, actual safe temporary-task registration/removal, OA-only observation semantics, exact source SHA and artifact checksum gate. Do not substitute the old EXE or lower approval criteria merely because the current result is inaccessible.
+4. Freeze any changed workflow/reporting inputs as a new full SHA and rerun the required exact-source Windows evidence and separate Independent QA/Revision decisions. Preserve this blocked round as history. If an actual late final receipt for the present SHA appears before new source changes, inspect it explicitly rather than treating this stale receipt as final.
+
+The user-PC task, API permissions and application source are not changed by this QA report. Delivery remains blocked until complete, truthful same-source evidence and both independent approvals exist.

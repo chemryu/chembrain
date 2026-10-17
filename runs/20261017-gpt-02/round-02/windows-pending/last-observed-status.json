@@ -1,0 +1,13 @@
+{
+  "status": "running",
+  "commit": "c96c210a89a077869da78e7e570f06c80768cc16",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39011910077",
+  "release_published": false,
+  "independent_review_required": true,
+  "artifact_url": null,
+  "limits": [
+    "No clean Windows VM test; runtime isolation removes Python/Node from the EXE PATH.",
+    "Browser opening uses a shell probe; Playwright separately tests the packaged UI."
+  ],
+  "steps": {}
+}

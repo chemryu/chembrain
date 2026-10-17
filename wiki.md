@@ -2,19 +2,20 @@
 
 ## 현재 상태
 
-**INDEPENDENT_QA_WAITING_WINDOWS — 20261017-gpt-02 / round-02, 수정 소스 고정·독립 검수 진행**
+**BLOCKED_REQUIRED_WINDOWS_EVIDENCE — round-02 앱 지적 0건, 필수 증거 미확인·round-03 Planning 인계**
 
 - 날짜/시간대: 2026-10-17 (America/Chicago)
 - 확정 범위: JACS 전체 논문, 주제 필터 없음, **서지정보 + OA PDF만**
 - 추가 요구: 본문·SI 참조 카드를 정규화 논문 DOI별 하나로 묶고 locator·원래 evidence 보존
-- 역할: round-02 Planning·Development 구현/로컬 검사 완료, Independent QA·Revision·Wiki 진행 중
+- 역할: round-02 Planning·Development·QA·Revision·Wiki 기록 완료, 다음 round-03 Planning 대기
 - 고정된 새 소스 SHA: `c96c210a89a077869da78e7e570f06c80768cc16` — 소스 브랜치에 푸시됨
 - 이전 거절 SHA: `36fde22d2791475062565161bf986b88f035b2da` — 계속 거절 상태이며 [round-01 보고서](runs/20261017-gpt-02/round-01/) 보존
 - 이전 거절 기록 게시: `27ad901ccd0183f018d840d78259ebd4158bb728`
 - 회차 시작 기반: `3f102821649ff13b5581ebdff18274ef46602322` — 이전 승인은 신규 변경에 승계하지 않음
-- 이전 지적 4건: QA가 로컬 독립 재현으로 **모두 해결 확인**, 현재 로컬 미해결 지적 0건. 최종 전달 승인 아님
-- 새 기능 QA·Revision 최종 승인: 아직 없음. QA는 정확한 Windows 증거 대기, Revision도 QA 최종 판단·CI 대기
-- 정확한 SHA의 Windows CI: **RUNNING**, [실행](https://github.com/chemryu/chembrain/actions/runs/39011910077) — 실행 중 영수증 `65a2dcf…`, 최종 로그·artifact 없음
+- 이전 지적 4건: QA와 Revision이 각각 독립 재현으로 **모두 해결 확인**, 미해결 앱 코드 지적 0건. 필수 증거 차단은 별도 문제
+- QA·Revision 최종 판정: 둘 다 **BLOCKED_REQUIRED_WINDOWS_EVIDENCE**, 최종 승인·전달 허가 없음
+- 다음 Planning: [round-02 인계](runs/20261017-gpt-02/round-02/handoff.md)를 읽고 CI 관찰/종료 보고·headless 검증만 round-03으로 계획
+- 정확한 SHA의 Windows 실제 runner 상태: **UNKNOWN**. [마지막 관찰](runs/20261017-gpt-02/round-02/windows-pending/observation.json)은 `65a2dcf…`의 오래된 running 영수증뿐이며 최종 로그·artifact·체크섬 없음; timeout/실패로 단정하지 않음
 - 로컬 검사: Python 227 PASS / Windows 전용 DPAPI 1 SKIP, collector 64 PASS, 빌드·실제 브라우저·소스 시작/재실행·스모크 PASS
 - 클라우드 공개 공급자 관찰: **UNAVAILABLE** (네트워크/DNS 제한) — 실제 다운로드 PASS가 아님
 - 전달 가능 여부: **아니오**, 승인된 새 artifact 없음. 사용자 PC 예약 작업 설치: **아직 없음**
@@ -179,3 +180,11 @@ QA·Revision은 새 전체 SHA를 검토 중이고 Windows CI는 PENDING입니�
 [QA 중간 보고서](runs/20261017-gpt-02/round-02/qa.md)는 소스 `c96c210a89a077869da78e7e570f06c80768cc16`의 이전 4건을 로컬에서 독립 재현해 해결을 확인했고, **로컬 미해결 지적 0건 / 정확한 Windows 증거 대기**로 기록했습니다. 별도 Revision의 보완 로컬 검사도 현재 지적 0건으로 보고되었으나 QA 최종 보고서와 Windows 결과를 기다립니다. 두 역할의 최종 승인이나 전달 승인이 완료된 상태가 아닙니다.
 
 새 SHA의 [Windows 실행](https://github.com/chemryu/chembrain/actions/runs/39011910077)은 RUNNING이며 현재 영수증 `65a2dcf…`는 실행 중 상태만 나타냅니다. 최종 필수 로그·공급자 관찰·artifact·체크섬을 확인하기 전에는 통과로 기록하지 않습니다. 이전 `36fde22…` 거절 및 네 지적 원문/인계는 그대로 보존하며, 클라우드 공급자 UNAVAILABLE를 실제 다운로드 성공으로 변경하지 않습니다. 새 코드 변경은 없고 사용자 PC 작업/Box 설치도 수행하지 않았습니다.
+
+## 2026-10-17 · round-02 필수 증거 차단 및 Planning 환류
+
+QA·Revision 최종 원문은 모두 **BLOCKED_REQUIRED_WINDOWS_EVIDENCE / 미해결 앱 코드 지적 0건**입니다. 이전 네 앱 수정은 해결된 상태로 보존하며 다시 미해결로 열지 않습니다. [round-02 인계](runs/20261017-gpt-02/round-02/handoff.md)는 다음 Planning에 CI 단계 관찰·중단 시에도 정확한 최종 증거 보존·live provider와 독립적인 packaged headless CLI 검증만 전달합니다.
+
+`2026-10-17T07:35:21.810849Z` 관찰에서도 마지막 영수증 `65a2dcf538f6ce8ef11fce32ee9615a6c38ad35f`는 `07:04:12Z`에 게시된 running 상태·빈 단계 결과·null artifact였습니다. 30분 job 예산보다 오래 지났지만 실제 runner 상태는 **UNKNOWN**입니다. Actions API Forbidden 때문에 권위 있는 현재 결과를 확인하지 못했으며 timeout·실패·계속 실행 중이라고 단정하지 않습니다. 같은 소스의 Windows 패키지/일반 실행/UI/재실행/PATH/scheduler/headless/최종 체크섬은 NOT VERIFIED입니다.
+
+live Crossref의 첫 관찰이 실패하면 packaged `--sync-jacs` 호출도 생략되는 검증 경로는 별도로 수정해야 합니다. 호출 생략은 NOT RUN이며 오프라인 smoke fixture나 로컬 PASS로 대체하지 않습니다. 새 SHA에 대한 기존 필수 검사·독립 QA·Revision을 그대로 유지하고 앱 범위를 넓히거나 합격 기준을 낮추지 않습니다. 현재 전달 가능한 새 artifact는 없습니다.

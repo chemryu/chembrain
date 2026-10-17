@@ -1,5 +1,5 @@
 {
-  "status": "INDEPENDENT_QA_WAITING_WINDOWS",
+  "status": "BLOCKED_REQUIRED_WINDOWS_EVIDENCE",
   "request_date": "2026-10-17",
   "requested_resume_time_verbatim": "today 7:43pm CST",
   "scheduled_automatically": false,
@@ -17,7 +17,7 @@
   "source_commit": "c96c210a89a077869da78e7e570f06c80768cc16",
   "source_modified_this_preparation": false,
   "unresolved_findings": 0,
-  "independent_qa_complete": false,
+  "independent_qa_complete": true,
   "revision_approved": false,
   "deliverable_ready": false,
   "repository": "chemryu/chembrain",
@@ -29,13 +29,13 @@
   "user_start_override_date": "2026-10-16",
   "user_start_override_verbatim": "지금 바로 시작해줘",
   "prior_reset_wait_superseded": true,
-  "current_phase": "Independent QA",
+  "current_phase": "Wiki handoff to Planning round-03",
   "roles": {
-    "Planning": "COMPLETE",
-    "Development": "IMPLEMENTATION_AND_LOCAL_CHECKS_COMPLETE",
-    "Independent QA": "LOCAL_COMPLETE_AWAITING_EXACT_WINDOWS_FINAL_VERDICT",
-    "Revision": "LOCAL_COMPLEMENTARY_COMPLETE_AWAITING_FINAL_QA_AND_WINDOWS",
-    "Wiki": "RUNNING"
+    "Planning": "ROUND_02_COMPLETE_AWAITING_ROUND_03",
+    "Development": "ROUND_02_COMPLETE_VERIFICATION_INFRASTRUCTURE_WORK_REQUIRED",
+    "Independent QA": "COMPLETE_BLOCKED_REQUIRED_WINDOWS_EVIDENCE",
+    "Revision": "COMPLETE_BLOCKED_REQUIRED_WINDOWS_EVIDENCE",
+    "Wiki": "COMPLETE_HANDOFF_TO_PLANNING"
   },
   "source_modified_this_round": true,
   "box_direct_write_or_sync_configured": false,
@@ -46,7 +46,7 @@
   "new_source_commit_pending": false,
   "baseline_source_commit": "3f102821649ff13b5581ebdff18274ef46602322",
   "source_commit_pushed": true,
-  "windows_ci_status": "RUNNING",
+  "windows_ci_status": "UNKNOWN_FINAL_EVIDENCE_UNAVAILABLE",
   "known_doi_finding_status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
   "local_checks": {
     "python": {
@@ -66,16 +66,16 @@
   },
   "clean_windows_vm": "NOT RUN",
   "actual_user_default_browser": "NOT RUN",
-  "independent_qa_verdict": "LOCAL_ZERO_FINDINGS_PENDING_EXACT_WINDOWS",
-  "revision_verdict": "LOCAL_COMPLEMENTARY_ZERO_FINDINGS_PENDING_FINAL_QA_AND_WINDOWS",
+  "independent_qa_verdict": "BLOCKED_REQUIRED_WINDOWS_EVIDENCE",
+  "revision_verdict": "BLOCKED_REQUIRED_WINDOWS_EVIDENCE",
   "deliverable_scope": "NEW_CANDIDATE_NOT_APPROVED",
   "initial_records_commit": "4224102580de88e3d10fa679c2457502044a8434",
   "windows_receipt_commit": null,
   "windows_tests": {
     "status": "NOT RUN"
   },
-  "planning_handoff": "ROUND_02_PLAN_COMPLETE_AWAITING_REVIEW",
-  "required_automated_checks": "LOCAL_PASS_PENDING_EXACT_SOURCE_WINDOWS_AND_FINAL_INDEPENDENT_VERDICTS",
+  "planning_handoff": "RETURN_TO_PLANNING_ROUND_03_INFRASTRUCTURE_ONLY",
+  "required_automated_checks": "BLOCKED_REQUIRED_EXACT_SOURCE_WINDOWS_EVIDENCE",
   "candidate_artifact_url": null,
   "candidate_inner_zip": null,
   "candidate_inner_zip_sha256": null,
@@ -84,7 +84,7 @@
   "release_published": false,
   "production_release_approved": false,
   "perpetual_background_agents": false,
-  "handoff_path": null,
+  "handoff_path": "runs/20261017-gpt-02/round-02/handoff.md",
   "source_commit_status": "FROZEN_PUSHED_AWAITING_INDEPENDENT_APPROVAL",
   "schedule_installed_on_user_pc": false,
   "feature_scope": {
@@ -191,30 +191,30 @@
     "live_download_pass": false
   },
   "windows_provider_observation": "PENDING",
-  "next_round": null,
+  "next_round": "round-03",
   "findings": [
     {
       "id": "QA-01/REV-01",
       "severity": "HIGH",
-      "status": "RESOLVED_IN_INDEPENDENT_LOCAL_QA_FINAL_GATE_PENDING",
+      "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
       "summary": "PDF redirect loses original DOI and approved route/version binding"
     },
     {
       "id": "QA-02/REV-02",
       "severity": "MEDIUM",
-      "status": "RESOLVED_IN_INDEPENDENT_LOCAL_QA_FINAL_GATE_PENDING",
+      "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
       "summary": "OA effective dates, version, supplied PDF link and Crossref type missing from provenance"
     },
     {
       "id": "QA-03/REV-03",
       "severity": "MEDIUM",
-      "status": "RESOLVED_IN_INDEPENDENT_LOCAL_QA_FINAL_GATE_PENDING",
+      "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
       "summary": "Downloaded PDF page count has no maximum bound"
     },
     {
       "id": "QA-04/REV-04",
       "severity": "MEDIUM",
-      "status": "RESOLVED_IN_INDEPENDENT_LOCAL_QA_FINAL_GATE_PENDING",
+      "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
       "summary": "Pre-existing duplicate DOI source IDs/count not reported"
     }
   ],
@@ -275,9 +275,32 @@
     }
   ],
   "previous_rejected_source_commit": "36fde22d2791475062565161bf986b88f035b2da",
-  "prior_findings_status": "RESOLVED_BY_INDEPENDENT_LOCAL_QA_FINAL_WINDOWS_GATE_PENDING",
+  "prior_findings_status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
   "local_unresolved_findings": 0,
   "windows_run_url": "https://github.com/chemryu/chembrain/actions/runs/39011910077",
   "windows_running_receipt_prefix": "65a2dcf",
-  "revision_local_unresolved_findings": 0
+  "revision_local_unresolved_findings": 0,
+  "unresolved_application_code_findings": 0,
+  "windows_last_receipt_status": "running",
+  "windows_last_observed_receipt_commit": "65a2dcf538f6ce8ef11fce32ee9615a6c38ad35f",
+  "windows_last_receipt_updated_at": "2026-10-17T07:04:12Z",
+  "windows_observed_at": "2026-10-17T07:35:21.810849Z",
+  "windows_actual_current_job_state": "UNKNOWN",
+  "windows_final_receipt_available": false,
+  "windows_configured_job_timeout_minutes": 30,
+  "windows_timeout_proven": false,
+  "github_actions_api_observation": "Forbidden including post-environment-reconnect retry",
+  "packaged_headless_cli_evidence": "NOT VERIFIED; initial provider failure skips production CLI invocation in current observation path",
+  "verification_blockers": [
+    {
+      "id": "VERIFY-01",
+      "status": "UNRESOLVED",
+      "summary": "Exact-source final Windows receipts/logs/artifact/checksum unavailable; runner state unknown"
+    },
+    {
+      "id": "VERIFY-02",
+      "status": "UNRESOLVED",
+      "summary": "Packaged headless CLI check is conditional on live metadata observation; needs independent bounded verification"
+    }
+  ]
 }

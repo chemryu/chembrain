@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-10-17T07:35:21.810849+00:00",
+  "source_commit": "c96c210a89a077869da78e7e570f06c80768cc16",
+  "receipt_commit": "65a2dcf538f6ce8ef11fce32ee9615a6c38ad35f",
+  "receipt_updated_at": "2026-10-17T07:04:12Z",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39011910077",
+  "configured_job_timeout_minutes": 30,
+  "final_receipt_available": false,
+  "artifact_url": null,
+  "actual_current_job_state": "UNKNOWN; last published receipt says running",
+  "github_actions_api": "Forbidden in this environment; post-environment-reconnect retry also Forbidden",
+  "approved_deliverable": false
+}
