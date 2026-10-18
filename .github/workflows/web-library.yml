@@ -7,7 +7,7 @@ on:
       collect:
         type: boolean
         default: false
-        description: Collect public journal metadata and supported OA PDFs before publishing
+        description: Collect only public DOI and author metadata before publishing
       expected_source:
         type: string
         default: ""
@@ -126,6 +126,26 @@ jobs:
           python scripts/web_smoke.py 2>&1 | tee web-browser.log
       - name: Reject document payloads in the Pages artifact
         run: python scripts/check_repository_payloads.py --dist dist
+      - name: Build install-free browser file
+        id: portable
+        run: |
+          set -euo pipefail
+          npm run build:portable 2>&1 | tee portable-build.log
+          cp release/browser-manifest.json browser-manifest.json
+          python scripts/check_repository_payloads.py --dist dist-portable
+          python scripts/portable_smoke.py 2>&1 | tee portable-browser.log
+      - name: Save install-free browser download
+        id: portable_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Chembrain-Browser-${{ github.sha }}
+          path: |
+            release/Chembrain.html
+            release/README-Browser.txt
+            release/browser-manifest.json
+            release/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
       - name: Record artifact stage
         env: { WEB_PHASE: upload-pages-artifact }
         run: python scripts/report_web_build.py

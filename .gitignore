@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-portable/
 .venv/
 .data/
 papers/
@@ -13,6 +14,7 @@ __pycache__/
 playwright-report/
 test-results/
 jacs-gateway.json
+browser-manifest.json
 
 release/
 build/

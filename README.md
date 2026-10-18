@@ -1,5 +1,18 @@
 # Chembrain browser preview
 
+## Open the updated program
+
+The normal app now opens the molecule-first browser library. No Python backend or AI API key is needed for this interface.
+
+For a ready-built download, open the latest successful build for this branch in **GitHub → Actions → Publish Chembrain browser preview**, then download the **Chembrain-Browser-<source SHA>** artifact. Extract it and double-click **Chembrain.html** in Chrome or Edge. Python, Node.js and a local server are not required to open this file. The file is an explicitly labelled preview; it works offline, and DOI links open online when clicked. An artifact build can succeed while the separate Pages publishing job is blocked.
+
+Edits stay in the current browser. Keep the file at the same filename/location and use **Backup JSON before moving, replacing or updating it**; open the new file and use **Import package** to transfer your saved data. File-URL storage depends on browser/privacy settings, so keep exported backups. The standalone file uses its bundled data; weekly updates are imported as normalized packages.
+
+For source development, install Node.js 24, then run `npm ci` and `npm run dev`. A standard `npm run build` or `npm run build:web` creates the hosted browser app in `dist`. To generate the single-file download yourself, run `npm run build:portable`; the result is `release/Chembrain.html` with a SHA-256 manifest and README. The explicit `npm run build:desktop` / `npm run dev:desktop` commands retain the earlier API-backed desktop interface. `scripts/setup.*`, `scripts/start.*` and `scripts/dev.sh` are legacy desktop helpers requiring Python.
+
+This download does not enable GitHub Pages or change repository visibility. The known historical quotations/images remain a separate concern before making the existing repository Public.
+
+
 Current paper-data boundary: GitHub receives only normalized reactions, chemicals, solutions (solvents/solutes), DOI and authors, plus internal linking/curation fields. Paper records have only id, doi and authors. Full PDFs, extracted prose, quoted procedures, paper-derived images and private review candidates are excluded. GitHub Actions collects metadata only and cannot ingest/download papers; private paper-work Actions caches are removed. Local PDF processing remains separate, outside Git checkouts, and must not be copied into GitHub.
 
 The current reachable Git history contains earlier prose quotations and two paper-derived crops even after their current files are cleaned. No PDF blobs were found in the fetched-head audit. A clean current branch does not erase old commits or remote Actions artifacts/caches; do not infer that making the existing repository Public would expose only the current data. See [data boundary](docs/data-boundary.md).
@@ -123,7 +136,7 @@ PyInstaller must run on the target OS. Building the Linux package does not valid
 
 ```sh
 .venv/bin/python -m pytest -q
-npm run build
+npm run build:desktop
 .venv/bin/python scripts/desktop.py --smoke-test
 .venv/bin/python scripts/check_desktop_launch.py .venv/bin/python scripts/desktop.py --no-browser
 python3 scripts/browser_smoke.py

@@ -18,7 +18,7 @@ def main():
  d={'commit':os.environ['GITHUB_SHA'],'built_commit':identity['built_commit'] if identity else None,'provenance':identity,'run_id':run,'run_url':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{run}",'reported_at':datetime.now(timezone.utc).isoformat(),'status':status,'terminal':terminal,'phase':phase,'page_url':url,'facts':json.loads(os.environ.get('WEB_FACTS') or '{}'),'independent_qa':'SEPARATE_REVIEW_REQUIRED; preview only','phases':(old.get('phases',[])+[{'phase':phase,'at':datetime.now(timezone.utc).isoformat()}])[-40:]}
  with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as temp:
   p=Path(temp);(p/'status.json').write_text(json.dumps(d,indent=2))
-  for name in ('web-build.log','web-tests.log','web-browser.log','web-access.log','pages-config.log','pages-config.json'):
+  for name in ('web-build.log','web-tests.log','web-browser.log','web-access.log','pages-config.log','pages-config.json','portable-build.log','portable-browser.log','browser-manifest.json'):
    f=w/name
    if old_commit:
     prior=git(w,'show',old_commit+':'+name,check=False)

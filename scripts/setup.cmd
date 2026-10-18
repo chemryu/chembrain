@@ -12,6 +12,6 @@ if not exist ".venv\Scripts\python.exe" (
 if errorlevel 1 exit /b 1
 call npm ci --no-audit --no-fund
 if errorlevel 1 exit /b 1
-call npm run build
+call npm run build:desktop
 if errorlevel 1 exit /b 1
 echo Setup complete. Run scripts\start.cmd to start Chembrain.
