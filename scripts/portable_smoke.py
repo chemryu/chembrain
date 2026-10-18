@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 
 from playwright.sync_api import expect, sync_playwright
+from synthesis_map_smoke import check_synthesis_map
 
 ROOT = Path(__file__).resolve().parents[1]
 STORE = 'chembrain.normalized-library.v1'
@@ -114,6 +115,7 @@ def verify_no_requests(requests, errors, forbidden, url):
 def edit_and_transfer(browser, url, document=None):
     context, page, requests, errors, forbidden = context_for(browser, url, document=document)
     startup(page, url)
+    check_synthesis_map(page)
     with page.expect_download() as initial_download:
         page.get_by_role('button', name='Backup JSON', exact=True).click()
     assert json.loads(Path(initial_download.value.path()).read_bytes()) == json.loads((ROOT / 'public/library.json').read_text())
@@ -123,7 +125,7 @@ def edit_and_transfer(browser, url, document=None):
     assert page.locator('.molecule-tile img').evaluate_all(
         '(images)=>images.every(image=>image.src.startsWith("data:image/svg+xml")&&image.complete&&image.naturalWidth>0)')
     expect(page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').locator('img')).to_have_count(0)
-    page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click()
+    page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click();page.get_by_role('tab',name='List',exact=True).click()
     expect(page.locator('.web-reaction')).to_have_count(2)
     page.get_by_role('button', name='Edit molecule', exact=True).click()
     page.get_by_label('Aliases (separate with semicolons)').fill('Offline curated molecule')
@@ -149,7 +151,7 @@ def edit_and_transfer(browser, url, document=None):
     expect(page.get_by_role('heading', name='Select a molecule', exact=True)).to_be_visible()
     expect(page.locator('.web-reaction')).to_have_count(0)
     assert saved_data(page) == saved
-    page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click()
+    page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click();page.get_by_role('tab',name='List',exact=True).click()
     expect(page.locator('.reaction-summary').filter(has_text='Offline curated coupling')).to_have_count(1)
     before = page.evaluate('(key)=>localStorage.getItem(key)', STORE)
     bad = {**saved, 'papers': [{**saved['papers'][0], 'abstract': 'Unsupported document field'}, *saved['papers'][1:]]}
@@ -201,7 +203,7 @@ def storage_failure_checks(browser, url, document=None):
         assert page.evaluate('globalThis.__storedOriginal()') == raw
         if mode != 'legacy-backup':
             expect(page.locator('.molecule-tile').first).to_be_visible()
-            page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click()
+            page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click();page.get_by_role('tab',name='List',exact=True).click()
             expect(page.locator('.web-reaction')).to_have_count(2)
         if mode == 'write':
             with page.expect_download() as downloaded:
@@ -262,7 +264,7 @@ def main():
         finally:
             browser.close()
     mode = 'HTTP_ONLY_PORTABLE_PASS: in-memory HTTP document (file:// NOT VERIFIED)' if args.http_only else 'PORTABLE_BROWSER_PASS: actual file:// HTML'
-    print(mode + ', offline and all additional resource requests rejected; zero app network/assets; embedded SVGs, initial empty reaction panel, molecule filter, one DOI/authors reference, chemical/reaction/solution/paper edits, reload, backup/profile import, unknown import rejected, unavailable/full storage retains originals, mobile, malicious raw-text fixture and unexpected chunks rejected; source=' + manifest['source_commit'] + ' html_sha256=' + manifest['sha256'])
+    print(mode + ', offline and all additional resource requests rejected; zero app network/assets; default synthesis map, pan/zoom/fit, keyboard node/detail navigation, branches/gaps, Map/List and mobile; embedded SVGs, initial empty reaction panel, molecule filter, one DOI/authors reference, chemical/reaction/solution/paper edits, reload, backup/profile import, unknown import rejected, unavailable/full storage retains originals, mobile, malicious raw-text fixture and unexpected chunks rejected; source=' + manifest['source_commit'] + ' html_sha256=' + manifest['sha256'])
 
 
 if __name__ == '__main__':
