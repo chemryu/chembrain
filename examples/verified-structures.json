@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "source": {
+    "name": "ChEMBL drug snapshot distributed in the official RDKit tutorials repository",
+    "url": "https://raw.githubusercontent.com/rdkit/rdkit-tutorials/46b3a615e4b9aa8ebbc99dc587d55fe8af168d5a/data/chembl_drugs.txt.gz",
+    "git_commit": "46b3a615e4b9aa8ebbc99dc587d55fe8af168d5a",
+    "sha256": "07634c2891a950829204d633a0f8098f9cd9e48c9e0cd888cabdb756e75507e8",
+    "observed_fields": [
+      "source_id",
+      "source_name",
+      "source_smiles"
+    ]
+  },
+  "computed_with": {
+    "tool": "RDKit",
+    "version": "2026.09.1",
+    "fields": [
+      "canonical_isomeric_smiles",
+      "formula",
+      "inchikey",
+      "molecular_weight",
+      "assigned_stereocenters",
+      "unassigned_stereocenters",
+      "formal_charge",
+      "fragments"
+    ]
+  },
+  "structures": [
+    {
+      "id": "paclitaxel",
+      "name": "Paclitaxel (Taxol)",
+      "source_id": "CHEMBL428647",
+      "source_name": "Paclitaxel (BAN, FDA, INN, USAN, USP)",
+      "source_smiles": "CC(=O)O[C@H]1C(=O)[C@]2(C)[C@@H](O)C[C@H]3OC[C@@]3(OC(=O)C)[C@H]2[C@H](OC(=O)c4ccccc4)[C@]5(O)C[C@H](OC(=O)[C@H](O)[C@@H](NC(=O)c6ccccc6)c7ccccc7)C(=C1C5(C)C)C",
+      "canonical_isomeric_smiles": "CC(=O)O[C@H]1C(=O)[C@@]2(C)[C@H]([C@H](OC(=O)c3ccccc3)[C@]3(O)C[C@H](OC(=O)[C@H](O)[C@@H](NC(=O)c4ccccc4)c4ccccc4)C(C)=C1C3(C)C)[C@]1(OC(C)=O)CO[C@@H]1C[C@@H]2O",
+      "formula": "C47H51NO14",
+      "inchikey": "RCINICONZNJXQF-MZXODVADSA-N",
+      "molecular_weight": 853.92,
+      "assigned_stereocenters": 11,
+      "unassigned_stereocenters": 0,
+      "formal_charge": 0,
+      "fragments": 1,
+      "representation": "Neutral parent in the cited ChEMBL snapshot tautomer representation; stereochemistry retained."
+    },
+    {
+      "id": "doxycycline",
+      "name": "Doxycycline",
+      "source_id": "CHEMBL1433",
+      "source_name": "Doxycycline (BAN, INN, USAN, USP, FDA); Doxycycline HCl (JAN); Doxycycline hyclate (FDA, USP); Doxycycline Fosfatex (BAN, USAN); Doxycycline Calcium (FDA, USP)",
+      "source_smiles": "C[C@@H]1[C@H]2[C@H](O)[C@H]3[C@H](N(C)C)C(=C(C(=O)N)C(=O)[C@@]3(O)C(=C2C(=O)c4c(O)cccc14)O)O",
+      "canonical_isomeric_smiles": "C[C@H]1c2cccc(O)c2C(=O)C2=C(O)[C@]3(O)C(=O)C(C(N)=O)=C(O)[C@@H](N(C)C)[C@@H]3[C@@H](O)[C@@H]21",
+      "formula": "C22H24N2O8",
+      "inchikey": "JBIWCJUYHHGXTC-AKNGSSGZSA-N",
+      "molecular_weight": 444.44,
+      "assigned_stereocenters": 6,
+      "unassigned_stereocenters": 0,
+      "formal_charge": 0,
+      "fragments": 1,
+      "representation": "Neutral parent in the cited ChEMBL snapshot tautomer representation; stereochemistry retained. Not the hydrochloride/hyclate isolate described in the paper."
+    }
+  ]
+}

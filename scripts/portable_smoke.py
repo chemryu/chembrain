@@ -11,6 +11,8 @@ import tempfile
 
 from playwright.sync_api import expect, sync_playwright
 from synthesis_map_smoke import check_synthesis_map
+from structure_smoke import check_structures,wait_for_seed_tile_images
+from structure_upgrade_smoke import check_structure_upgrade
 
 ROOT = Path(__file__).resolve().parents[1]
 STORE = 'chembrain.normalized-library.v1'
@@ -115,16 +117,16 @@ def verify_no_requests(requests, errors, forbidden, url):
 def edit_and_transfer(browser, url, document=None):
     context, page, requests, errors, forbidden = context_for(browser, url, document=document)
     startup(page, url)
+    check_structures(page)
+    check_structure_upgrade(page)
     check_synthesis_map(page)
     with page.expect_download() as initial_download:
         page.get_by_role('button', name='Backup JSON', exact=True).click()
     assert json.loads(Path(initial_download.value.path()).read_bytes()) == json.loads((ROOT / 'public/library.json').read_text())
     expect(page.get_by_text('All reactions', exact=True)).to_have_count(0)
     expect(page.get_by_text('Organic synthesis', exact=True)).to_have_count(0)
-    assert page.locator('.molecule-tile img').count() > 0
-    assert page.locator('.molecule-tile img').evaluate_all(
-        '(images)=>images.every(image=>image.src.startsWith("data:image/svg+xml")&&image.complete&&image.naturalWidth>0)')
-    expect(page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').locator('img')).to_have_count(0)
+    wait_for_seed_tile_images(page)
+    expect(page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').locator('img[data-structure-state="ready"]')).to_have_count(1,timeout=30000)
     page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click();page.get_by_role('tab',name='List',exact=True).click()
     expect(page.locator('.web-reaction')).to_have_count(2)
     page.get_by_role('button', name='Edit molecule', exact=True).click()
@@ -199,7 +201,12 @@ def storage_failure_checks(browser, url, document=None):
         })();'''.replace('KEY', json.dumps(STORE)).replace('ORIGINAL', json.dumps(raw)).replace('MODE', json.dumps(mode))
         context, page, requests, errors, forbidden = context_for(browser, url, script, document)
         page.goto(url, wait_until='load')
-        expect(page.get_by_role('alert')).to_be_visible()
+        if mode == 'write':
+            # A complete valid library needs no startup rewrite. Writing fails
+            # only after a real edit attempts to replace the primary copy.
+            expect(page.get_by_role('alert')).to_have_count(0)
+        else:
+            expect(page.get_by_role('alert')).to_be_visible()
         assert page.evaluate('globalThis.__storedOriginal()') == raw
         if mode != 'legacy-backup':
             expect(page.locator('.molecule-tile').first).to_be_visible()
@@ -213,6 +220,7 @@ def storage_failure_checks(browser, url, document=None):
             page.get_by_label('Aliases (separate with semicolons)').fill('This save must fail')
             page.get_by_role('button', name='Validate & save', exact=True).click()
             expect(page.get_by_role('dialog')).to_be_visible()
+            expect(page.get_by_role('dialog').get_by_role('alert')).to_contain_text('Storage full')
             assert page.evaluate('globalThis.__storedOriginal()') == raw
         else:
             expect(page.get_by_role('button', name='Import package', exact=True)).to_be_disabled()
@@ -229,6 +237,11 @@ def check_artifact():
     assert len(payload) == manifest['bytes']
     assert hashlib.sha256(payload).hexdigest() == manifest['sha256']
     assert hashlib.sha256((ROOT / 'public/library.json').read_bytes()).hexdigest() == manifest['library_sha256']
+    renderer = manifest['structure_renderer']
+    assert renderer['package'] == '@rdkit/rdkit' and renderer['version'] == '2026.9.1'
+    assert renderer['wasm_sha256'] == hashlib.sha256((ROOT / 'node_modules/@rdkit/rdkit/dist/RDKit_minimal.wasm').read_bytes()).hexdigest()
+    assert (ROOT / 'packaging/RDKit-LICENSE.txt').read_text() in payload.decode('utf-8')
+    assert 'BSD 3-Clause License' in (release / 'README-Browser.txt').read_text()
     for line in (release / 'SHA256SUMS.txt').read_text().splitlines():
         digest, name = line.split('  ', 1)
         assert name in ['Chembrain.html', 'README-Browser.txt', 'browser-manifest.json']
@@ -264,7 +277,7 @@ def main():
         finally:
             browser.close()
     mode = 'HTTP_ONLY_PORTABLE_PASS: in-memory HTTP document (file:// NOT VERIFIED)' if args.http_only else 'PORTABLE_BROWSER_PASS: actual file:// HTML'
-    print(mode + ', offline and all additional resource requests rejected; zero app network/assets; default synthesis map, pan/zoom/fit, keyboard node/detail navigation, branches/gaps, Map/List and mobile; embedded SVGs, initial empty reaction panel, molecule filter, one DOI/authors reference, chemical/reaction/solution/paper edits, reload, backup/profile import, unknown import rejected, unavailable/full storage retains originals, mobile, malicious raw-text fixture and unexpected chunks rejected; source=' + manifest['source_commit'] + ' html_sha256=' + manifest['sha256'])
+    print(mode + ', offline and all additional resource requests rejected; zero app network/assets; bundled renderer real target/selected/map vector structures, imported stereo/charged/multifragment SMILES, rename/edit/invalid recovery, structure JSON backup/import, private verified-example upgrade; default synthesis map, pan/zoom/fit, keyboard node/detail navigation, branches/gaps, Map/List and mobile; initial empty reaction panel, molecule filter, one DOI/authors reference, chemical/reaction/solution/paper edits, reload, backup/profile import, unknown import rejected, unavailable/full storage retains originals, mobile, malicious raw-text fixture and unexpected chunks rejected; source=' + manifest['source_commit'] + ' html_sha256=' + manifest['sha256'])
 
 
 if __name__ == '__main__':

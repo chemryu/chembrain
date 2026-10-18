@@ -2,6 +2,8 @@
 
 ## 현재 상태와 작업 위치
 
+최신 요청 `20261018-structures-07`는 실제 분자 구조 표시입니다. 현재 SMILES로 구조를 그려 목록·선택 상세·합성 지도에 표시하고, 확인된 Taxol/doxycycline parent 구조만 추가합니다. 논문 번호만 있는 중간체를 추측하지 않습니다. 기존 라이브러리의 명시적 구조 추가는 정확한 private 원본 백업 후 누락된 일치 예시만 보완하며 사용자 편집을 유지합니다. 새 소스의 실제 offline HTML와 별도 QA/Revision을 요구합니다.
+
 최신 요청 `20261018-synthesis-map-06`는 분자 선택 시 brainstorming 형태의 합성 지도입니다. Map을 기본으로 열고 List에 기존 반응 카드·편집을 보존합니다. 화살표는 실제 reactants/products만 사용하고 targets·논문 순서·이름으로 빠진 반응을 만들지 않습니다. 분리된 구간·미확인 구조·표시 제한을 안내하고, 확대·이동·Fit·반응 선택의 조건/DOI 확인과 실제 offline HTML 검증을 요구합니다. 데이터 범위·Public·Pages·Git 역사 권한은 그대로입니다.
 
 

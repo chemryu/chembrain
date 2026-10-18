@@ -5,6 +5,8 @@ from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
 from synthesis_map_smoke import check_synthesis_map
+from structure_smoke import check_structures,wait_for_seed_tile_images
+from structure_upgrade_smoke import check_structure_upgrade
 ROOT=Path(__file__).resolve().parents[1]
 class Handler(SimpleHTTPRequestHandler):
  def do_GET(self):
@@ -175,14 +177,16 @@ def main():
    check_metadata_boundary(browser,url)
    page.goto(url,wait_until='networkidle');expect(page.get_by_role('heading',name='Select a molecule',exact=True)).to_be_visible()
    expect(page.locator('.web-reaction')).to_have_count(0);expect(page.get_by_text('All reactions',exact=True)).to_have_count(0);expect(page.get_by_text('Organic synthesis',exact=True)).to_have_count(0)
+   check_structures(page)
+   check_structure_upgrade(page)
    check_synthesis_map(page)
+   wait_for_seed_tile_images(page)
    page.screenshot(path='/tmp/chembrain-web-library.png',full_page=True)
-   assert page.locator('.molecule-tile img').evaluate_all('(xs)=>xs.every(x=>x.complete&&x.naturalWidth>0)')
    page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').click();page.get_by_role('tab',name='List',exact=True).click();expect(page.locator('.web-reaction')).to_have_count(2)
    page.locator('.reaction-summary').filter(has_text='Taxol side-chain coupling').click();expect(page.locator('.paper-reference')).to_have_count(1)
    expect(page.locator('.paper-reference a')).to_have_attribute('href','https://doi.org/10.1021/ja00083a067')
    expect(page.locator('.paper-reference a')).to_have_text('10.1021/ja00083a067 ↗')
-   expect(page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').locator('img')).to_have_count(0)
+   expect(page.locator('.molecule-tile').filter(has_text='Paclitaxel (Taxol)').locator('img[data-structure-state="ready"]')).to_have_count(1,timeout=30000)
    expect(page.locator('.step')).to_have_count(3);expect(page.locator('.step').nth(2)).to_contain_text('Ethanol')
    page.get_by_role('button',name='Edit record',exact=True).click();page.get_by_label('Reaction name',exact=True).fill('User curated coupling');page.get_by_role('button',name='Validate & save').click()
    saved=page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")
@@ -207,6 +211,6 @@ def main():
    assert not errors,errors
    assert not any('/api/' in r or not r.startswith(url.split('/chembrain')[0]) for r in requests),requests
    browser.close()
-   print('WEB_LIBRARY_BROWSER_PASS: default recorded synthesis map, branches, gap notice, pan/zoom/fit, keyboard node/detail navigation, no exploration writes, map mobile and List fallback; empty initial panel, molecule-related records, stage solutions, one DOI reference, edit/reload/import preservation, malformed-editor correction/cancel/storage, Python-export browser import, metadata-only DOI/authors display/export, byte-exact legacy backup and storage-failure recovery, unknown-field rejection, no copied paper assets, backup, subpath assets and mobile; no backend API.')
+   print('WEB_LIBRARY_BROWSER_PASS: real vector target/selected/map structures, imported stereo/charged/multifragment SMILES, rename/edit/invalid recovery, structure JSON backup/import, private verified-example upgrade; default recorded synthesis map, branches, gap notice, pan/zoom/fit, keyboard node/detail navigation, no exploration writes, map mobile and List fallback; empty initial panel, molecule-related records, stage solutions, one DOI reference, edit/reload/import preservation, malformed-editor correction/cancel/storage, Python-export browser import, metadata-only DOI/authors display/export, byte-exact legacy backup and storage-failure recovery, unknown-field rejection, no copied paper assets, backup, subpath assets and mobile; no backend API.')
  finally:server.shutdown();server.server_close()
 if __name__=='__main__':main()

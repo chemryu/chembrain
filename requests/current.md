@@ -1,3 +1,9 @@
+# Current request — 20261018-structures-07
+
+User: “structure들은 구조가 나타나질 않니?” Add actual current-SMILES drawings in molecule tiles, selected large structure and synthesis map. Include source-checked neutral parent Taxol and doxycycline, retain unknown paper-numbered structures without guessing. Generic offline bundled renderer must handle valid imported/edited SMILES independently of name/ID and visibly report invalid/unencoded inputs. Explicit narrow old-example enrichment must preserve user edits and exact private original bytes before replacement. Same frozen source must pass hosted and actual file HTML checks and separate QA/Revision, then Wiki. Existing Pages403, history/Public, no-main, no-Box-sync and no-schedule constraints are retained.
+
+---
+
 # Current request — 20261018-synthesis-map-06
 
 Round-02 follows the formal round-01 Revision → Wiki → Planning handoff. Fix QA-SYN-01 mobile Focus using live dragged node position/dimensions and shared real mobile regression. Preserve complete short/large head-tail CI diagnostics, then diagnose and resolve the actual failed hosted-browser assertion from CI39140468551; its old receipt omitted the error head. Round-01 source e6ed4e7 is rejected; no approval transfers. Require new exact-source hosted/file checks and both reviews.
