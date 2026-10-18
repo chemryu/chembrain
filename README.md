@@ -2,7 +2,7 @@
 
 ## Open the updated program
 
-The normal app now opens the molecule-first browser library. No Python backend or AI API key is needed for this interface.
+The normal app now opens the molecule-first browser library. Clicking a molecule opens its branching **Map**: recorded molecules connect through reaction steps, with arrows showing synthesis direction. Drag the canvas to pan, use zoom/Fit controls, and click a reaction to inspect its conditions, solvents/solutes, yield and DOI reference. Click another molecule node to explore its synthesis context. **List** keeps the existing reaction cards and editing workflow. Separate recorded fragments remain separate when intervening transformations have not been curated; target tags do not create reaction arrows. Layout exploration is not saved as chemistry data. No Python backend or AI API key is needed for this interface.
 
 For a ready-built download, open the latest successful build for this branch in **GitHub → Actions → Publish Chembrain browser preview**, then download the **Chembrain-Browser-<source SHA>** artifact. Extract it and double-click **Chembrain.html** in Chrome or Edge. Python, Node.js and a local server are not required to open this file. The file is an explicitly labelled preview; it works offline, and DOI links open online when clicked. An artifact build can succeed while the separate Pages publishing job is blocked.
 
@@ -18,7 +18,7 @@ Current paper-data boundary: GitHub receives only normalized reactions, chemical
 The current reachable Git history contains earlier prose quotations and two paper-derived crops even after their current files are cleaned. No PDF blobs were found in the fetched-head audit. A clean current branch does not erase old commits or remote Actions artifacts/caches; do not infer that making the existing repository Public would expose only the current data. See [data boundary](docs/data-boundary.md).
 
 
-The current app starts with only the molecular library. Select a molecule to see directly related reactions; optionally include steps from that target’s synthesis route. There is no initial all-reactions/category panel. Edits are stored in the current browser, with JSON backup/import and no account sync. The app uses no AI API key or Python runtime in the browser.
+The current app starts with only the molecular library. Select a molecule to open its recorded synthesis Map. Switch to List for direct reaction cards and the optional synthesis-route filter. There is no initial all-reactions/category panel. Edits are stored in the current browser, with JSON backup/import and no account sync. The app uses no AI API key or Python runtime in the browser.
 
 The starter contains three uploaded total-synthesis papers and 12 draft curated reaction records. Numbered intermediates remain paper-specific; unknown SMILES/stereochemistry, amounts, concentrations and unreported conditions stay empty. Only structure SVGs generated from encoded SMILES are included. Unencoded target/intermediate structures show an honest placeholder; source-paper crops were removed. Full PDFs and page text are excluded. Stage-specific solutions, multi-step yields, salts and uncertain ranges retain their context. These draft facts are not full substrate scopes or independently reproduced procedures.
 

@@ -1,6 +1,6 @@
 {
-  "status": "READY_REVIEWED_BROWSER_DOWNLOAD_PREVIEW_PAGES_BLOCKED_HISTORY_NOT_CLEARED",
-  "request_date": "2026-10-17",
+  "status": "READY_REVIEWED_SYNTHESIS_MAP_BROWSER_DOWNLOAD_PAGES_BLOCKED_HISTORY_NOT_CLEARED",
+  "request_date": "2026-10-18",
   "requested_resume_time_verbatim": "새벽 데이터 리셋된 이후인 12시5분에 이전까지 한 내용부터 다시 시작해줘",
   "scheduled_automatically": false,
   "workflow": [
@@ -14,7 +14,7 @@
   "external_ai_api_calls": false,
   "agent_definitions_prepared": true,
   "five_role_run_started": true,
-  "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+  "source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
   "source_modified_this_preparation": false,
   "unresolved_findings": 0,
   "independent_qa_complete": true,
@@ -23,19 +23,19 @@
   "repository": "chemryu/chembrain",
   "branch": "codex/gpt-agent-workflow",
   "primary_record_store": "GitHub",
-  "run_id": "20261018-program-update-05",
-  "round": "round-01",
+  "run_id": "20261018-synthesis-map-06",
+  "round": "round-02",
   "timezone": "America/Chicago",
   "user_start_override_date": "2026-10-16",
   "user_start_override_verbatim": "지금 바로 시작해줘",
   "prior_reset_wait_superseded": true,
-  "current_phase": "Wiki complete: exact-source Independent QA and Revision PASS with zero material findings; actual-file CI passes; downloadable preview ready",
+  "current_phase": "Wiki complete: both independent reviews PASS/zero material findings, current hosted and actual-file CI PASS; synthesis-map download preview ready, Pages403/history limits separate",
   "roles": {
-    "Planning": "COMPLETE_DEFAULT_BROWSER_AND_PORTABLE_DELIVERY_SCOPE",
-    "Development": "COMPLETE_FROZEN_SOURCE_DEVELOPMENT_CHECKS_PASS",
-    "Independent QA": "COMPLETE_EXACT_SOURCE_PASS_HOSTED_AND_ACTUAL_FILE_CI_ZERO_FINDINGS",
-    "Revision": "COMPLETE_EXACT_SOURCE_PASS_BROWSER_PREVIEW_ZERO_FINDINGS",
-    "Wiki": "COMPLETE_FINAL_REPORTS_AND_EXTERNAL_LIMIT_HANDOFF"
+    "Planning": "COMPLETE_BOUNDED_ROUND02_REPAIR_PLAN_FROM_FORMAL_WIKI_HANDOFF",
+    "Development": "COMPLETE_FROZEN_SOURCE_LIVE_FOCUS_DIAGNOSTICS_CHECKS_PASS",
+    "Independent QA": "COMPLETE_PASS_EXACT_SOURCE_QA_SYN_01_RESOLVED_AND_CURRENT_CI_VERIFIED",
+    "Revision": "COMPLETE_PASS_EXACT_SOURCE_DOWNLOAD_PREVIEW_ZERO_MATERIAL_FINDINGS",
+    "Wiki": "COMPLETE_FULL_REPORT_HASHES_AND_BOUNDED_DOWNLOAD_HANDOFF"
   },
   "source_modified_this_round": true,
   "box_direct_write_or_sync_configured": false,
@@ -44,52 +44,57 @@
   "records_branch_published": true,
   "records_reference_exact_source_commit": true,
   "new_source_commit_pending": false,
-  "baseline_source_commit": "6280794c87e7867b0ccd2e2d4f6924814917997a",
+  "baseline_source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
   "source_commit_pushed": true,
   "windows_ci_status": "LEGACY_BLOCKED_STATUS_PRESERVED_IN_SUPERSEDED_RUN_HISTORY_NOT_A_WEB_PREVIEW_GATE",
   "known_doi_finding_status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
   "local_checks": {
     "python": {
       "status": "PASS",
-      "passed": 284,
+      "passed": 290,
       "skipped": 1,
       "skip_reason": "Windows-only DPAPI"
     },
     "frontend_web_build": "PASS",
-    "real_browser_web_checks": "PASS",
-    "focused_collector_durability_state": {
-      "passed": 46
+    "real_browser_web_checks": "PASS_INCLUDING_LIVE_MOBILE_DRAG_FOCUS_GEOMETRY",
+    "synthesis_graph_and_receipt_runtime": {
+      "status": "PASS",
+      "passed": 7
     },
-    "portable_contract_browser_runtime": {
-      "passed": 8
+    "tracked_payload_gate": {
+      "status": "PASS",
+      "files": 157
     },
-    "repository_payload_legacy_import": {
-      "passed": 8
+    "dist_payload_gate": {
+      "status": "PASS",
+      "files": 13
     },
-    "evidence_role": "Development root and helpers, not independent approval"
+    "portable_http_only": "PASS_NOT_ACTUAL_FILE",
+    "actual_file_browser": "NOT RUN_MANAGED_ADMIN_POLICY",
+    "evidence_role": "Development full290/1; separate IndependentQA17focused+hosted/http PASS, Revision7focused+independent originalmobile repro PASS"
   },
   "clean_windows_vm": "NOT RUN",
   "actual_user_default_browser": "NOT RUN",
-  "independent_qa_verdict": "PASS_EXACT_SOURCE_BROWSER_PREVIEW",
-  "revision_verdict": "PASS_EXACT_SOURCE_BROWSER_PREVIEW",
-  "deliverable_scope": "DOWNLOADABLE_SINGLE_HTML_BROWSER_PREVIEW_ONLY",
+  "independent_qa_verdict": "PASS_EXACT_SOURCE_BOUNDED_DOWNLOAD_PREVIEW_ZERO_MATERIAL_FINDINGS",
+  "revision_verdict": "PASS_EXACT_SOURCE_BOUNDED_DOWNLOAD_PREVIEW_ZERO_MATERIAL_FINDINGS",
+  "deliverable_scope": "REVIEWED_DOWNLOADABLE_SINGLE_HTML_SYNTHESIS_MAP_PREVIEW",
   "initial_records_commit": "4224102580de88e3d10fa679c2457502044a8434",
   "windows_receipt_commit": null,
   "windows_tests": {
     "status": "NOT RUN_FOR_WEB_PREVIEW"
   },
-  "planning_handoff": "NO_CURRENT_SOURCE_REPAIR_REQUIRED_PREVIEW_DELIVERY_READY_EXTERNAL_PAGES_HISTORY_DECISIONS_SEPARATE",
-  "required_automated_checks": "EXACT_SOURCE_CI_TEST_BUILD_HOSTED_BROWSER_ACTUAL_FILE_BROWSER_PAYLOAD_PASS",
-  "candidate_artifact_url": "https://github.com/chemryu/chembrain/actions/runs/39102813926/artifacts/12127033101",
+  "planning_handoff": "CLOSE_NO_CURRENT_SOURCE_REPAIR_REQUIRED_DOWNLOAD_PREVIEW_READY_EXTERNAL_PAGES_HISTORY_DECISIONS_SEPARATE",
+  "required_automated_checks": "PASS_EXACT_SOURCE_TEST_BUILD_HOSTED_BROWSER_ACTUAL_FILE_BROWSER_PAYLOAD_AND_ARTIFACT_IDENTITY",
+  "candidate_artifact_url": "https://github.com/chemryu/chembrain/actions/runs/39141206671/artifacts/12140894328",
   "candidate_inner_zip": null,
   "candidate_inner_zip_sha256": null,
-  "checksum_verification_method": "LOCAL_HTML_AND_ALL_NINE_CI_RAW_FILES_BYTE_AND_SHA256_VERIFIED_AGAINST_IMMUTABLE_RECEIPT; ARCHIVE_NOT_INDEPENDENTLY_DOWNLOADED",
+  "checksum_verification_method": "CI immutable manifest equals local release; actual local HTML and library independently hashed; uploaded ZIP digest reported by CI, archive not independently downloaded",
   "artifact_independently_downloaded_and_rehashed": false,
   "release_published": false,
   "production_release_approved": false,
   "perpetual_background_agents": false,
-  "handoff_path": "runs/20261018-program-update-05/round-01/handoff.md",
-  "source_commit_status": "FROZEN_PUSHED_BOTH_INDEPENDENT_PREVIEW_REVIEWS_PASS",
+  "handoff_path": "runs/20261018-synthesis-map-06/round-02/handoff.md",
+  "source_commit_status": "FROZEN_PUSHED_BOTH_INDEPENDENT_REVIEWS_PASS_BOUNDED_DOWNLOAD_PREVIEW",
   "schedule_installed_on_user_pc": false,
   "feature_scope": {
     "main_app": "GITHUB_PAGES_BROWSER_STORAGE",
@@ -108,7 +113,10 @@
     "github_pdf_or_original_document_uploads": false,
     "github_collection": "HARD_METADATA_ONLY",
     "local_pdf_processing": "PRIVATE_OUTSIDE_GIT_ONLY",
-    "private_legacy_backup": "EXACT_ORIGINAL_BYTES_BROWSER_LOCAL_ONLY"
+    "private_legacy_backup": "EXACT_ORIGINAL_BYTES_BROWSER_LOCAL_ONLY",
+    "molecule_selection": "DEFAULT_INTERACTIVE_SYNTHESIS_MAP_WITH_EXPLICIT_LIST_FALLBACK",
+    "map_edges": "RECORDED_REACTANT_REACTION_PRODUCT_ONLY_NO_INVENTED_GAP_EDGES",
+    "layout_exploration_persisted_as_chemistry": false
   },
   "development_helpers": 1,
   "completed_run_history": [
@@ -673,9 +681,449 @@
         "library_sha256": "25e98df9810b686e9da2c3c3b3f7f5da627dd2186ab3b00533b28d34072aef8c"
       },
       "published_records_commit": "b9285eca83cb4dc5128b9ef00f146fb43675bd88"
+    },
+    {
+      "status": "CHANGES_REQUESTED_SYNTHESIS_MAP_ROUND01_MOBILE_FOCUS_AND_CI_BROWSER_FAILURE",
+      "request_date": "2026-10-18",
+      "requested_resume_time_verbatim": "새벽 데이터 리셋된 이후인 12시5분에 이전까지 한 내용부터 다시 시작해줘",
+      "scheduled_automatically": false,
+      "workflow": [
+        "Planning",
+        "Development",
+        "Independent QA",
+        "Revision",
+        "Wiki",
+        "Planning"
+      ],
+      "external_ai_api_calls": false,
+      "agent_definitions_prepared": true,
+      "five_role_run_started": true,
+      "source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+      "source_modified_this_preparation": false,
+      "unresolved_findings": 1,
+      "independent_qa_complete": true,
+      "revision_approved": false,
+      "deliverable_ready": false,
+      "repository": "chemryu/chembrain",
+      "branch": "codex/gpt-agent-workflow",
+      "primary_record_store": "GitHub",
+      "run_id": "20261018-synthesis-map-06",
+      "round": "round-01",
+      "timezone": "America/Chicago",
+      "user_start_override_date": "2026-10-16",
+      "user_start_override_verbatim": "지금 바로 시작해줘",
+      "prior_reset_wait_superseded": true,
+      "current_phase": "Wiki records round-01 rejection and hands mobile Focus fix plus unresolved CI browser failure/diagnostic capture to round-02 Planning",
+      "roles": {
+        "Planning": "COMPLETE_ROUND01_AWAITING_ROUND02_FROM_WIKI",
+        "Development": "COMPLETE_ROUND01_FROZEN_CANDIDATE_REJECTED",
+        "Independent QA": "COMPLETE_CHANGES_REQUESTED_QA_SYN_01",
+        "Revision": "COMPLETE_CONFIRMED_QA_SYN_01_CHANGES_REQUESTED",
+        "Wiki": "COMPLETE_HANDOFF_TO_ROUND02_PLANNING"
+      },
+      "source_modified_this_round": true,
+      "box_direct_write_or_sync_configured": false,
+      "source_branch": "codex/gpt-agent-workflow",
+      "records_branch": "codex/gpt-workflow-records",
+      "records_branch_published": true,
+      "records_reference_exact_source_commit": true,
+      "new_source_commit_pending": false,
+      "baseline_source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+      "source_commit_pushed": true,
+      "windows_ci_status": "LEGACY_BLOCKED_STATUS_PRESERVED_IN_SUPERSEDED_RUN_HISTORY_NOT_A_WEB_PREVIEW_GATE",
+      "known_doi_finding_status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+      "local_checks": {
+        "python": {
+          "status": "PASS",
+          "passed": 289,
+          "skipped": 1,
+          "skip_reason": "Windows-only DPAPI"
+        },
+        "frontend_web_build": "PASS",
+        "real_browser_web_checks": "PASS_BROAD_SMOKE_MISSED_MOBILE_SELECTED_DRAG_FOCUS",
+        "synthesis_graph_runtime": {
+          "status": "PASS",
+          "passed": 5
+        },
+        "tracked_payload_gate": {
+          "status": "PASS",
+          "files": 156
+        },
+        "dist_payload_gate": {
+          "status": "PASS",
+          "files": 13
+        },
+        "portable_http_only": "PASS_NOT_ACTUAL_FILE",
+        "actual_file_browser": "NOT RUN_MANAGED_ADMIN_POLICY",
+        "evidence_role": "Development, separately from Independent QA15focusedPASS and independent mobilefinding"
+      },
+      "clean_windows_vm": "NOT RUN",
+      "actual_user_default_browser": "NOT RUN",
+      "independent_qa_verdict": "CHANGES_REQUESTED_ONE_MATERIAL_FINDING",
+      "revision_verdict": "CHANGES_REQUESTED_ONE_MATERIAL_FINDING_CONFIRMED",
+      "deliverable_scope": "SYNTHESIS_MAP_CANDIDATE_NOT_APPROVED_OLD_DOWNLOAD_HISTORICAL_ONLY",
+      "initial_records_commit": "4224102580de88e3d10fa679c2457502044a8434",
+      "windows_receipt_commit": null,
+      "windows_tests": {
+        "status": "NOT RUN_FOR_WEB_PREVIEW"
+      },
+      "planning_handoff": "RETURN_TO_PLANNING_ROUND02_LIVE_NODE_FOCUS_MOBILE_REGRESSION_AND_CI_FAILURE_DIAGNOSTICS",
+      "required_automated_checks": "NOT_SATISFIED_CURRENT_SOURCE_CI_BROWSER_FAIL_ACTUAL_FILE_AND_ARTIFACT_NOT_RUN",
+      "candidate_artifact_url": null,
+      "candidate_inner_zip": null,
+      "candidate_inner_zip_sha256": null,
+      "checksum_verification_method": null,
+      "artifact_independently_downloaded_and_rehashed": false,
+      "release_published": false,
+      "production_release_approved": false,
+      "perpetual_background_agents": false,
+      "handoff_path": "runs/20261018-synthesis-map-06/round-01/handoff.md",
+      "source_commit_status": "FROZEN_PUSHED_REJECTED_BY_BOTH_INDEPENDENT_REVIEWS",
+      "schedule_installed_on_user_pc": false,
+      "feature_scope": {
+        "main_app": "GITHUB_PAGES_BROWSER_STORAGE",
+        "initial_view": "MOLECULAR_LIBRARY_WITH_EMPTY_REACTION_PANEL_UNTIL_SELECTION",
+        "normalized_tables": [
+          "papers",
+          "chemicals",
+          "solutions",
+          "reactions"
+        ],
+        "public_paper_fields": [
+          "id",
+          "doi",
+          "authors"
+        ],
+        "github_pdf_or_original_document_uploads": false,
+        "github_collection": "HARD_METADATA_ONLY",
+        "local_pdf_processing": "PRIVATE_OUTSIDE_GIT_ONLY",
+        "private_legacy_backup": "EXACT_ORIGINAL_BYTES_BROWSER_LOCAL_ONLY",
+        "molecule_selection": "DEFAULT_INTERACTIVE_SYNTHESIS_MAP_WITH_EXPLICIT_LIST_FALLBACK",
+        "map_edges": "RECORDED_REACTANT_REACTION_PRODUCT_ONLY_NO_INVENTED_GAP_EDGES",
+        "layout_exploration_persisted_as_chemistry": false
+      },
+      "development_helpers": 1,
+      "live_provider_cloud_observation": {
+        "status": "UNAVAILABLE",
+        "reason": "Network/DNS restriction",
+        "live_download_pass": false
+      },
+      "windows_provider_observation": "PENDING",
+      "next_round": "round-02",
+      "findings": [
+        {
+          "id": "QA-SYN-01",
+          "severity": "P2",
+          "status": "CONFIRMED_UNRESOLVED",
+          "summary": "Mobile Focus uses original graph position after selected molecule card drag; live card remains outside canvas",
+          "source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+          "required_fix": "Use current ReactFlow position and dimensions; shared actual mobile drag-then-Focus regression in hosted/offline suites"
+        }
+      ],
+      "previous_rejected_source_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+      "prior_findings_status": "FOUR_RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+      "local_unresolved_findings": 1,
+      "windows_run_url": "https://github.com/chemryu/chembrain/actions/runs/39011910077",
+      "windows_running_receipt_prefix": "65a2dcf",
+      "revision_local_unresolved_findings": 1,
+      "unresolved_application_code_findings": 1,
+      "windows_last_receipt_status": "running",
+      "windows_last_observed_receipt_commit": "65a2dcf538f6ce8ef11fce32ee9615a6c38ad35f",
+      "windows_last_receipt_updated_at": "2026-10-17T07:04:12Z",
+      "windows_observed_at": "2026-10-17T07:35:21.810849Z",
+      "windows_actual_current_job_state": "UNKNOWN",
+      "windows_final_receipt_available": false,
+      "windows_configured_job_timeout_minutes": 30,
+      "windows_timeout_proven": false,
+      "github_actions_api_observation": "Forbidden including post-environment-reconnect retry",
+      "packaged_headless_cli_evidence": "NOT VERIFIED; initial provider failure skips production CLI invocation in current observation path",
+      "verification_blockers": [
+        {
+          "id": "CURRENT_CI_BROWSER_FAILURE",
+          "status": "FAIL_CAUSE_UNRESOLVED_LOG_TAIL_MISSING_DIAGNOSTIC",
+          "application_finding": false,
+          "next_action": "Capture bounded head/tail and compact root failure diagnostic without weakening test, reproduce and resolve on new source"
+        },
+        {
+          "id": "CURRENT_PORTABLE_ARTIFACT",
+          "status": "SKIPPED_AFTER_BROWSER_FAILURE_ACTUAL_FILE_NOT_RUN",
+          "application_finding": false
+        },
+        {
+          "id": "PUBLIC_HISTORY_REVIEW",
+          "status": "KNOWN_OLD_QUOTES_CROPS_AND_UNVERIFIED_REMOTE_STORAGE",
+          "application_finding": false
+        }
+      ],
+      "public_preview_explicitly_authorized": true,
+      "public_preview_access_verified": false,
+      "pages_run_id": "39140468551",
+      "pages_phase": "terminal",
+      "pages_terminal_result": "blocked",
+      "pages_exact_public_source_marker_verified": false,
+      "weekly_github_cron_active": false,
+      "weekly_cron_requires_default_branch": true,
+      "default_branch_merged_or_changed": false,
+      "local_schedule_installer_executed_by_user": false,
+      "cross_device_account_sync": false,
+      "previous_windows_diagnostics": "UNFINISHED_PRESERVED_SEPARATELY_NOT_MIXED_IN_WEB_SOURCE",
+      "agent_quota_history": {
+        "actual_limit_error_occurred": true,
+        "normal_resume_attempt_after_announced_reset": true,
+        "model_or_key_switched_to_bypass": false,
+        "final_reviews_not_yet_returned": false,
+        "actual_post_reset_independent_reports_returned": true,
+        "round03_review_status": "BOTH_FINAL_EXACT_SOURCE_REPORTS_RETURNED_AFTER_EXPLICIT_USER_RESUME"
+      },
+      "windows_required_for_current_web_preview": false,
+      "pages_status": "NOT_ATTEMPTED_CURRENT_RUN_FAILED_BEFORE_PUBLISH",
+      "pages_terminal_receipt_commit": "44c569c9fc284fe30fb59b440a61eb7ad084ed57",
+      "pages_configuration": {
+        "status": "NOT RUN",
+        "reason": "Current hosted browser step failed before publish; previous403 remains historical only",
+        "observation_source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+        "http_status": null
+      },
+      "pages_deployment": "NOT RUN",
+      "pages_public_access": "NOT RUN",
+      "pages_url": null,
+      "pages_ci_checks": {
+        "python": {
+          "status": "PASS",
+          "passed": 289,
+          "skipped": 1,
+          "skip_reason": "Windows-only DPAPI"
+        },
+        "web_build": "PASS",
+        "browser_smoke": "FAIL_CAUSE_UNRESOLVED_TRUNCATED_LOG_TAIL",
+        "collection": "SKIPPED",
+        "portable_build": "SKIPPED",
+        "actual_file_browser": "NOT RUN",
+        "portable_artifact": "SKIPPED",
+        "build_job_result": "failure"
+      },
+      "owner_pages_setting_confirmation": "SCREENSHOT_CONFIRMED_PRIVATE_REPOSITORY_PLAN_REQUIRES_UPGRADE_OR_PUBLIC",
+      "revision_review_complete": true,
+      "external_blockers": [
+        {
+          "id": "HISTORICAL_PAPER_CONTENT",
+          "status": "KNOWN_REACHABLE_OLD_QUOTES_AND_CROPS_REQUIRES_PUBLICATION_DECISION",
+          "history_rewritten": false
+        },
+        {
+          "id": "REMOTE_ACTIONS_STORAGE",
+          "status": "UNVERIFIED_NO_PURGE_CLAIM"
+        },
+        {
+          "id": "PAGES_ACCOUNT_PLAN",
+          "status": "OWNER_SCREENSHOT_SHOWS_UPGRADE_OR_PUBLIC_REQUIREMENT",
+          "current_source_ci": "NOT_ATTEMPTED_PRIOR403_HISTORICAL_ONLY"
+        }
+      ],
+      "state_branch_durability": {
+        "branch": "build/paper-state",
+        "contents": "EXPLICIT_METADATA_CHECKPOINTS_AND_ANCHORS_ONLY",
+        "pdf_or_private_review_bytes": false,
+        "pdf_queue_license_link_objects": false
+      },
+      "raw_archive_actions_cache": "REMOVED_IN_CURRENT_WORKFLOW_PRIOR_REMOTE_STORAGE_UNVERIFIED",
+      "weekly_dispatcher": {
+        "status": "FAIL_CLOSED_UNCONFIGURED_REVIEW_ARTIFACT_ONLY",
+        "installed_on_default_branch": false
+      },
+      "resolved_findings": [
+        {
+          "id": "WEB-QA-01/WEB-REV-01",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "summary": "Malformed advanced JSON shape unmounts application before save"
+        },
+        {
+          "id": "WEB-QA-02/WEB-REV-02",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "summary": "Processor-exported v1 contract can be rejected by browser validator"
+        },
+        {
+          "id": "WEB-QA-03/WEB-REV-03",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "summary": "PDF cap loses eligible known downloads after metadata checkpoint advances"
+        },
+        {
+          "id": "WEB-QA-04/WEB-REV-04",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "summary": "Weekly collected-data build identity overwritten by trigger SHA in public and terminal markers"
+        },
+        {
+          "id": "WEB-QA-05/WEB-REV-05",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "source_commit": "56be43bf15b4c98b8b515d2dc3bbd2bd0fcbbbae",
+          "summary": "Metadata output/checkpoint and origin-acknowledged feed/state durability ordering with stable replay windows"
+        }
+      ],
+      "pages_build_provenance": {
+        "schema_version": 1,
+        "workflow_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+        "built_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+        "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb"
+      },
+      "pause_history": [
+        {
+          "paused_at_utc": "2026-10-17T20:48:26.051195+00:00",
+          "source_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+          "previous_status": "CHANGES_REQUESTED_WITH_EXTERNAL_PAGES_BLOCK",
+          "previous_phase": "Wiki handoff to Planning round-03",
+          "reason": "User requested next reset-time resume"
+        }
+      ],
+      "resume_request_history": [
+        {
+          "prior_verbatim": "today 7:43pm CST",
+          "superseded_by": "새벽 데이터 리셋된 이후인 12시5분에 이전까지 한 내용부터 다시 시작해줘",
+          "recorded_at_utc": "2026-10-17T20:48:26.051195+00:00"
+        }
+      ],
+      "requested_resume_time_assumed": "2026-10-18T00:05:00-05:00",
+      "resume_timezone_assumption": "America/Chicago inferred from earlier Central-time context; not newly confirmed",
+      "automatic_resume_capability": "UNAVAILABLE — no callable scheduling tool; user return or supported client task required",
+      "resume_checkpoint": "runs/20261017-web-03/RESUME.md",
+      "active_resume_wait": false,
+      "resume_history": [
+        {
+          "at_utc": "2026-10-18T03:21:05.438839+00:00",
+          "user_verbatim": "이어서 진행해줘",
+          "from_source": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+          "from_phase": "PAUSED — next action is round-03 Planning from saved handoff"
+        }
+      ],
+      "previous_pages_observation": {
+        "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+        "pages_status": "BLOCKED_CONFIGURATION_403_CURRENT_SOURCE_CONFIRMED",
+        "pages_run_id": "39102813926",
+        "pages_terminal_receipt_commit": "8ad7371b089fafad09bfbc222cd565e5cc3a28b5",
+        "pages_configuration": {
+          "status": "blocked",
+          "http_status": 403,
+          "message": "Resource not accessible by integration",
+          "observation_source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae"
+        },
+        "pages_deployment": "NOT RUN",
+        "pages_public_access": "NOT RUN",
+        "pages_url": null,
+        "pages_ci_checks": {
+          "python": {
+            "passed": 284,
+            "skipped": 1,
+            "skip_reason": "Windows-only DPAPI"
+          },
+          "web_build": "PASS",
+          "browser_smoke": "PASS",
+          "payload_gates": "PASS",
+          "collection": "SKIPPED",
+          "portable_build": "PASS",
+          "actual_file_browser": "PASS_OFFLINE_ZERO_ADDITIONAL_RESOURCES"
+        }
+      },
+      "current_round_record_path": "runs/20261018-synthesis-map-06/round-01/wiki-record.md",
+      "revision_approval_scope": "NO_CURRENT_SOURCE_APPROVAL_ONE_MATERIAL_FINDING_AND_REQUIRED_CI_FAILURE",
+      "independent_reports_sha256": {
+        "qa.md": "0ec6894de2026a46fe28e7dfa22bbec56329e8074cdb1857c77dc386823a8cdf",
+        "revision.md": "9249cc29739360bd59a6d967c4bb4347c3ac9607acc75c042584e5567150c9ef"
+      },
+      "development_environment_configuration": {
+        "status": "DRAFT_SAVED_REQUIRES_PUBLISH",
+        "draft_id": "cecfgdraft_6ad284a0831c8191890e572d9068e6ba",
+        "repository": "chemryu/chembrain",
+        "source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+        "start_skill_saved": true,
+        "runtime_published": false,
+        "is_app_approval_gate": false,
+        "root_observation": "Development reports reusable environment draft source updated; requiresPublish remains separate from app delivery.",
+        "install_script_saved": true
+      },
+      "publication_boundary": {
+        "current_tracked_payload_gate": "PASS",
+        "dist_payload_gate": "PASS",
+        "reachable_pdf_blobs": 0,
+        "reachable_historical_quotation_json_blobs": 2,
+        "reachable_historical_paper_crop_blobs": 2,
+        "historical_audit": "runs/20261018-metadata-only-04/round-01/audit/reachable-history.json",
+        "remote_actions_artifacts_and_caches": "UNVERIFIED",
+        "deleted_refs_and_server_unreachable_objects": "UNVERIFIED",
+        "repository_visibility_changed": false,
+        "history_rewritten": false,
+        "public_safe_claim": false
+      },
+      "browser_preview": {
+        "source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+        "preview": true,
+        "format": "single HTML browser file",
+        "approval": "REJECTED_QA_SYN_01_REQUIRED_CI_FAILED",
+        "html": {
+          "file": "Chembrain.html",
+          "bytes": 722493,
+          "sha256": "fc5560a6469c725e286fff65a16c24a9493f05828c4756cdded7ff709f50c614",
+          "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb"
+        },
+        "github_artifact": null,
+        "receipt_commit": "44c569c9fc284fe30fb59b440a61eb7ad084ed57",
+        "actual_file_browser": "NOT RUN_CI_SKIPPED",
+        "local_file_browser": "NOT RUN_MANAGED_ADMIN_POLICY",
+        "local_http_document": "PASS_HTTP_ONLY_NOT_DELIVERY_APPROVAL",
+        "site_url": null,
+        "pages": "NOT_ATTEMPTED_CURRENT_RUN",
+        "history_public_clearance": "NOT_CLEARED",
+        "visibility_changed": false
+      },
+      "records_publication_source": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+      "historical_browser_preview": {
+        "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+        "preview": true,
+        "format": "single HTML browser file",
+        "html": {
+          "schema_version": 1,
+          "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+          "app_version": "0.2.0",
+          "preview": true,
+          "format": "single-html-base64-utf8-module",
+          "file": "Chembrain.html",
+          "bytes": 463557,
+          "sha256": "843a7e610582352dfc0e30be310133834684084b20125f89bf894fb5934da10a",
+          "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb",
+          "javascript_sha256": "be51cfddfd0b75f0cf9fe196c068a16bdc362d6b5be7498d7592ed892d0de16d",
+          "styles_sha256": [
+            "387aefa458efb2a0819739b89bf056ca44389c734a5687715512abddba6e43fe"
+          ]
+        },
+        "github_artifact": {
+          "artifact-id": "12127033101",
+          "artifact-digest": "ef31fe4f69971b576390986cfb5f564f2a331512002e314d80a99d6f63d115d2",
+          "artifact-url": "https://github.com/chemryu/chembrain/actions/runs/39102813926/artifacts/12127033101"
+        },
+        "receipt_commit": "8ad7371b089fafad09bfbc222cd565e5cc3a28b5",
+        "actual_file_browser": "PASS_SEPARATE_CI_RUNNER",
+        "local_file_browser": "NOT_RUN_MANAGED_ADMIN_POLICY",
+        "local_http_document": "PASS",
+        "github_artifact_archive_independently_downloaded": false,
+        "site_url": null,
+        "pages": "BLOCKED_NEW_ACTUAL_403",
+        "history_public_clearance": "NOT_CLEARED",
+        "visibility_changed": false
+      },
+      "current_round_records_published": false,
+      "round01_full_reports_sha256": {
+        "planning.md": "e28395ba5199c4ca0730daa33992f2b1fb5f93ce278b1a9f12262015749b79d6",
+        "development.md": "4fa494146d35202143bb9825c90fb9aeed9fcaf5f753d03734b61b2a43ad81f0",
+        "development-graph.md": "68cd621c609ea84e7582fd704a657a881404b8f182f51a1c824797370910e2a9",
+        "qa.md": "0ec6894de2026a46fe28e7dfa22bbec56329e8074cdb1857c77dc386823a8cdf",
+        "revision.md": "9249cc29739360bd59a6d967c4bb4347c3ac9607acc75c042584e5567150c9ef"
+      }
     }
   ],
-  "previous_rejected_source_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+  "previous_rejected_source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
   "prior_findings_status": "FOUR_RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
   "local_unresolved_findings": 0,
   "windows_run_url": "https://github.com/chemryu/chembrain/actions/runs/39011910077",
@@ -871,7 +1319,7 @@
   ],
   "public_preview_explicitly_authorized": true,
   "public_preview_access_verified": false,
-  "pages_run_id": "39102813926",
+  "pages_run_id": "39141206671",
   "pages_phase": "terminal",
   "pages_terminal_result": "blocked",
   "pages_exact_public_source_marker_verified": false,
@@ -890,20 +1338,22 @@
     "round03_review_status": "BOTH_FINAL_EXACT_SOURCE_REPORTS_RETURNED_AFTER_EXPLICIT_USER_RESUME"
   },
   "windows_required_for_current_web_preview": false,
-  "pages_status": "BLOCKED_CONFIGURATION_403_CURRENT_SOURCE_CONFIRMED",
-  "pages_terminal_receipt_commit": "8ad7371b089fafad09bfbc222cd565e5cc3a28b5",
+  "pages_status": "BLOCKED_NEW_ACTUAL_CONFIGURATION_403",
+  "pages_terminal_receipt_commit": "8c8d3c6317433502ffd4984df39fd6b4290ef52e",
   "pages_configuration": {
-    "status": "blocked",
+    "status": "BLOCKED",
     "http_status": 403,
     "message": "Resource not accessible by integration",
-    "observation_source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae"
+    "observation_source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+    "owner_source_setting_confirmation": "PENDING"
   },
   "pages_deployment": "NOT RUN",
   "pages_public_access": "NOT RUN",
   "pages_url": null,
   "pages_ci_checks": {
     "python": {
-      "passed": 284,
+      "status": "PASS",
+      "passed": 290,
       "skipped": 1,
       "skip_reason": "Windows-only DPAPI"
     },
@@ -912,7 +1362,9 @@
     "payload_gates": "PASS",
     "collection": "SKIPPED",
     "portable_build": "PASS",
-    "actual_file_browser": "PASS_OFFLINE_ZERO_ADDITIONAL_RESOURCES"
+    "actual_file_browser": "PASS_OFFLINE_ADDITIONAL_REQUESTS_REJECTED",
+    "portable_artifact": "SUCCESS",
+    "build_job_result": "success"
   },
   "owner_pages_setting_confirmation": "SCREENSHOT_CONFIRMED_PRIVATE_REPOSITORY_PLAN_REQUIRES_UPGRADE_OR_PUBLIC",
   "revision_review_complete": true,
@@ -929,7 +1381,7 @@
     {
       "id": "PAGES_ACCOUNT_PLAN",
       "status": "OWNER_SCREENSHOT_SHOWS_UPGRADE_OR_PUBLIC_REQUIREMENT",
-      "current_source_ci": "NEW_403_CONFIRMED"
+      "current_source_ci": "NEW403CONFIRMED"
     }
   ],
   "state_branch_durability": {
@@ -974,12 +1426,18 @@
       "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
       "source_commit": "56be43bf15b4c98b8b515d2dc3bbd2bd0fcbbbae",
       "summary": "Metadata output/checkpoint and origin-acknowledged feed/state durability ordering with stable replay windows"
+    },
+    {
+      "id": "QA-SYN-01",
+      "status": "RESOLVED_BY_BOTH_INDEPENDENT_REPRODUCTIONS",
+      "source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+      "summary": "Mobile Focus uses current ReactFlow node position/dimensions after drag; shared hosted/offline real-mobile card containment regression and both independent original reproductions pass"
     }
   ],
   "pages_build_provenance": {
     "schema_version": 1,
-    "workflow_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
-    "built_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+    "workflow_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+    "built_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
     "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb"
   },
   "pause_history": [
@@ -1012,50 +1470,48 @@
     }
   ],
   "previous_pages_observation": {
-    "pages_status": "BLOCKED_CONFIGURATION_403",
-    "pages_run_id": "39063636131",
-    "pages_phase": "terminal",
-    "pages_terminal_result": "blocked",
-    "pages_terminal_receipt_commit": "4fb229121ebd4597c51bae7dec30cf37dc759d61",
+    "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+    "pages_status": "BLOCKED_CONFIGURATION_403_CURRENT_SOURCE_CONFIRMED",
+    "pages_run_id": "39102813926",
+    "pages_terminal_receipt_commit": "8ad7371b089fafad09bfbc222cd565e5cc3a28b5",
     "pages_configuration": {
-      "status": "BLOCKED",
+      "status": "blocked",
       "http_status": 403,
       "message": "Resource not accessible by integration",
-      "observation_source_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
-      "owner_source_setting_confirmation": "PENDING"
+      "observation_source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae"
     },
     "pages_deployment": "NOT RUN",
     "pages_public_access": "NOT RUN",
     "pages_url": null,
     "pages_ci_checks": {
       "python": {
-        "passed": 253,
-        "skipped": 1
+        "passed": 284,
+        "skipped": 1,
+        "skip_reason": "Windows-only DPAPI"
       },
       "web_build": "PASS",
-      "browser_smoke": "PASS"
-    },
-    "pages_build_provenance": {
-      "workflow_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
-      "built_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
-      "library_sha256": "25e98df9810b686e9da2c3c3b3f7f5da627dd2186ab3b00533b28d34072aef8c"
+      "browser_smoke": "PASS",
+      "payload_gates": "PASS",
+      "collection": "SKIPPED",
+      "portable_build": "PASS",
+      "actual_file_browser": "PASS_OFFLINE_ZERO_ADDITIONAL_RESOURCES"
     }
   },
-  "current_round_record_path": "runs/20261018-program-update-05/round-01/wiki-record.md",
-  "revision_approval_scope": "EXACT_SOURCE_DOWNLOADABLE_BROWSER_PREVIEW_ONLY_NOT_PUBLIC_HISTORY_CLEARANCE_HOSTED_SITE_OR_WINDOWS",
+  "current_round_record_path": "runs/20261018-synthesis-map-06/round-02/wiki-record.md",
+  "revision_approval_scope": "EXACT_SOURCE_DOWNLOAD_PREVIEW_ONLY_NOT_HOSTED_SITE_PUBLIC_HISTORY_OR_PRODUCTION_RELEASE",
   "independent_reports_sha256": {
-    "qa.md": "8cc90b0b3a17a70bd7c9ddaff2bf2965defacd2159d97fa61f7c7ff0d1434a83",
-    "revision.md": "2af6de4e1c2972898f956ada39554da756f511b87ee2f77ab73cd92927f1a87c"
+    "qa.md": "f6c127cdbf477f13a84162b44ac014d225d7681fb6ef93112c23cf63092523de",
+    "revision.md": "53278ef00a6c2568f34cc478c7d92c5a288935aafae7323b4c5bde67210318e4"
   },
   "development_environment_configuration": {
     "status": "DRAFT_SAVED_REQUIRES_PUBLISH",
     "draft_id": "cecfgdraft_6ad284a0831c8191890e572d9068e6ba",
     "repository": "chemryu/chembrain",
-    "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+    "source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
     "start_skill_saved": true,
     "runtime_published": false,
     "is_app_approval_gate": false,
-    "root_observation": "Ordinary browser install/start configuration saved for exact source; requires environment Publish, separately from app or Pages delivery.",
+    "root_observation": "Root reports reusable environment draft source updated to02d0dff; requiresPublish separate from app download/Pages.",
     "install_script_saved": true
   },
   "publication_boundary": {
@@ -2145,9 +2601,435 @@
         "history_rewritten": false,
         "public_safe_claim": false
       }
+    },
+    {
+      "status": "READY_REVIEWED_BROWSER_DOWNLOAD_PREVIEW_PAGES_BLOCKED_HISTORY_NOT_CLEARED",
+      "request_date": "2026-10-17",
+      "requested_resume_time_verbatim": "새벽 데이터 리셋된 이후인 12시5분에 이전까지 한 내용부터 다시 시작해줘",
+      "scheduled_automatically": false,
+      "workflow": [
+        "Planning",
+        "Development",
+        "Independent QA",
+        "Revision",
+        "Wiki",
+        "Planning"
+      ],
+      "external_ai_api_calls": false,
+      "agent_definitions_prepared": true,
+      "five_role_run_started": true,
+      "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+      "source_modified_this_preparation": false,
+      "unresolved_findings": 0,
+      "independent_qa_complete": true,
+      "revision_approved": true,
+      "deliverable_ready": true,
+      "repository": "chemryu/chembrain",
+      "branch": "codex/gpt-agent-workflow",
+      "primary_record_store": "GitHub",
+      "run_id": "20261018-program-update-05",
+      "round": "round-01",
+      "timezone": "America/Chicago",
+      "user_start_override_date": "2026-10-16",
+      "user_start_override_verbatim": "지금 바로 시작해줘",
+      "prior_reset_wait_superseded": true,
+      "current_phase": "Wiki complete: exact-source Independent QA and Revision PASS with zero material findings; actual-file CI passes; downloadable preview ready",
+      "roles": {
+        "Planning": "COMPLETE_DEFAULT_BROWSER_AND_PORTABLE_DELIVERY_SCOPE",
+        "Development": "COMPLETE_FROZEN_SOURCE_DEVELOPMENT_CHECKS_PASS",
+        "Independent QA": "COMPLETE_EXACT_SOURCE_PASS_HOSTED_AND_ACTUAL_FILE_CI_ZERO_FINDINGS",
+        "Revision": "COMPLETE_EXACT_SOURCE_PASS_BROWSER_PREVIEW_ZERO_FINDINGS",
+        "Wiki": "COMPLETE_FINAL_REPORTS_AND_EXTERNAL_LIMIT_HANDOFF"
+      },
+      "source_modified_this_round": true,
+      "box_direct_write_or_sync_configured": false,
+      "source_branch": "codex/gpt-agent-workflow",
+      "records_branch": "codex/gpt-workflow-records",
+      "records_branch_published": true,
+      "records_reference_exact_source_commit": true,
+      "new_source_commit_pending": false,
+      "baseline_source_commit": "6280794c87e7867b0ccd2e2d4f6924814917997a",
+      "source_commit_pushed": true,
+      "windows_ci_status": "LEGACY_BLOCKED_STATUS_PRESERVED_IN_SUPERSEDED_RUN_HISTORY_NOT_A_WEB_PREVIEW_GATE",
+      "known_doi_finding_status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+      "local_checks": {
+        "python": {
+          "status": "PASS",
+          "passed": 284,
+          "skipped": 1,
+          "skip_reason": "Windows-only DPAPI"
+        },
+        "frontend_web_build": "PASS",
+        "real_browser_web_checks": "PASS",
+        "focused_collector_durability_state": {
+          "passed": 46
+        },
+        "portable_contract_browser_runtime": {
+          "passed": 8
+        },
+        "repository_payload_legacy_import": {
+          "passed": 8
+        },
+        "evidence_role": "Development root and helpers, not independent approval"
+      },
+      "clean_windows_vm": "NOT RUN",
+      "actual_user_default_browser": "NOT RUN",
+      "independent_qa_verdict": "PASS_EXACT_SOURCE_BROWSER_PREVIEW",
+      "revision_verdict": "PASS_EXACT_SOURCE_BROWSER_PREVIEW",
+      "deliverable_scope": "DOWNLOADABLE_SINGLE_HTML_BROWSER_PREVIEW_ONLY",
+      "initial_records_commit": "4224102580de88e3d10fa679c2457502044a8434",
+      "windows_receipt_commit": null,
+      "windows_tests": {
+        "status": "NOT RUN_FOR_WEB_PREVIEW"
+      },
+      "planning_handoff": "NO_CURRENT_SOURCE_REPAIR_REQUIRED_PREVIEW_DELIVERY_READY_EXTERNAL_PAGES_HISTORY_DECISIONS_SEPARATE",
+      "required_automated_checks": "EXACT_SOURCE_CI_TEST_BUILD_HOSTED_BROWSER_ACTUAL_FILE_BROWSER_PAYLOAD_PASS",
+      "candidate_artifact_url": "https://github.com/chemryu/chembrain/actions/runs/39102813926/artifacts/12127033101",
+      "candidate_inner_zip": null,
+      "candidate_inner_zip_sha256": null,
+      "checksum_verification_method": "LOCAL_HTML_AND_ALL_NINE_CI_RAW_FILES_BYTE_AND_SHA256_VERIFIED_AGAINST_IMMUTABLE_RECEIPT; ARCHIVE_NOT_INDEPENDENTLY_DOWNLOADED",
+      "artifact_independently_downloaded_and_rehashed": false,
+      "release_published": false,
+      "production_release_approved": false,
+      "perpetual_background_agents": false,
+      "handoff_path": "runs/20261018-program-update-05/round-01/handoff.md",
+      "source_commit_status": "FROZEN_PUSHED_BOTH_INDEPENDENT_PREVIEW_REVIEWS_PASS",
+      "schedule_installed_on_user_pc": false,
+      "feature_scope": {
+        "main_app": "GITHUB_PAGES_BROWSER_STORAGE",
+        "initial_view": "MOLECULAR_LIBRARY_WITH_EMPTY_REACTION_PANEL_UNTIL_SELECTION",
+        "normalized_tables": [
+          "papers",
+          "chemicals",
+          "solutions",
+          "reactions"
+        ],
+        "public_paper_fields": [
+          "id",
+          "doi",
+          "authors"
+        ],
+        "github_pdf_or_original_document_uploads": false,
+        "github_collection": "HARD_METADATA_ONLY",
+        "local_pdf_processing": "PRIVATE_OUTSIDE_GIT_ONLY",
+        "private_legacy_backup": "EXACT_ORIGINAL_BYTES_BROWSER_LOCAL_ONLY"
+      },
+      "development_helpers": 1,
+      "live_provider_cloud_observation": {
+        "status": "UNAVAILABLE",
+        "reason": "Network/DNS restriction",
+        "live_download_pass": false
+      },
+      "windows_provider_observation": "PENDING",
+      "next_round": null,
+      "findings": [],
+      "previous_rejected_source_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+      "prior_findings_status": "FOUR_RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+      "local_unresolved_findings": 0,
+      "windows_run_url": "https://github.com/chemryu/chembrain/actions/runs/39011910077",
+      "windows_running_receipt_prefix": "65a2dcf",
+      "revision_local_unresolved_findings": 0,
+      "unresolved_application_code_findings": 0,
+      "windows_last_receipt_status": "running",
+      "windows_last_observed_receipt_commit": "65a2dcf538f6ce8ef11fce32ee9615a6c38ad35f",
+      "windows_last_receipt_updated_at": "2026-10-17T07:04:12Z",
+      "windows_observed_at": "2026-10-17T07:35:21.810849Z",
+      "windows_actual_current_job_state": "UNKNOWN",
+      "windows_final_receipt_available": false,
+      "windows_configured_job_timeout_minutes": 30,
+      "windows_timeout_proven": false,
+      "github_actions_api_observation": "Forbidden including post-environment-reconnect retry",
+      "packaged_headless_cli_evidence": "NOT VERIFIED; initial provider failure skips production CLI invocation in current observation path",
+      "verification_blockers": [
+        {
+          "id": "PUBLIC_HISTORY_REVIEW",
+          "status": "KNOWN_OLD_QUOTES_CROPS_AND_UNVERIFIED_REMOTE_STORAGE",
+          "application_finding": false
+        },
+        {
+          "id": "PAGES403",
+          "status": "NEW_EXACT_SOURCE_CONFIGURATION403_DEPLOYMENT_HTTP_NOTRUN",
+          "application_finding": false
+        }
+      ],
+      "public_preview_explicitly_authorized": true,
+      "public_preview_access_verified": false,
+      "pages_run_id": "39102813926",
+      "pages_phase": "terminal",
+      "pages_terminal_result": "blocked",
+      "pages_exact_public_source_marker_verified": false,
+      "weekly_github_cron_active": false,
+      "weekly_cron_requires_default_branch": true,
+      "default_branch_merged_or_changed": false,
+      "local_schedule_installer_executed_by_user": false,
+      "cross_device_account_sync": false,
+      "previous_windows_diagnostics": "UNFINISHED_PRESERVED_SEPARATELY_NOT_MIXED_IN_WEB_SOURCE",
+      "agent_quota_history": {
+        "actual_limit_error_occurred": true,
+        "normal_resume_attempt_after_announced_reset": true,
+        "model_or_key_switched_to_bypass": false,
+        "final_reviews_not_yet_returned": false,
+        "actual_post_reset_independent_reports_returned": true,
+        "round03_review_status": "BOTH_FINAL_EXACT_SOURCE_REPORTS_RETURNED_AFTER_EXPLICIT_USER_RESUME"
+      },
+      "windows_required_for_current_web_preview": false,
+      "pages_status": "BLOCKED_CONFIGURATION_403_CURRENT_SOURCE_CONFIRMED",
+      "pages_terminal_receipt_commit": "8ad7371b089fafad09bfbc222cd565e5cc3a28b5",
+      "pages_configuration": {
+        "status": "blocked",
+        "http_status": 403,
+        "message": "Resource not accessible by integration",
+        "observation_source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae"
+      },
+      "pages_deployment": "NOT RUN",
+      "pages_public_access": "NOT RUN",
+      "pages_url": null,
+      "pages_ci_checks": {
+        "python": {
+          "passed": 284,
+          "skipped": 1,
+          "skip_reason": "Windows-only DPAPI"
+        },
+        "web_build": "PASS",
+        "browser_smoke": "PASS",
+        "payload_gates": "PASS",
+        "collection": "SKIPPED",
+        "portable_build": "PASS",
+        "actual_file_browser": "PASS_OFFLINE_ZERO_ADDITIONAL_RESOURCES"
+      },
+      "owner_pages_setting_confirmation": "SCREENSHOT_CONFIRMED_PRIVATE_REPOSITORY_PLAN_REQUIRES_UPGRADE_OR_PUBLIC",
+      "revision_review_complete": true,
+      "external_blockers": [
+        {
+          "id": "HISTORICAL_PAPER_CONTENT",
+          "status": "KNOWN_REACHABLE_OLD_QUOTES_AND_CROPS_REQUIRES_PUBLICATION_DECISION",
+          "history_rewritten": false
+        },
+        {
+          "id": "REMOTE_ACTIONS_STORAGE",
+          "status": "UNVERIFIED_NO_PURGE_CLAIM"
+        },
+        {
+          "id": "PAGES_ACCOUNT_PLAN",
+          "status": "OWNER_SCREENSHOT_SHOWS_UPGRADE_OR_PUBLIC_REQUIREMENT",
+          "current_source_ci": "NEW_403_CONFIRMED"
+        }
+      ],
+      "state_branch_durability": {
+        "branch": "build/paper-state",
+        "contents": "EXPLICIT_METADATA_CHECKPOINTS_AND_ANCHORS_ONLY",
+        "pdf_or_private_review_bytes": false,
+        "pdf_queue_license_link_objects": false
+      },
+      "raw_archive_actions_cache": "REMOVED_IN_CURRENT_WORKFLOW_PRIOR_REMOTE_STORAGE_UNVERIFIED",
+      "weekly_dispatcher": {
+        "status": "FAIL_CLOSED_UNCONFIGURED_REVIEW_ARTIFACT_ONLY",
+        "installed_on_default_branch": false
+      },
+      "resolved_findings": [
+        {
+          "id": "WEB-QA-01/WEB-REV-01",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "summary": "Malformed advanced JSON shape unmounts application before save"
+        },
+        {
+          "id": "WEB-QA-02/WEB-REV-02",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "summary": "Processor-exported v1 contract can be rejected by browser validator"
+        },
+        {
+          "id": "WEB-QA-03/WEB-REV-03",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "summary": "PDF cap loses eligible known downloads after metadata checkpoint advances"
+        },
+        {
+          "id": "WEB-QA-04/WEB-REV-04",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "summary": "Weekly collected-data build identity overwritten by trigger SHA in public and terminal markers"
+        },
+        {
+          "id": "WEB-QA-05/WEB-REV-05",
+          "severity": "MEDIUM",
+          "status": "RESOLVED_BY_INDEPENDENT_QA_AND_REVISION",
+          "source_commit": "56be43bf15b4c98b8b515d2dc3bbd2bd0fcbbbae",
+          "summary": "Metadata output/checkpoint and origin-acknowledged feed/state durability ordering with stable replay windows"
+        }
+      ],
+      "pages_build_provenance": {
+        "schema_version": 1,
+        "workflow_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+        "built_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+        "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb"
+      },
+      "pause_history": [
+        {
+          "paused_at_utc": "2026-10-17T20:48:26.051195+00:00",
+          "source_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+          "previous_status": "CHANGES_REQUESTED_WITH_EXTERNAL_PAGES_BLOCK",
+          "previous_phase": "Wiki handoff to Planning round-03",
+          "reason": "User requested next reset-time resume"
+        }
+      ],
+      "resume_request_history": [
+        {
+          "prior_verbatim": "today 7:43pm CST",
+          "superseded_by": "새벽 데이터 리셋된 이후인 12시5분에 이전까지 한 내용부터 다시 시작해줘",
+          "recorded_at_utc": "2026-10-17T20:48:26.051195+00:00"
+        }
+      ],
+      "requested_resume_time_assumed": "2026-10-18T00:05:00-05:00",
+      "resume_timezone_assumption": "America/Chicago inferred from earlier Central-time context; not newly confirmed",
+      "automatic_resume_capability": "UNAVAILABLE — no callable scheduling tool; user return or supported client task required",
+      "resume_checkpoint": "runs/20261017-web-03/RESUME.md",
+      "active_resume_wait": false,
+      "resume_history": [
+        {
+          "at_utc": "2026-10-18T03:21:05.438839+00:00",
+          "user_verbatim": "이어서 진행해줘",
+          "from_source": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+          "from_phase": "PAUSED — next action is round-03 Planning from saved handoff"
+        }
+      ],
+      "previous_pages_observation": {
+        "pages_status": "BLOCKED_CONFIGURATION_403",
+        "pages_run_id": "39063636131",
+        "pages_phase": "terminal",
+        "pages_terminal_result": "blocked",
+        "pages_terminal_receipt_commit": "4fb229121ebd4597c51bae7dec30cf37dc759d61",
+        "pages_configuration": {
+          "status": "BLOCKED",
+          "http_status": 403,
+          "message": "Resource not accessible by integration",
+          "observation_source_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+          "owner_source_setting_confirmation": "PENDING"
+        },
+        "pages_deployment": "NOT RUN",
+        "pages_public_access": "NOT RUN",
+        "pages_url": null,
+        "pages_ci_checks": {
+          "python": {
+            "passed": 253,
+            "skipped": 1
+          },
+          "web_build": "PASS",
+          "browser_smoke": "PASS"
+        },
+        "pages_build_provenance": {
+          "workflow_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+          "built_commit": "d423c718ca3c0b7d1dd090a362ba02990d7e223a",
+          "library_sha256": "25e98df9810b686e9da2c3c3b3f7f5da627dd2186ab3b00533b28d34072aef8c"
+        }
+      },
+      "current_round_record_path": "runs/20261018-program-update-05/round-01/wiki-record.md",
+      "revision_approval_scope": "EXACT_SOURCE_DOWNLOADABLE_BROWSER_PREVIEW_ONLY_NOT_PUBLIC_HISTORY_CLEARANCE_HOSTED_SITE_OR_WINDOWS",
+      "independent_reports_sha256": {
+        "qa.md": "8cc90b0b3a17a70bd7c9ddaff2bf2965defacd2159d97fa61f7c7ff0d1434a83",
+        "revision.md": "2af6de4e1c2972898f956ada39554da756f511b87ee2f77ab73cd92927f1a87c"
+      },
+      "development_environment_configuration": {
+        "status": "DRAFT_SAVED_REQUIRES_PUBLISH",
+        "draft_id": "cecfgdraft_6ad284a0831c8191890e572d9068e6ba",
+        "repository": "chemryu/chembrain",
+        "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+        "start_skill_saved": true,
+        "runtime_published": false,
+        "is_app_approval_gate": false,
+        "root_observation": "Ordinary browser install/start configuration saved for exact source; requires environment Publish, separately from app or Pages delivery.",
+        "install_script_saved": true
+      },
+      "publication_boundary": {
+        "current_tracked_payload_gate": "PASS",
+        "dist_payload_gate": "PASS",
+        "reachable_pdf_blobs": 0,
+        "reachable_historical_quotation_json_blobs": 2,
+        "reachable_historical_paper_crop_blobs": 2,
+        "historical_audit": "runs/20261018-metadata-only-04/round-01/audit/reachable-history.json",
+        "remote_actions_artifacts_and_caches": "UNVERIFIED",
+        "deleted_refs_and_server_unreachable_objects": "UNVERIFIED",
+        "repository_visibility_changed": false,
+        "history_rewritten": false,
+        "public_safe_claim": false
+      },
+      "browser_preview": {
+        "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+        "preview": true,
+        "format": "single HTML browser file",
+        "html": {
+          "schema_version": 1,
+          "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
+          "app_version": "0.2.0",
+          "preview": true,
+          "format": "single-html-base64-utf8-module",
+          "file": "Chembrain.html",
+          "bytes": 463557,
+          "sha256": "843a7e610582352dfc0e30be310133834684084b20125f89bf894fb5934da10a",
+          "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb",
+          "javascript_sha256": "be51cfddfd0b75f0cf9fe196c068a16bdc362d6b5be7498d7592ed892d0de16d",
+          "styles_sha256": [
+            "387aefa458efb2a0819739b89bf056ca44389c734a5687715512abddba6e43fe"
+          ]
+        },
+        "github_artifact": {
+          "artifact-id": "12127033101",
+          "artifact-digest": "ef31fe4f69971b576390986cfb5f564f2a331512002e314d80a99d6f63d115d2",
+          "artifact-url": "https://github.com/chemryu/chembrain/actions/runs/39102813926/artifacts/12127033101"
+        },
+        "receipt_commit": "8ad7371b089fafad09bfbc222cd565e5cc3a28b5",
+        "actual_file_browser": "PASS_SEPARATE_CI_RUNNER",
+        "local_file_browser": "NOT_RUN_MANAGED_ADMIN_POLICY",
+        "local_http_document": "PASS",
+        "github_artifact_archive_independently_downloaded": false,
+        "site_url": null,
+        "pages": "BLOCKED_NEW_ACTUAL_403",
+        "history_public_clearance": "NOT_CLEARED",
+        "visibility_changed": false
+      },
+      "records_publication_source": "aaf4d8b13d4604e98458cd6eec59cc8205254bae"
     }
   ],
   "browser_preview": {
+    "source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+    "preview": true,
+    "feature": "molecule-selected branching recorded synthesis map",
+    "html": {
+      "schema_version": 1,
+      "source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+      "app_version": "0.2.0",
+      "preview": true,
+      "format": "single-html-base64-utf8-module",
+      "file": "Chembrain.html",
+      "bytes": 722585,
+      "sha256": "a1a175882c6701e2d3f98b61b80dbed27d643e0de1eb661823c930b36384278d",
+      "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb",
+      "javascript_sha256": "f2dd4a889dbbc515b3c49c30101d41556ffc348a593abd8d37d2fc954e0b5c4e",
+      "styles_sha256": [
+        "30b93df9af4d4bff5d593f4bff1a6455642ef6965b5d2a134ec7d7022d4afdb3"
+      ]
+    },
+    "github_artifact": {
+      "artifact-id": "12140894328",
+      "artifact-digest": "d5ba0bad0030913a63c36824123dd4ae2561c5034556cab32e1daa23eb331ee2",
+      "artifact-url": "https://github.com/chemryu/chembrain/actions/runs/39141206671/artifacts/12140894328"
+    },
+    "receipt_commit": "8c8d3c6317433502ffd4984df39fd6b4290ef52e",
+    "actual_file_browser": "PASS_SEPARATE_CI_RUNNER",
+    "local_file_browser": "NOT_RUN_MANAGED_ADMIN_POLICY",
+    "local_http_document": "PASS",
+    "archive_independently_downloaded": false,
+    "site_url": null,
+    "pages": "NEW_ACTUAL_403_BLOCKED",
+    "public_history": "NOT_CLEARED",
+    "prior_rejected_ci_failure_cause": "UNRECOVERABLE_OLD_TRUNCATED_LOG_CURRENT_SOURCE_HOSTED_AND_FILE_CHECKS_PASS",
+    "approval": "BOTH_INDEPENDENT_REVIEWS_PASS_EXACT_SOURCE_BOUNDED_DOWNLOAD_PREVIEW",
+    "github_artifact_archive_independently_downloaded": false,
+    "visibility_changed": false
+  },
+  "records_publication_source": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+  "historical_browser_preview": {
     "source_commit": "aaf4d8b13d4604e98458cd6eec59cc8205254bae",
     "preview": true,
     "format": "single HTML browser file",
@@ -2181,5 +3063,28 @@
     "history_public_clearance": "NOT_CLEARED",
     "visibility_changed": false
   },
-  "records_publication_source": "aaf4d8b13d4604e98458cd6eec59cc8205254bae"
+  "current_round_records_published": false,
+  "round01_full_reports_sha256": {
+    "planning.md": "e28395ba5199c4ca0730daa33992f2b1fb5f93ce278b1a9f12262015749b79d6",
+    "development.md": "4fa494146d35202143bb9825c90fb9aeed9fcaf5f753d03734b61b2a43ad81f0",
+    "development-graph.md": "68cd621c609ea84e7582fd704a657a881404b8f182f51a1c824797370910e2a9",
+    "qa.md": "0ec6894de2026a46fe28e7dfa22bbec56329e8074cdb1857c77dc386823a8cdf",
+    "revision.md": "9249cc29739360bd59a6d967c4bb4347c3ac9607acc75c042584e5567150c9ef"
+  },
+  "round02_full_reports_sha256": {
+    "planning.md": "3ccdcd9504a83132f9dd6bd15222e125fe7e911830aaeac8c6d5b3ae2be369f9",
+    "development.md": "b03d44107d5f8e5cd26695df8d328959e5a6999a71ae73fd19e84b658a7ae213",
+    "qa.md": "f6c127cdbf477f13a84162b44ac014d225d7681fb6ef93112c23cf63092523de",
+    "revision.md": "53278ef00a6c2568f34cc478c7d92c5a288935aafae7323b4c5bde67210318e4"
+  },
+  "prior_rejected_round01_ci": {
+    "source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+    "run_id": "39140468551",
+    "receipt_commit": "44c569c9fc284fe30fb59b440a61eb7ad084ed57",
+    "hosted_browser": "FAIL",
+    "cause": "UNRESOLVED_ORIGINAL_ASSERTION_HEAD_LOST_NOT_ATTRIBUTED_TO_MOBILE_FINDING",
+    "raw_evidence_preserved": "runs/20261018-synthesis-map-06/round-01/web/manifest.json",
+    "portable_artifact": "SKIPPED",
+    "pages_configuration": "NOT_ATTEMPTED"
+  }
 }

@@ -1,0 +1,34 @@
+{
+  "source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+  "preview": true,
+  "feature": "molecule-selected branching recorded synthesis map",
+  "html": {
+    "schema_version": 1,
+    "source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+    "app_version": "0.2.0",
+    "preview": true,
+    "format": "single-html-base64-utf8-module",
+    "file": "Chembrain.html",
+    "bytes": 722585,
+    "sha256": "a1a175882c6701e2d3f98b61b80dbed27d643e0de1eb661823c930b36384278d",
+    "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb",
+    "javascript_sha256": "f2dd4a889dbbc515b3c49c30101d41556ffc348a593abd8d37d2fc954e0b5c4e",
+    "styles_sha256": [
+      "30b93df9af4d4bff5d593f4bff1a6455642ef6965b5d2a134ec7d7022d4afdb3"
+    ]
+  },
+  "github_artifact": {
+    "artifact-id": "12140894328",
+    "artifact-digest": "d5ba0bad0030913a63c36824123dd4ae2561c5034556cab32e1daa23eb331ee2",
+    "artifact-url": "https://github.com/chemryu/chembrain/actions/runs/39141206671/artifacts/12140894328"
+  },
+  "receipt_commit": "8c8d3c6317433502ffd4984df39fd6b4290ef52e",
+  "actual_file_browser": "PASS_SEPARATE_CI_RUNNER",
+  "local_file_browser": "NOT_RUN_MANAGED_ADMIN_POLICY",
+  "local_http_document": "PASS",
+  "archive_independently_downloaded": false,
+  "site_url": null,
+  "pages": "NEW_ACTUAL_403_BLOCKED",
+  "public_history": "NOT_CLEARED",
+  "prior_rejected_ci_failure_cause": "UNRECOVERABLE_OLD_TRUNCATED_LOG_CURRENT_SOURCE_HOSTED_AND_FILE_CHECKS_PASS"
+}

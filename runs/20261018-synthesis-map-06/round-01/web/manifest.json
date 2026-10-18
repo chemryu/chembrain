@@ -1,0 +1,24 @@
+{
+  "source_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+  "receipt_commit": "44c569c9fc284fe30fb59b440a61eb7ad084ed57",
+  "run_id": "39140468551",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39140468551",
+  "files": {
+    "status.json": {
+      "bytes": 2882,
+      "sha256": "ea488a35416c4691d04cd01bdd59d9bccfb338ac741e3b853a6fef60e36f191b"
+    },
+    "web-browser.log": {
+      "bytes": 4633,
+      "sha256": "d1e668694277fd90cec171e350124c4ebba421aec6114881a4e3c1f2c25dde3b"
+    },
+    "web-build.log": {
+      "bytes": 436,
+      "sha256": "63b536c7f3aebbdf82b6df41aa36007d86a8c15d74a330e8d852d767bab9f083"
+    },
+    "web-tests.log": {
+      "bytes": 981,
+      "sha256": "042db53250e183505a6221dfb2c14cd7470f73b7bbce53e5f72ed9326dd53567"
+    }
+  }
+}

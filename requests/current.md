@@ -1,3 +1,11 @@
+# Current request — 20261018-synthesis-map-06
+
+Round-02 follows the formal round-01 Revision → Wiki → Planning handoff. Fix QA-SYN-01 mobile Focus using live dragged node position/dimensions and shared real mobile regression. Preserve complete short/large head-tail CI diagnostics, then diagnose and resolve the actual failed hosted-browser assertion from CI39140468551; its old receipt omitted the error head. Round-01 source e6ed4e7 is rejected; no approval transfers. Require new exact-source hosted/file checks and both reviews.
+
+User: “molecule을 누르면 brainstorming처럼 합성과정이 나오게 해줘.” Clicking a molecule opens a branching synthesis map by default; an explicit List view preserves existing cards/editing. Use only recorded reactant→reaction→product edges, include recorded route fragments/precursors, clearly distinguish missing connections. Pan/zoom/fit and reaction click expose existing solution/condition/DOI details. No AI-generated transformations, original papers, schema expansion or platform/visibility/history/main changes. Same app and map must work in the downloadable offline HTML; require new exact-source QA/Revision and artifact checks. Preserve prior requests below.
+
+---
+
 # Current request — 20261018-program-update-05
 
 User: “이제 프로그램 업데이트 해줘 말한대로”. Make the requested molecule-first metadata-only browser program the ordinary entry/build, preserve the explicit legacy desktop path, and provide a tested single-file browser preview while existing Pages remains blocked. No new Public permission, main merge, schedule activation or shared-history rewrite. Source and download need new exact-SHA Independent QA and Revision, then Wiki. See this run planning. Earlier requests remain in full below.

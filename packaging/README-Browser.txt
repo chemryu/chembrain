@@ -6,7 +6,10 @@ The app and starter chemistry data are included in this one HTML file.
 DOI links open the publisher's website when you choose a reference and have
 internet access. The app itself needs no network connection.
 
-Select a molecule to see related reaction records. Papers contribute normalized
+Select a molecule to open its branching recorded synthesis Map. Drag the canvas
+to pan, zoom or Fit, and select a reaction for conditions and DOI. Use List for
+the original reaction cards. Separate fragments mean connecting steps have not
+been curated; missing transformations are never invented. Papers contribute normalized
 reaction, chemical, solution (solvent/solute), DOI and author facts only. Draft
 structures and reaction conditions still require checking against the source.
 PDFs, paper text and copied paper figures are not included.

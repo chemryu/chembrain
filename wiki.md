@@ -1,6 +1,29 @@
 # ChemBrain 진행 위키
 
-## 현재 상태 — 설치 없는 브라우저 프로그램 업데이트 / program-update round-01
+## 현재 상태 — 합성 brainstorming Map / synthesis-map round-02
+
+**다운로드 합성 Map 미리보기 READY / 별도 QA·Revision material 지적 0건 — 새 Pages403·과거 역사 Public 미승인은 별도 유지**
+
+- 정확한 고정·푸시 소스 **`02d0dff2ce66a00f10e0c873baea80fa6f94e963`**, 실행 `20261018-synthesis-map-06 / round-02`. 거절 round-01 Revision → Wiki → 별도 [Planning](runs/20261018-synthesis-map-06/round-02/planning.md) → [Development](runs/20261018-synthesis-map-06/round-02/development.md) → 별도 [QA 전체 원문](runs/20261018-synthesis-map-06/round-02/qa.md) → 별도 [Revision 전체 원문](runs/20261018-synthesis-map-06/round-02/revision.md) → [Wiki](runs/20261018-synthesis-map-06/round-02/wiki-record.md)·[전달](runs/20261018-synthesis-map-06/round-02/handoff.md) 완료입니다. 두 독립 역할은 **bounded downloadable preview PASS / 지적 0건**, QA-SYN-01 해결을 각각 실제 모바일 재현으로 확인했습니다.
+- 분자를 선택하면 brainstorming 형태의 **Map**이 기본으로 열립니다. 기록된 분자→반응→생성물만 화살표로 연결하고, 빠진 단계는 분리된 fragment로 안내합니다. 확대/축소·이동·Fit/선택 분자 Focus·반응 클릭 조건/용매·용질/DOI 확인이 가능하며 **List**로 기존 카드·편집을 엽니다. 미확인 구조·조건과 draft 표시를 유지하며 새 화학 사실을 만들지 않았습니다.
+- **[업데이트 프로그램 다운로드](https://github.com/chemryu/chembrain/actions/runs/39141206671/artifacts/12140894328)**: GitHub 로그인 → ZIP 다운로드·압축 해제 → `Chembrain.html`을 Edge/Chrome에서 엽니다. Python·Node·AI API 키 설치 없이 사용합니다. 기존 파일을 바꾸거나 옮기기 전에 **Backup JSON**, 새 파일에서 **Import package**로 복원하세요. 브라우저/프로필/파일 위치 저장이며 기기 간 동기화를 보장하지 않습니다.
+- 실제 HTML **722585 bytes**, SHA-256 **`a1a175882c6701e2d3f98b61b80dbed27d643e0de1eb661823c930b36384278d`**; artifact ID12140894328, CI-reported ZIP digest `d5ba0bad0030913a63c36824123dd4ae2561c5034556cab32e1daa23eb331ee2`. [delivery.json](runs/20261018-synthesis-map-06/round-02/delivery.json)에 identity를 보존했습니다. 로컬 HTML/CI manifest·라이브러리 digest 일치를 확인했으나 ZIP 자체를 독립 다운로드했다고 주장하지 않습니다.
+- 새 실제 [CI39141206671](https://github.com/chemryu/chembrain/actions/runs/39141206671), 불변 영수증 **`8c8d3c6317433502ffd4984df39fd6b4290ef52e`**: **290 PASS / Windows DPAPI 1 SKIP**, hosted build/browser·payload·portable build·**실제 file:// 오프라인 browser PASS**, artifact upload SUCCESS입니다. 모바일 실제 card drag→Focus geometry와 기존 편집/저장/backup/import/오류보존/보안 검사 포함. QA/Revision/Wiki가 [9개 원본](runs/20261018-synthesis-map-06/round-02/web/manifest.json)의 bytes/hash와 불변 Git receipt를 대조했습니다. 로컬 관리 브라우저 file 차단은 우회하지 않았고 별도 CI runner의 실제 파일 실행과 구분합니다.
+- 모바일 Focus는 ReactFlow의 현재 위치·치수를 읽도록 수정했습니다. QA·Revision이 각각 이전 실패 재현을 그대로 실행해 카드가 화면 안으로 돌아오는 것을 확인했습니다. CI 진단은 짧은 로그 전체·큰 로그 앞뒤를 보존하며 실제 Git receipt 회귀 검사를 추가했습니다. **이전 e6ed4e7 CI 실패의 사라진 최초 assertion 원인은 여전히 UNRESOLVED**이고 이번 성공으로 원인을 밝혔거나 이전 실행이 통과했다고 표현하지 않습니다. 이전 거절 원문·4개 CI 증거는 그대로 보존합니다.
+- 이번 CI는 실제 Pages 설정을 시도하여 **새 403 Resource not accessible by integration**, 배포/HTTP **NOT RUN**, URL null을 기록했습니다. collection SKIP·주간 미활성·PC 예약 미설치·Box 미동기화입니다. 역사 인용문/crop과 원격 storage UNVERIFIED 때문에 Public 전환은 계속 미승인입니다. visibility/history/main/권한 변경·production release 없음입니다. cloud 환경 draft는 새 소스로 저장됐지만 **환경 Publish 필요**이며 앱 다운로드 실행과 별개입니다. 새 코드 수정 지적이 없어 빈 Planning 회차를 만들지 않고 다운로드 미리보기 전달로 종료합니다.
+
+## 이전 상태 — 합성 brainstorming Map / synthesis-map round-01
+
+**CHANGES REQUESTED / 미해결 앱 지적 1건 + 새 CI browser FAIL — round-02 Planning 환류, 새 다운로드 미승인**
+
+- 실행 `20261018-synthesis-map-06 / round-01`, 정확한 고정·푸시 소스 **`e6ed4e70028fa77dfd59cbeede249ccc1a52b274`**. [Planning](runs/20261018-synthesis-map-06/round-01/planning.md) → [Development](runs/20261018-synthesis-map-06/round-01/development.md) → 별도 [QA 전체 원문](runs/20261018-synthesis-map-06/round-01/qa.md) → 별도 [Revision 전체 원문](runs/20261018-synthesis-map-06/round-01/revision.md) → [Wiki 기록](runs/20261018-synthesis-map-06/round-01/wiki-record.md)·[round-02 인계](runs/20261018-synthesis-map-06/round-01/handoff.md)입니다. 두 독립 역할 모두 **CHANGES REQUESTED**, 이전 승인은 새 소스에 승계하지 않습니다.
+- 분자 선택 시 Map을 기본으로 열고 실제 reactant→reaction→product만 표시했습니다. List·기존 편집·조건/용매/용질/DOI 확인을 유지하며, 기록 없는 연결은 만들지 않고 분리된 fragment로 안내합니다. 하지만 **QA-SYN-01 P2**: 모바일에서 선택 분자 카드를 드래그한 뒤 Focus를 누르면 초기 좌표로 이동해 실제 카드가 화면 밖에 남습니다. QA와 Revision이 각각 실제 Chromium에서 재현했습니다. 현재 ReactFlow 노드 위치·치수를 사용하고 실제 모바일 drag→Focus 회귀 검사가 필요합니다.
+- Development 전체 **289 PASS / Windows DPAPI 1 SKIP**, build·broad hosted browser·payload gates PASS, QA 별도 집중 **15 PASS**·hosted browser·HTTP-only portable PASS입니다. 이 broad 검사는 추가 모바일 실패를 놓쳤으며 통과로 상쇄하지 않습니다. 로컬 실제 file://는 관리 브라우저 정책으로 NOT RUN, 우회하지 않았습니다.
+- 새 실제 [CI 39140468551](https://github.com/chemryu/chembrain/actions/runs/39140468551), 불변 영수증 **`44c569c9fc284fe30fb59b440a61eb7ad084ed57`**: tests **289 PASS / 1 SKIP**, app build PASS이나 **hosted browser FAIL**입니다. 현재 보존된 `web-browser.log`는 tail DOM만 있어 최초 실패 원인은 **UNRESOLVED**이며 QA-SYN-01과 같다고 단정하지 않습니다. portable build·실제 file:// 검사·artifact upload는 **SKIP/NOT RUN**, 새 전달 artifact 없음입니다. [네 원본 파일/manifest](runs/20261018-synthesis-map-06/round-01/web/manifest.json)는 Wiki가 bytes/SHA-256 및 불변 영수증과 대조했습니다.
+- 이 CI에서는 publish가 생략되어 **Pages 설정·배포·HTTPS 모두 NOT RUN, URL null**입니다. 이전 `aaf4d8b` 실행의 Pages403은 역사이며 이번 실행에서 새 403을 관찰했다고 쓰지 않습니다. 이전 다운로드는 이전 프로그램용으로만 보존하고 합성 Map 전달물로 제시하지 않습니다.
+- 다음 순서: [round-02 Planning 인계](runs/20261018-synthesis-map-06/round-01/handoff.md) → 좁은 mobile Focus 수정·실제 drag 회귀·CI 실패 head/tail/간결한 진단 보존 및 실제 원인 해결 → 새 SHA/HTML 전체 필수 검사와 두 독립 검수 → Wiki. 완료 기준을 낮추지 않습니다. 알려진 Git 역사 원문/그림·원격 Actions storage UNVERIFIED·Public 미승인, Box 미동기화·주간 미활성·main 미병합·브라우저 로컬 저장 한계는 그대로입니다.
+
+## 이전 상태 — 설치 없는 브라우저 프로그램 업데이트 / program-update round-01
 
 **다운로드 브라우저 미리보기 READY / Independent QA·Revision 지적 0건 — Pages403·기존 역사 Public 미승인은 별도 유지**
 

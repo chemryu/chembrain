@@ -1,0 +1,57 @@
+{
+  "commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+  "built_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+  "provenance": {
+    "schema_version": 1,
+    "workflow_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+    "built_commit": "e6ed4e70028fa77dfd59cbeede249ccc1a52b274",
+    "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb"
+  },
+  "run_id": "39140468551",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39140468551",
+  "reported_at": "2026-10-18T15:28:03.398869+00:00",
+  "status": "blocked",
+  "terminal": true,
+  "phase": "terminal",
+  "page_url": null,
+  "facts": {
+    "build": {
+      "result": "failure",
+      "outputs": {
+        "facts": "{\n  \"collection\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"feed\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"identity\": {\n    \"outputs\": {\n      \"value\": \"{\\\"schema_version\\\":1,\\\"workflow_commit\\\":\\\"e6ed4e70028fa77dfd59cbeede249ccc1a52b274\\\",\\\"built_commit\\\":\\\"e6ed4e70028fa77dfd59cbeede249ccc1a52b274\\\",\\\"library_sha256\\\":\\\"7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb\\\"}\"\n    },\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"tests\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"app\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"browser\": {\n    \"outputs\": {},\n    \"outcome\": \"failure\",\n    \"conclusion\": \"failure\"\n  },\n  \"portable\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"portable_artifact\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  }\n}",
+        "provenance": "{\"schema_version\":1,\"workflow_commit\":\"e6ed4e70028fa77dfd59cbeede249ccc1a52b274\",\"built_commit\":\"e6ed4e70028fa77dfd59cbeede249ccc1a52b274\",\"library_sha256\":\"7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb\"}"
+      }
+    },
+    "publish": {
+      "result": "skipped",
+      "outputs": {}
+    }
+  },
+  "independent_qa": "SEPARATE_REVIEW_REQUIRED; preview only",
+  "phases": [
+    {
+      "phase": "dependencies",
+      "at": "2026-10-18T15:26:18.719146+00:00"
+    },
+    {
+      "phase": "tests",
+      "at": "2026-10-18T15:26:55.466973+00:00"
+    },
+    {
+      "phase": "browser-build",
+      "at": "2026-10-18T15:27:08.650780+00:00"
+    },
+    {
+      "phase": "browser-checks",
+      "at": "2026-10-18T15:27:14.008909+00:00"
+    },
+    {
+      "phase": "build-finished",
+      "at": "2026-10-18T15:27:53.606543+00:00"
+    },
+    {
+      "phase": "terminal",
+      "at": "2026-10-18T15:28:03.398899+00:00"
+    }
+  ]
+}

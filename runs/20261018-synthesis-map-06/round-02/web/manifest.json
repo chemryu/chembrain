@@ -1,0 +1,51 @@
+{
+  "source_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+  "receipt_commit": "8c8d3c6317433502ffd4984df39fd6b4290ef52e",
+  "run_id": "39141206671",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39141206671",
+  "files": {
+    "browser-manifest.json": {
+      "bytes": 583,
+      "sha256": "215104752f7f7362440d8ba2fcb4d8be6f4445fe80d9bdd570359b7ea4b5b25f"
+    },
+    "pages-config.json": {
+      "bytes": 102,
+      "sha256": "d5f4c7ca7e87f504320eaa47a94d7103ff611a138891713ab577410df78e8a97"
+    },
+    "pages-config.log": {
+      "bytes": 95,
+      "sha256": "2133ccf2720c2e773774e8eb645b17387c8a13de3fe7d05ede7c3641a0c06187"
+    },
+    "portable-browser.log": {
+      "bytes": 651,
+      "sha256": "86b1fb1f713c729e1252a4eef4e7a767c7faf6caf950353f986c504d1523a403"
+    },
+    "portable-build.log": {
+      "bytes": 711,
+      "sha256": "7a59575f86495d283277456d888ead703943c81a55d3beb0399203c998974870"
+    },
+    "status.json": {
+      "bytes": 3790,
+      "sha256": "42664a7d77694207e4594ccb1e778203189db53f667da16a57a15df80c6ba568"
+    },
+    "web-browser.log": {
+      "bytes": 567,
+      "sha256": "5b72101910fa8cb8fe327fff62bb32c246be764eb86323e4712d3ec335369dca"
+    },
+    "web-build.log": {
+      "bytes": 436,
+      "sha256": "360bb58902122c42af0d6167d746748755b3fab2fe7b03aa676e9501af9bb7ec"
+    },
+    "web-tests.log": {
+      "bytes": 982,
+      "sha256": "1118b68c0eccec43bfda4228af52a15c85bf53a768c536978870aa0f8d115a53"
+    }
+  },
+  "portable_artifact": {
+    "artifact-id": "12140894328",
+    "artifact-digest": "d5ba0bad0030913a63c36824123dd4ae2561c5034556cab32e1daa23eb331ee2",
+    "artifact-url": "https://github.com/chemryu/chembrain/actions/runs/39141206671/artifacts/12140894328"
+  },
+  "local_and_ci_html_manifest_identical": true,
+  "artifact_archive_independently_downloaded": false
+}

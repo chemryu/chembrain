@@ -5,6 +5,13 @@ from pathlib import Path
 from web_provenance import resolve_identity
 
 def git(cwd,*args,check=True):return subprocess.run(['git',*args],cwd=cwd,capture_output=True,check=check,timeout=45)
+def bounded_log(data,limit=100000):
+ if len(data)<=limit:return data
+ marker=b'\n[... middle of oversized log omitted; beginning and end preserved ...]\n'
+ size=(limit-len(marker))//2-8
+ head=data[:size].decode('utf-8',errors='replace').encode('utf-8')
+ tail=data[-size:].decode('utf-8',errors='replace').encode('utf-8')
+ return head+marker+tail
 def main():
  w=Path(os.environ['GITHUB_WORKSPACE']);run=os.environ['GITHUB_RUN_ID'];ref='refs/heads/build/web-run-'+run
  old={};old_commit=None;found=git(w,'ls-remote','origin',ref).stdout
@@ -23,7 +30,7 @@ def main():
    if old_commit:
     prior=git(w,'show',old_commit+':'+name,check=False)
     if prior.returncode==0:(p/name).write_bytes(prior.stdout)
-   if f.exists():(p/name).write_bytes(b''.join(f.read_bytes().splitlines(keepends=True)[-120:])[-100000:])
+   if f.exists():(p/name).write_bytes(bounded_log(f.read_bytes()))
   git(p,'init','-b','receipt');git(p,'config','user.name','github-actions[bot]');git(p,'config','user.email','41898282+github-actions[bot]@users.noreply.github.com');git(p,'add','.');git(p,'commit','-m',f'Web preview {run}: {phase} {status}')
   git(w,'fetch',str(p),'receipt');commit=git(w,'rev-parse','FETCH_HEAD').stdout.decode().strip();git(w,'push','origin',commit+':'+ref,'--force')
   # Latest is just an index; older workflow finalizers must not replace newer runs.
