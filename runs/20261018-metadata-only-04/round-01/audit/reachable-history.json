@@ -1,0 +1,27 @@
+{
+  "scope": "locally reachable commits and fetched remote heads; not GitHub caches/artifacts/deleted server refs",
+  "objects": 632,
+  "blobs": 393,
+  "pdf_blobs": [],
+  "paper_text_json_blobs": [
+    {
+      "object": "1a8fdad6c93bbc1e863aba3f964a3b9363a0e223",
+      "path": "examples/uploaded-literature.json"
+    },
+    {
+      "object": "1b61afb294cdbb825d94289cf2cd7f6064d24ae9",
+      "path": "examples/uploaded-literature.json"
+    }
+  ],
+  "known_paper_crop_blobs": [
+    {
+      "object": "3b65d1d7a5c27b57789ba92e6e45873d42c3aef4",
+      "path": "public/structures/doxycycline.png"
+    },
+    {
+      "object": "febefb58a49db29e491862680e120bfdc61a088d",
+      "path": "public/structures/paclitaxel.png"
+    }
+  ],
+  "history_rewritten": false
+}

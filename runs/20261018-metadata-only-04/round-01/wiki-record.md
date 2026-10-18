@@ -1,0 +1,19 @@
+# Wiki final record — metadata-only round 01
+
+Frozen implementation source: **6280794c87e7867b0ccd2e2d4f6924814917997a**; previous source56be remains separately historical. Current request tightens GitHub content to reaction, chemical, solution(solvent/solute), DOI and authors. Internal IDs, concise technical conditions and evidence locators support those facts. Source policy implementation is complete; existing-repository Public clearance and internet delivery are not complete.
+
+## Recorded role sequence and evidence
+
+[Planning](planning.md) preceded [Development](development.md). Separate [Independent QA](qa.md) and [Revision](revision.md) reviewed this same source, then Wiki preserved their complete originals. Both report **0 unresolved material current-source application/policy findings**. Their complete text and historical limitations are not replaced by this summary. SHA-256 identities are in progress.json. Revision performed38 focused tests; QA independently ran284PASS/1Windows-onlySKIP, focused56PASS and actual Chromium. Development284PASS/1SKIP, production build/browser, source/dist gates PASS. Dispatch's old OA-PDF wording is a documented nonblocking label remnant; enforced Actions behavior is metadata-only, no code round required solely for wording.
+
+Actual CI run **39098202973**, immutable receipt **c3add00d19e2e6e2daf1e9d92efe69b3835d48f2**, binds workflow/built source6280794 and public-library SHA-256 **7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb**. [Raw manifest](web/manifest.json) retains six exact source-bound files; Wiki independently checked each byte count/hash. QA and Revision separately verified against immutable Git receipt blobs. Tests284PASS/1SKIP, web/build/browser/payload gatesPASS; collectionSKIP. New Pages config403 `Resource not accessible by integration`, deployment/accessNOTRUN, URLnull. Live collection or internet access is not inferred from fixture/build success.
+
+## Resulting boundary
+
+Strict nested allowlists restrict portable data; paper rows have only internal ID, DOI, authors. Browser references/editors/backups omit title/journal/year/paper notes. Original legacy bytes are backed up and verified privately in browser storage before projection; failure preserves originals. Chemistry changes and locators survive, unknown structures stay unknown. Current copied paper crops/legacy quotation payloads were removed, encoded chemistry SVGs remain. Actions forcibly uses metadata-only, refuses local PDF ingestion, skips private queue/download/extraction/archive work, removes paper-work cache and publishes checkpoint/anchor-only state. Separate bounded local PDF processing remains outside Git. Existing metadata durability survives. Controls govern this program, not every manual GitHub upload or semantic interpretation of future strings.
+
+## History and external disposition
+
+Current tracked146-file and dist13-file payload gatesPASS. [Reachable history audit](audit/reachable-history.json) found **0PDF blobs but2quotation JSON blobs and2source-paper crop blobs**. Their source contents are not reproduced in this record. Current deletion does not erase history. Remote Actions caches/artifacts, deleted refs and server-retained unreachable objects remainUNVERIFIED. No history rewrite, ref deletion, artifact/cache deletion, Public toggle, main merge or new publication repository occurred. **Existing repository is not cleared for Public.** Owner must separately choose historical remediation or an independently clean publication repository; no destructive step is automatic.
+
+Weeklies remain inactive on feature branch; PC task was not installed. No Box sync, external model API, permanent agents, production approval or live URL is claimed. Current-source cloud start/repository draft is saved and needsPublish; this is separate from app/Pages verification. See [handoff](handoff.md). No new code-repair findings require an empty next Planning round.

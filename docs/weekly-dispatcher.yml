@@ -1,7 +1,7 @@
 # REVIEW ARTIFACT ONLY. Not an active workflow. Install as the sole default-branch
 # .github/workflows/web-library.yml only AFTER review/hosting gates and replacing
 # REVIEWED_SOURCE below with the full approved feature-source commit.
-name: Dispatch reviewed Chembrain weekly processor
+name: Dispatch reviewed Chembrain metadata-only weekly processor
 on:
   schedule:
     - cron: '0 15 * * 1'

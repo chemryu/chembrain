@@ -2,18 +2,17 @@
   "id": "uploaded-literature-2026-10-16",
   "schema_version": 1,
   "scope": "Six representative reactions from three user-supplied articles and their SI (251 PDF pages); not a complete substrate-scope extraction.",
-  "review_method": "Assisted curation checked against text, structures and table images. No independent experimental reproduction. Two article/SI discrepancies remain drafts.",
+  "review_method": "Structured reaction facts with DOI and page/locator references; no source text is distributed.",
   "page_numbering": "1-based PDF page numbers; printed page labels in evidence locators where applicable.",
   "sources": [
     {
       "filename": "science.1161976.pdf",
       "sha256": "afe4f2be4f02e58cc4ea546898fd48f5a30a4f2f30ed9bf2f85b446e53d57dba",
       "metadata": {
-        "title": "Nicewicz 2008 · Main article",
+        "title": "10.1126/science.1161976",
         "doi": "10.1126/science.1161976",
-        "citation": "Nicewicz & MacMillan (2008), Science 322, 77–80.",
-        "document_role": "main",
-        "notes": "The target article spans PDF pp. 1–4; adjacent articles appear at the top of p. 1 and bottom of p. 4. Table 1 entries 3 and 4 disagree with the SI and remain drafts."
+        "citation": "Nicewicz & MacMillan",
+        "document_role": "main"
       },
       "related_files": [
         "nicewicz.som.pdf"
@@ -23,11 +22,10 @@
       "filename": "nicewicz.som.pdf",
       "sha256": "3d4aceb9628a30b6d0668e6a613393d80dd5072a4a87dcdc3d5b70c757ab0b29",
       "metadata": {
-        "title": "Nicewicz 2008 · SI",
+        "title": "10.1126/science.1161976",
         "doi": "10.1126/science.1161976",
-        "citation": "Nicewicz & MacMillan (2008), Supporting Online Material.",
-        "document_role": "supplement",
-        "notes": "Article/SI discrepancy: entry 3, SI p. 6: 93% yield, 91% ee; article: 92%, 90% ee. Entry 4, SI p. 7: 85% yield; article: 83%. Cause unresolved."
+        "citation": "Nicewicz & MacMillan",
+        "document_role": "supplement"
       },
       "related_files": [
         "science.1161976.pdf"
@@ -37,11 +35,10 @@
       "filename": "science.1255525.pdf",
       "sha256": "b06b23abdb4efb5229e1379222a04bc93427cab5eb39f88c30a8231e1a901316",
       "metadata": {
-        "title": "Zuo 2014 · Main article",
+        "title": "10.1126/science.1255525",
         "doi": "10.1126/science.1255525",
-        "citation": "Zuo et al. (2014), Science 345, 437–440.",
-        "document_role": "main",
-        "notes": "Fig. 3 is on PDF p. 2. The article spans pp. 1–4; another article begins at the bottom of p. 4. Fig. 3 labels the products as racemic (±)."
+        "citation": "Zuo et al.",
+        "document_role": "main"
       },
       "related_files": [
         "zuo.sm.pdf"
@@ -51,11 +48,10 @@
       "filename": "zuo.sm.pdf",
       "sha256": "849d0fba7c0e9b54f4e13c85fba26e90ad4f01bcd0a0e3c0b8d7a4e4f94256a4",
       "metadata": {
-        "title": "Zuo 2014 · SI",
+        "title": "10.1126/science.1255525",
         "doi": "10.1126/science.1255525",
-        "citation": "Zuo et al. (2014), Supplementary Materials.",
-        "document_role": "supplement",
-        "notes": "The selected arene-scope examples use General Procedure A: two fluorescent lamps and 72 h. Procedure B has different light and substrate equivalents."
+        "citation": "Zuo et al.",
+        "document_role": "supplement"
       },
       "related_files": [
         "science.1255525.pdf"
@@ -65,11 +61,10 @@
       "filename": "nature17431.pdf",
       "sha256": "d28d5e783af43555e0bc057e82c801db150e0a1a4a5e73175160db552f43ff52",
       "metadata": {
-        "title": "Horn 2016 · Main article",
+        "title": "10.1038/nature17431",
         "doi": "10.1038/nature17431",
-        "citation": "Horn et al. (2016), Nature 533, 77–81.",
-        "document_role": "main",
-        "notes": "Keep substrate-specific solvent exceptions separate from general acetone conditions. Small-scale RVC and large-scale graphite procedures differ. 10 mA/mmol is current per substrate amount, not current density."
+        "citation": "Horn et al.",
+        "document_role": "main"
       },
       "related_files": [
         "41586_2016_BFnature17431_MOESM219_ESM.pdf"
@@ -79,11 +74,10 @@
       "filename": "41586_2016_BFnature17431_MOESM219_ESM.pdf",
       "sha256": "3f5427eab05f62169b858a2a306b583a8bbe0b0e37d4446edd8bb77818e27749",
       "metadata": {
-        "title": "Horn 2016 · SI",
+        "title": "10.1038/nature17431",
         "doi": "10.1038/nature17431",
-        "citation": "Horn et al. (2016), Supplementary Information.",
-        "document_role": "supplement",
-        "notes": "PDF pp. 6–7 contain small-scale and large-scale procedures. On p. 45, compound 6 uses MeCN; compound 7 follows the general acetone procedure. Unreported charge and photon quantities are left blank."
+        "citation": "Horn et al.",
+        "document_role": "supplement"
       },
       "related_files": [
         "nature17431.pdf"
@@ -269,25 +263,21 @@
         {
           "source": "nicewicz.som.pdf",
           "page": 3,
-          "quote": "General Procedure: An oven-dried 8 mL vial equipped with a Teflon septum and magnetic stir bar was charged with tris-(2,2´-bipyridyl)ruthenium (II) chloride hexahydrate (1.9 µmol, 0.005 equiv), the corresponding bromide (0.385 mmol, 1.0 equiv), and (2R,5S)-2-tert-butyl-3,5-dimethylimidazolidin-4-one trifluoromethane- sulfonic acid salt (76.9 µmol, 0.2 equiv). The vial was purged with a stream of nitrogen and 0.8 mL of dry DMF was added via syringe, followed by the corresponding aldehyde (0.769 mmol, 2.0 equiv) and 2,6-lutidine (0.769 mmol, 2.0 equiv). The resultant mixture was degassed for 10 min by bubbling nitrogen through the reaction medium. After the reaction was thoroughly degassed, the vial was sealed with parafilm and placed approximately 8 cm from a 15 W fluorescent lamp. After the reaction was complete (as judged by TLC analysis), the mixture was poured into a separatory funnel containing 5 mL of Et2O and 5 mL of H2O. The layers were separated and the aqueous layer was extracted with Et2O (3 × 5 mL). The combined organic layers were dried (MgSO4) and concentrated in vacuo. Purification of the crude product by flash chromatography on Davisil Grade 643 silica gel using the indicated solvent system afforded the desired α- alkylated aldehyde.",
           "locator": "General Procedure; light source, solvent and nitrogen atmosphere"
         },
         {
           "source": "nicewicz.som.pdf",
           "page": 5,
-          "quote": "(R)-Diethyl 2-(1-oxo-3-phenylpropan-2-yl)propanedioate (entry 3, Table 1):",
           "locator": "Entry 3 name and structure; visually checked"
         },
         {
           "source": "nicewicz.som.pdf",
           "page": 6,
-          "quote": "bipyridyl)ruthenium (II) chloride hexahydrate (1.9 µmol, 0.005 equiv), 66.0 µL of diethyl bromomalonate (0.385 mmol, 1.0 equiv), 24.6 mg of (2R,5S)-2-tert-butyl-3,5- dimethylimidazolidin-4-one trifluoromethanesulfonic acid salt (76.9 µmol, 0.2 equiv), 101 µL of hydrocinnamaldehyde (0.769 mmol, 2.0 equiv), and 90.0 µL 2,6-lutidine (0.769 mmol, 2.0 equiv). After 7 h, the reaction mixture was subjected to the workup protocol outlined in the general procedure and purified by flash chromatography using petroleum ether:Et2O (4:1) as the eluent to afford 105 mg (93% yield, 91% ee) of the title compound as a colorless oil.",
           "locator": "Entry 3 procedure: 7 h, 105 mg, 93% yield, 91% ee"
         },
         {
           "source": "science.1161976.pdf",
           "page": 3,
-          "quote": "Table 1. Survey of the bromide and aldehyde scope in the direct a-alkylation of aldehydes.",
           "locator": "Table 1; 23 °C, yields and ee checked visually in table image"
         }
       ],
@@ -324,25 +314,21 @@
         {
           "source": "nicewicz.som.pdf",
           "page": 3,
-          "quote": "General Procedure: An oven-dried 8 mL vial equipped with a Teflon septum and magnetic stir bar was charged with tris-(2,2´-bipyridyl)ruthenium (II) chloride hexahydrate (1.9 µmol, 0.005 equiv), the corresponding bromide (0.385 mmol, 1.0 equiv), and (2R,5S)-2-tert-butyl-3,5-dimethylimidazolidin-4-one trifluoromethane- sulfonic acid salt (76.9 µmol, 0.2 equiv). The vial was purged with a stream of nitrogen and 0.8 mL of dry DMF was added via syringe, followed by the corresponding aldehyde (0.769 mmol, 2.0 equiv) and 2,6-lutidine (0.769 mmol, 2.0 equiv). The resultant mixture was degassed for 10 min by bubbling nitrogen through the reaction medium. After the reaction was thoroughly degassed, the vial was sealed with parafilm and placed approximately 8 cm from a 15 W fluorescent lamp. After the reaction was complete (as judged by TLC analysis), the mixture was poured into a separatory funnel containing 5 mL of Et2O and 5 mL of H2O. The layers were separated and the aqueous layer was extracted with Et2O (3 × 5 mL). The combined organic layers were dried (MgSO4) and concentrated in vacuo. Purification of the crude product by flash chromatography on Davisil Grade 643 silica gel using the indicated solvent system afforded the desired α- alkylated aldehyde.",
           "locator": "General Procedure; light source, solvent and nitrogen atmosphere"
         },
         {
           "source": "nicewicz.som.pdf",
           "page": 6,
-          "quote": "(R)-Diethyl 2-(1-cyclohexyl-2-oxoethyl)propanedioate (entry 4, Table 1):",
           "locator": "Entry 4 name and structure; visually checked"
         },
         {
           "source": "nicewicz.som.pdf",
           "page": 7,
-          "quote": "bromomalonate (0.385 mmol, 1.0 equiv), 24.6 mg of (2R,5S)-2-tert-butyl-3,5- dimethylimidazolidin-4-one trifluoromethanesulfonic acid salt (76.9 µmol, 0.2 equiv), 107 µL of 2-cyclohexylethanal (0.769 mmol, 2.0 equiv), and 90.0 µL 2,6-lutidine (0.769 mmol, 2.0 equiv). After 7 h, the reaction mixture was subjected to the workup protocol outlined in the general procedure and purified by flash chromatography using petroleum ether:Et2O (4:1) as the eluent to afford 93 mg (85% yield, 95% ee) of the title compound as a colorless oil.",
           "locator": "Entry 4 procedure: 7 h, 93 mg, 85% yield, 95% ee"
         },
         {
           "source": "science.1161976.pdf",
           "page": 3,
-          "quote": "Table 1. Survey of the bromide and aldehyde scope in the direct a-alkylation of aldehydes.",
           "locator": "Table 1; 23 °C, yields and ee checked visually in table image"
         }
       ],
@@ -379,19 +365,16 @@
         {
           "source": "zuo.sm.pdf",
           "page": 5,
-          "quote": "General Procedure A for the Decarboxylative Arylation (Arene Scope): An oven- dried 40 mL vial equipped with a Teflon septum and magnetic stir bar was charged with Ir[dF(CF3)ppy]2(dtbbpy)PF6 (4.00 μmol, 0.01 equiv), NiCl2glyme (0.04 mmol, 0.1 equiv), 4,4-di-tert-butyl-2,2-bipyridyl (0.06 mmol, 0.15 equiv), the corresponding aromatic halides (0.40 mmol, 1.0 equiv), Boc-Pro-OH (0.60 mmol, 1.5 equiv), Cs2CO3 (0.60 mmol, 1.5 equiv), and 20 mL of DMF. The reaction mixture was degassed by bubbling argon stream for 20 min, then irradiated with two 26 W fluorescent lamps (at approximately 2 cm away from the light source). After 72h, the reaction mixture was diluted with saturated aqueous NaHCO3 solution, extracted with Et2O (3 × 100 mL). The combined organic extracts were washed with water and brine, dried over MgSO4 and concentrated in vacuo. Purification of the crude product by flash chromatography on silica gel using the indicated solvent system afforded the desired product.",
           "locator": "S5, General Procedure A; separate from Procedure B"
         },
         {
           "source": "zuo.sm.pdf",
           "page": 7,
-          "quote": "tert-Butyl 2-(p-tolyl)pyrrolidine-1-carboxylate [known compound (27)]: According to the general procedure A, Ir[dF(CF3)ppy]2(dtbbpy)PF6 (4.5 mg, 4.0 μmol, 0.01 equiv), NiCl2glyme (8.8 mg, 0.04 mmol, 0.1 equiv), 4,4-di-tert-butyl-2,2-bipyridyl (16.1 mg, 0.06 mmol, 0.15 equiv), 4-iodotoluene (89.0 mg, 0.4 mmol, 1.0 equiv), Boc-Pro-OH (129.0 mg, 0.60 mmol, 1.5 equiv), Cs2CO3 (195.6 mg, 0.6 mmol, 1.5 equiv), and 20 mL of DMF were used. The product was isolated by flash chromatography (15% ethyl acetate/hexane) as a pale yellow solid (81 mg, 78%).",
           "locator": "S7, individual synthesis; product structure and formula checked"
         },
         {
           "source": "science.1255525.pdf",
           "page": 2,
-          "quote": "Fig. 3. Photoredox-nickel catalyzed decarboxylative cross-coupling: aryl halide scope.",
           "locator": "Fig. 3; 23 °C and racemic (±)-10, (±)-14 checked visually"
         }
       ],
@@ -428,19 +411,16 @@
         {
           "source": "zuo.sm.pdf",
           "page": 5,
-          "quote": "General Procedure A for the Decarboxylative Arylation (Arene Scope): An oven- dried 40 mL vial equipped with a Teflon septum and magnetic stir bar was charged with Ir[dF(CF3)ppy]2(dtbbpy)PF6 (4.00 μmol, 0.01 equiv), NiCl2glyme (0.04 mmol, 0.1 equiv), 4,4-di-tert-butyl-2,2-bipyridyl (0.06 mmol, 0.15 equiv), the corresponding aromatic halides (0.40 mmol, 1.0 equiv), Boc-Pro-OH (0.60 mmol, 1.5 equiv), Cs2CO3 (0.60 mmol, 1.5 equiv), and 20 mL of DMF. The reaction mixture was degassed by bubbling argon stream for 20 min, then irradiated with two 26 W fluorescent lamps (at approximately 2 cm away from the light source). After 72h, the reaction mixture was diluted with saturated aqueous NaHCO3 solution, extracted with Et2O (3 × 100 mL). The combined organic extracts were washed with water and brine, dried over MgSO4 and concentrated in vacuo. Purification of the crude product by flash chromatography on silica gel using the indicated solvent system afforded the desired product.",
           "locator": "S5, General Procedure A; separate from Procedure B"
         },
         {
           "source": "zuo.sm.pdf",
           "page": 10,
-          "quote": "tert-Butyl 2-(4-acetylphenyl)pyrrolidine-1-carboxylate: According to the general procedure A, Ir[dF(CF3)ppy]2(dtbbpy)PF6 (4.5 mg, 4.0 μmol, 0.01 equiv), NiCl2glyme (8.80 mg, 0.04 mmol, 0.1 equiv), 4,4-di-tert-butyl-2,2-bipyridyl (16.1 mg, 0.06 mmol, 0.15 equiv), 4-bromoacetophenone (81.9 mg, 0.4 mmol, 1.0 equiv), Boc-Pro-OH (129.0 mg, 0.6 mmol, 1.5 equiv), Cs2CO3 (195.6 mg, 0.6 mmol, 1.5 equiv), and 20 mL of DMF were used. The product was isolated by flash chromatography (20% ethyl acetate/hexane) as a pale yellow solid (100 mg, 86%).",
           "locator": "S10, individual synthesis; product structure and formula checked"
         },
         {
           "source": "science.1255525.pdf",
           "page": 2,
-          "quote": "Fig. 3. Photoredox-nickel catalyzed decarboxylative cross-coupling: aryl halide scope.",
           "locator": "Fig. 3; 23 °C and racemic (±)-10, (±)-14 checked visually"
         }
       ],
@@ -477,19 +457,16 @@
         {
           "source": "41586_2016_BFnature17431_MOESM219_ESM.pdf",
           "page": 6,
-          "quote": "General Procedure for Electrochemical Allylic Oxidation: With no precautions to exclude air or moisture, a test tube is charged with a stir bar, Cl4NHPI (0.2 equiv.) and LiClO4 (0.6 equiv, 0.1 M). Acetone (6 mL/mmol substrate) is added, and the resulting suspension is stirred until most of the solids dissolve. Substrate (1 equiv.) is added, followed by pyridine (2 equiv.) and 70% aqueous tert-butyl hydroperoxide (1.5 equiv.). The anode and cathode (RVC, separated by a glass slide) are placed in the solution, and the reaction mixture is electrolyzed at a current of 10 mA/mmol substrate until the reaction is complete WWW.NATURE.COM/NATURE | 6",
           "locator": "Small-scale general procedure; 10 mA/mmol and RVC anode/cathode"
         },
         {
           "source": "41586_2016_BFnature17431_MOESM219_ESM.pdf",
           "page": 7,
-          "quote": "as judged by TLC or GCMS analysis. The reaction mixture is transferred to a separatory funnel, and the electrodes are washed thoroughly with hexanes, diethyl ether, or ethyl acetate. The organic layer is washed twice with H2O, once with brine, dried, and concentrated. The resulting crude product was then purified on SiO2 to furnish the desired enone product.",
           "locator": "Small-scale endpoint and purification; separate from large-scale procedure"
         },
         {
           "source": "41586_2016_BFnature17431_MOESM219_ESM.pdf",
           "page": 45,
-          "quote": "tert-Butyl cyclohexenone (6). Following the general procedure Me Me with 0.5 mmol tert-butyl cyclohexene (69 mg) using MeCN (3 mL) Me in place of acetone afforded the title compound (40 mg, 52% yield) O as a clear, colorless oil after purification on SiO2 (5% Et2O/hexanes).",
           "locator": "Compound 6; MeCN exception, 52% yield and structure checked visually"
         }
       ],
@@ -526,19 +503,16 @@
         {
           "source": "41586_2016_BFnature17431_MOESM219_ESM.pdf",
           "page": 6,
-          "quote": "General Procedure for Electrochemical Allylic Oxidation: With no precautions to exclude air or moisture, a test tube is charged with a stir bar, Cl4NHPI (0.2 equiv.) and LiClO4 (0.6 equiv, 0.1 M). Acetone (6 mL/mmol substrate) is added, and the resulting suspension is stirred until most of the solids dissolve. Substrate (1 equiv.) is added, followed by pyridine (2 equiv.) and 70% aqueous tert-butyl hydroperoxide (1.5 equiv.). The anode and cathode (RVC, separated by a glass slide) are placed in the solution, and the reaction mixture is electrolyzed at a current of 10 mA/mmol substrate until the reaction is complete WWW.NATURE.COM/NATURE | 6",
           "locator": "Small-scale general procedure; 10 mA/mmol and RVC anode/cathode"
         },
         {
           "source": "41586_2016_BFnature17431_MOESM219_ESM.pdf",
           "page": 7,
-          "quote": "as judged by TLC or GCMS analysis. The reaction mixture is transferred to a separatory funnel, and the electrodes are washed thoroughly with hexanes, diethyl ether, or ethyl acetate. The organic layer is washed twice with H2O, once with brine, dried, and concentrated. The resulting crude product was then purified on SiO2 to furnish the desired enone product.",
           "locator": "Small-scale endpoint and purification; separate from large-scale procedure"
         },
         {
           "source": "41586_2016_BFnature17431_MOESM219_ESM.pdf",
           "page": 45,
-          "quote": "Phenyl cyclohexenone (7). Following the general procedure with 0.5 Ph mmol phenyl cyclohexene (79 mg) afforded the title compound (47 O mg, 55% yield) as a clear, colorless oil after purification on SiO2 (10– 20% Et2O/hexanes) Spectroscopic properties",
           "locator": "Compound 7; general procedure, 55% yield and structure checked visually"
         }
       ],

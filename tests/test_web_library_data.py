@@ -8,6 +8,7 @@ def test_browser_package_relations_and_non_destructive_import():
  import {{validateLibrary,mergeLibrary,relatedReactions,paperReferences}} from {json.dumps((root/'src/libraryData.ts').as_uri())};
  const d=validateLibrary(JSON.parse(fs.readFileSync({json.dumps(str(root/'examples/total-synthesis.json'))},'utf8')));
  assert.equal(relatedReactions(d,null).length,0);assert.equal(relatedReactions(d,'paclitaxel').length,2);assert.equal(relatedReactions(d,'paclitaxel',true).length,8);
+ assert.ok(d.papers.every(p=>Object.keys(p).sort().join(',')==='authors,doi,id'));
  const original=structuredClone(d);original.papers[0].doi='HTTPS://DOI.ORG/'+original.papers[0].doi.toUpperCase();const before=JSON.stringify(original);validateLibrary(original);assert.equal(JSON.stringify(original),before);
  d.reactions[0].name='My preserved edit';const repeated=mergeLibrary(d,JSON.parse(fs.readFileSync({json.dumps(str(root/'examples/total-synthesis.json'))},'utf8')));assert.equal(repeated.reactions[0].name,'My preserved edit');assert.equal(repeated.reactions.length,12);
  const incoming=structuredClone(d);incoming.papers[0].id='duplicate-paper';incoming.reactions.forEach(r=>r.evidence.forEach(e=>{{if(e.paper_id==='holton')e.paper_id='duplicate-paper';}}));incoming.reactions[0].id='new-reaction';

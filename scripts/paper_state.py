@@ -1,14 +1,13 @@
-"""Persist public DOI retry/checkpoint metadata across best-effort Actions caches.
+"""Persist only compact metadata replay anchors/checkpoints, never PDF work.
 
-This branch contains no archives, review candidates or local file paths. Archive
-bytes remain in the processor workspace/cache, not in this durable queue index.
+Legacy snapshots containing pending PDF/provider data fail closed.
 """
 import argparse,hashlib,json,os,re,subprocess,tempfile
 from pathlib import Path
+from datetime import datetime
 
 REF='refs/heads/build/paper-state'
 MAX_BYTES=10*1024*1024
-SOURCE_FIELDS={'DOI','type','ISSN','title','author','license','link'}
 
 def git(root,*args,check=True):
     return subprocess.run(['git',*args],cwd=root,capture_output=True,text=True,check=check,timeout=45)
@@ -16,26 +15,37 @@ def git(root,*args,check=True):
 def checked(snapshot):
     if not isinstance(snapshot,dict) or snapshot.get('version')!=1 or not isinstance(snapshot.get('journals'),dict):
         raise ValueError('Invalid processor state snapshot')
+    if set(snapshot)-{'version','journals','run_id','source','feed'}:raise ValueError('Unexpected processor snapshot field')
     if len(json.dumps(snapshot).encode())>MAX_BYTES:raise ValueError('Processor state exceeds bound')
+    if 'run_id' in snapshot and (not isinstance(snapshot['run_id'],str) or not re.fullmatch(r'[0-9]{1,30}',snapshot['run_id'])):raise ValueError('Invalid state run ID')
+    if 'source' in snapshot and (not isinstance(snapshot['source'],str) or not re.fullmatch(r'[a-f0-9]{40}',snapshot['source'])):raise ValueError('Invalid state source')
+    if 'feed' in snapshot:
+        feed=snapshot['feed']
+        if not isinstance(feed,dict) or set(feed)!={'ref','commit','library_sha256'}:raise ValueError('Invalid feed acknowledgment')
+        if not isinstance(feed['ref'],str) or not re.fullmatch(r'refs/heads/[a-zA-Z0-9_./-]{1,200}',feed['ref']):raise ValueError('Invalid feed ref')
+        for field,size in (('commit',40),('library_sha256',64)):
+            if not isinstance(feed[field],str) or not re.fullmatch('[a-f0-9]{'+str(size)+'}',feed[field]):raise ValueError('Invalid feed identity')
+    def timestamp(value):
+        if not isinstance(value,str) or len(value)>50 or datetime.fromisoformat(value).tzinfo is None:raise ValueError('Invalid checkpoint timestamp')
     for slug,files in snapshot['journals'].items():
-        if not re.fullmatch('[a-z0-9-]+',slug) or not isinstance(files,dict) or set(files)-{'state','pending'}:
+        if not re.fullmatch('[a-z0-9-]+',slug) or not isinstance(files,dict) or set(files)-{'state'}:
             raise ValueError('Unexpected processor state file')
         if 'state' in files:
             state=files['state']
             if not isinstance(state,dict) or set(state)-{'last_success','resume'} or len(json.dumps(state))>256_000:
                 raise ValueError('Invalid processor checkpoint')
-        if 'pending' in files:
-            pending=files['pending']
-            if not isinstance(pending,dict) or pending.get('version')!=1 or not isinstance(pending.get('items'),dict) or len(pending['items'])>2000:
-                raise ValueError('Invalid pending DOI queue')
-            for identifier,entry in pending['items'].items():
-                if not isinstance(identifier,str) or not isinstance(entry,dict) or set(entry)-{'source','status'}:
-                    raise ValueError('Unexpected pending DOI metadata')
-                source=entry.get('source')
-                if not isinstance(source,dict) or set(source)-SOURCE_FIELDS or source.get('DOI','').lower()!=identifier:
-                    raise ValueError('Unexpected pending DOI source')
-                if entry.get('status') not in ('pending','failed','oa_unverified') or len(json.dumps(source).encode())>32*1024:
-                    raise ValueError('Invalid pending DOI status')
+            if 'last_success' in state:timestamp(state['last_success'])
+            if 'resume' in state:
+                resume=state['resume']
+                if not isinstance(resume,dict) or set(resume)!={'cursor','start','until','processed','started_at'}:raise ValueError('Invalid metadata replay anchor')
+                if not isinstance(resume['cursor'],str) or not 0<len(resume['cursor'])<=200_000:raise ValueError('Invalid metadata cursor')
+                if type(resume['processed']) is not int or resume['processed']<0:raise ValueError('Invalid processed count')
+                for field in ('start','until'):
+                    value=resume[field]
+                    if not isinstance(value,str) or not re.fullmatch(r'\d{4}-\d{2}-\d{2}',value):raise ValueError('Invalid replay date')
+                    datetime.fromisoformat(value)
+                if resume['start']>resume['until']:raise ValueError('Invalid replay order')
+                timestamp(resume['started_at'])
     return snapshot
 
 def read_remote(root):
@@ -61,7 +71,7 @@ def restore(root,work):
         for name,value in files.items():
             path=directory/(name+'.json');temporary=path.with_suffix('.tmp')
             temporary.write_text(json.dumps(value,separators=(',',':')));temporary.replace(path)
-    return 'RESTORED_PUBLIC_PENDING_AND_CHECKPOINTS'
+    return 'RESTORED_METADATA_CHECKPOINTS'
 
 def acknowledged_feed(root,feed_ref,feed_commit,library_sha256):
     """A local commit is insufficient: require the advertised origin and bytes."""
@@ -94,7 +104,7 @@ def save(root,work,run_id,source,*,feed_ref,feed_commit,library_sha256):
         for folder in work.iterdir():
             if not folder.is_dir() or not re.fullmatch('[a-z0-9-]+',folder.name):continue
             files={}
-            for name in ('state','pending'):
+            for name in ('state',):
                 path=folder/(name+'.json')
                 if path.exists():
                     if path.stat().st_size>MAX_BYTES:raise ValueError('Processor state file exceeds bound')
@@ -109,10 +119,10 @@ def save(root,work,run_id,source,*,feed_ref,feed_commit,library_sha256):
         directory=Path(temporary)
         (directory/'state.json').write_text(json.dumps(snapshot,separators=(',',':')))
         git(directory,'init','-b','state');git(directory,'config','user.name','github-actions[bot]');git(directory,'config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
-        git(directory,'add','state.json');git(directory,'commit','-m','Preserve public paper retry state '+str(run_id))
+        git(directory,'add','state.json');git(directory,'commit','-m','Preserve compact paper metadata checkpoints '+str(run_id))
         git(root,'fetch',str(directory),'state');commit=git(root,'rev-parse','FETCH_HEAD').stdout.strip()
         git(root,'push','origin',commit+':'+REF,'--force-with-lease='+REF+':'+(old or ''))
-    return 'SAVED_PUBLIC_PENDING_AND_CHECKPOINTS'
+    return 'SAVED_METADATA_CHECKPOINTS'
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

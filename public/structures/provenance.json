@@ -1,1 +1,3 @@
-{"paclitaxel.png": {"doi": "10.1021/jacs.0c03592", "pdf_page": 3, "locator": "Scheme 1, compound 1; individual chemical diagram only; not machine-readable stereochemistry"}, "doxycycline.png": {"doi": "10.1126/science.1109755", "pdf_page": 2, "locator": "Scheme 1, compound 2; individual chemical diagram only; not machine-readable stereochemistry"}, "svg": "Small-molecule drawings generated from encoded SMILES with RDKit; no paper figures"}
+{
+  "svg": "Chemical diagrams generated only from encoded SMILES with RDKit; source PDF figures and crops are excluded."
+}

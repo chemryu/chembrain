@@ -36,7 +36,7 @@ def persist(repository,work,run='100',commit=None,ref='refs/heads/source',digest
 def state_commit(repository):
     return git(repository,'ls-remote','origin',REF).split()[0]
 
-def test_pending_survives_missing_cache_without_archiving_document_text(tmp_path):
+def test_only_checkpoints_survive_and_private_pending_is_never_read(tmp_path):
     repository,work,library,a=fixture_repo(tmp_path);folder=work/'jacs';folder.mkdir(parents=True)
     source={'DOI':'10.1021/jacs.fixture','type':'journal-article','ISSN':['0002-7863'],'title':['Public title'],'license':[],'link':[]}
     pending={'version':1,'items':{source['DOI']:{'source':source,'status':'pending'}}}
@@ -46,21 +46,21 @@ def test_pending_survives_missing_cache_without_archiving_document_text(tmp_path
     (folder/'archive').mkdir();(folder/'archive/private.pdf').write_bytes(b'PRIVATE PDF')
     assert persist(repository,work).startswith('SAVED')
     payload=git(repository,'show','FETCH_HEAD:state.json')
-    assert 'PRIVATE' not in payload and 'archive' not in payload and 'review' not in payload
+    assert 'PRIVATE' not in payload and 'archive' not in payload and 'review' not in payload and 'Public title' not in payload and 'license' not in payload and 'pending' not in payload
     snapshot=json.loads(payload)
     assert snapshot['feed']=={'ref':'refs/heads/source','commit':a,'library_sha256':hashlib.sha256(library.read_bytes()).hexdigest()}
     shutil.rmtree(work)
     assert restore(repository,work).startswith('RESTORED')
-    assert json.loads((folder/'pending.json').read_text())==pending
+    assert not (folder/'pending.json').exists()
     assert json.loads((folder/'state.json').read_text())==state
     assert not (folder/'archive').exists() and not (folder/'review').exists()
     with pytest.raises(ValueError,match='newer'):
         persist(repository,work,run='99')
     empty=tmp_path/'empty';empty.mkdir();persist(repository,empty,run='101')
     shutil.rmtree(work);restore(repository,work)
-    assert json.loads((folder/'pending.json').read_text())==pending
+    assert not (folder/'pending.json').exists()
     bad={'version':1,'journals':{'jacs':{'pending':{'version':1,'items':{source['DOI']:{'source':{**source,'candidate_text':'document body'},'status':'pending'}}}}}}
-    with pytest.raises(ValueError,match='source'):checked(bad)
+    with pytest.raises(ValueError,match='Unexpected processor state file'):checked(bad)
 
 
 def test_unpublished_feed_cannot_advance_state_and_same_run_published_feed_can(tmp_path):
@@ -114,13 +114,13 @@ def test_first_anchor_recovers_non_oa_metadata_after_output_failure_and_cache_ev
         if Path(path)==library:raise OSError('Injected output replacement failure')
         return real_write(path,value)
     monkeypatch.setattr(pipeline,'write_json',output_failure)
-    with pytest.raises(OSError):pipeline.weekly(ROOT/'paper_pipeline/journals.json',work,library,ROOT/'examples/total-synthesis.json')
+    with pytest.raises(OSError):pipeline.weekly(ROOT/'paper_pipeline/journals.json',work,library,ROOT/'examples/total-synthesis.json',metadata_only=True)
     assert library.read_bytes()==before and (work/'jacs/state.json').read_bytes()==anchor
     assert state_commit(repository)==prior
     shutil.rmtree(work) # total runner/cache loss; only acknowledged A and state branch survive.
     restore(repository,work);clock['now']=datetime(2026,11,24,tzinfo=timezone.utc)
     monkeypatch.setattr(pipeline,'write_json',real_write)
-    report=pipeline.weekly(ROOT/'paper_pipeline/journals.json',work,library,ROOT/'examples/total-synthesis.json')
+    report=pipeline.weekly(ROOT/'paper_pipeline/journals.json',work,library,ROOT/'examples/total-synthesis.json',metadata_only=True)
     output=json.loads(library.read_text())
     assert not report['failures']
     assert sum(p['doi']==article['DOI'] for p in output['papers'])==1
@@ -136,3 +136,13 @@ def test_restore_does_not_trust_unpublished_checkpoint_left_in_cache(tmp_path):
     assert restore(repository,work)=='NO_DURABLE_STATE_YET'
     assert not (folder/'state.json').exists()
     assert (folder/'archive/retained.pdf').exists()
+
+
+@pytest.mark.parametrize('value',[
+ {'pending':{'version':1,'items':{}}},
+ {'state':{'resume':{'cursor':'*','start':'2026-10-01','until':'2026-10-02','processed':0,'started_at':'2026-10-01T00:00:00+00:00','title':'PRIVATE'}}},
+ {'state':{'last_success':'PRIVATE BODY'}},
+ {'archive':'private.pdf'},
+])
+def test_public_snapshot_rejects_old_queue_and_nested_private_fields(value):
+ with pytest.raises(ValueError):checked({'version':1,'journals':{'jacs':value}})

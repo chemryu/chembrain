@@ -1,6 +1,23 @@
 # ChemBrain 진행 위키
 
-## 현재 상태
+## 현재 상태 — 정보 범위 제한 / metadata-only round-01
+
+**현재 소스 정책 검수 PASS / 두 독립 역할 material 지적 0건 — Public 준비 미승인·Pages403**
+
+- 최신 사용자 요청은 GitHub에 논문 PDF를 올리지 않고 reaction, chemical, solution(용매·용질), DOI, 저자만 논문 정보로 다루는 것입니다. 논문 원문·인용문·PDF 그림·추출 후보도 GitHub/Pages 공개 데이터에서 제외했습니다.
+- 실행/회차 `20261018-metadata-only-04 / round-01`; 새 고정 소스 **`6280794c87e7867b0ccd2e2d4f6924814917997a`**. 이전 `56be43bf15b4c98b8b515d2dc3bbd2bd0fcbbbae`의 두 독립 검수 지적 0건은 역사이며 새 변경의 승인이 아닙니다.
+- [Planning](runs/20261018-metadata-only-04/round-01/planning.md) → [Development](runs/20261018-metadata-only-04/round-01/development.md) 완료. [Independent QA](runs/20261018-metadata-only-04/round-01/qa.md)는 같은 소스의 material 지적 0건·현재 정책 PASS를 확인했습니다. 별도 전체 검사 284 PASS/1 SKIP, 집중 56 PASS, 실제 Chromium·payload gate PASS입니다. [Revision](runs/20261018-metadata-only-04/round-01/revision.md)도 독립 집중 38 PASS 및 원본 CI/manifest 대조로 material 지적 0건·현재 정책 PASS를 확정했습니다. 현재 코드 변경 완료와 과거 역사 포함 Public 전환 승인은 구분합니다.
+- 개발 검사: **284 PASS / Windows 전용 DPAPI 1 SKIP**, 웹 production build·실제 Chromium PASS. 중첩 allowlist, DOI/저자만 있는 paper, 레거시 원본 로컬 백업 실패 시 보존, metadata-only 수집·내구성·payload gate를 검사했습니다. 독립 승인으로 대체하지 않습니다.
+- 현재 app은 논문 제목·저널·연도·paper notes를 내보내지 않고 DOI/저자만 참조로 표시합니다. reaction/chemical/solution 조건·연결 ID·근거 위치·draft/검토 상태는 유지합니다. 레거시 원본은 정확한 bytes로 브라우저 안에 별도 백업하며 GitHub 업로드용이 아닙니다. 미확인 구조·조건은 unknown으로 유지합니다.
+- GitHub Actions는 강제 metadata-only로 PDF 다운로드/텍스트 추출을 실행하지 않습니다. paper-work cache는 제거했고 원격 durable state는 명시적 checkpoint/anchor만 저장합니다. 별도 로컬 PDF 처리는 Git 밖 비공개 작업으로 남습니다. PC 주간 작업·기본 브랜치 cron은 활성화하지 않았습니다.
+- [현재 트리](runs/20261018-metadata-only-04/round-01/audit/current-tree.json)와 [dist](runs/20261018-metadata-only-04/round-01/audit/dist.json) payload 검사 PASS. **[도달 가능한 역사 검사](runs/20261018-metadata-only-04/round-01/audit/reachable-history.json)는 PDF blob 0개이나, 과거 인용문 JSON blob 2개와 논문 그림 crop blob 2개를 확인했습니다. 현재 파일 삭제는 과거 commit 삭제가 아닙니다.** 원문 자체는 보고서에 재인용하지 않습니다.
+- GitHub Actions의 과거 artifact/cache·삭제된 ref·서버의 unreachable object는 완전 확인하지 못했습니다. 따라서 Public-safe·모든 원격 원문 제거를 주장하지 않습니다. visibility 변경·역사 재작성·브랜치/태그 삭제·원격 artifact/cache 삭제는 수행하지 않았습니다. 별도 깨끗한 배포 저장소는 대안이며 아직 만들지 않았습니다.
+- 소유자 화면은 현재 비공개 저장소 요금제의 Pages 제한을 확인했습니다. 새 소스 실제 CI `39098202973` / 불변 영수증 `c3add00d19e2e6e2daf1e9d92efe69b3835d48f2`는 284 PASS/1 SKIP·웹 빌드·실제 브라우저·payload gate PASS, collection SKIP입니다. 새 Pages 설정도 실제 **403 Resource not accessible by integration**이며 배포·HTTPS 검사는 NOT RUN, URL null입니다. [원본 6개와 검증 manifest](runs/20261018-metadata-only-04/round-01/web/manifest.json)를 보존했습니다. 실제 공개 URL·production 승인은 없습니다. Box 자동 저장/동기화·개인 AI API 호출도 없습니다.
+
+- 최종 [Wiki 기록](runs/20261018-metadata-only-04/round-01/wiki-record.md)과 [인계](runs/20261018-metadata-only-04/round-01/handoff.md)에 두 독립 원문·해시·정확한 CI 증거·외부 제한을 보존했습니다. 새 코드 수정 지적이 없어 빈 Planning 회차를 만들지 않습니다. 알려진 과거 인용문/그림 처리 또는 깨끗한 별도 배포 저장소 결정이 다음 외부 작업이며 현재 Public 전환은 권하지 않습니다.
+- cloud 환경 draft는 현재 `6280794c87e7867b0ccd2e2d4f6924814917997a` 저장소/소스와 start skill로 갱신 저장했으며 **Publish 필요**입니다. 네트워크·설치·비밀 설정은 바꾸지 않았고 앱 승인의 추가 조건으로 만들지 않습니다.
+
+## 이전 웹 round-03 상태
 
 **SOURCE REVIEW PASS / CODE FINDINGS 0 — 공개 미리보기는 PAGES 설정403으로 BLOCKED**
 

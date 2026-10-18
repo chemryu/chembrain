@@ -2,6 +2,8 @@
 
 ## 현재 상태와 작업 위치
 
+최신 사용자 요청 `20261018-metadata-only-04`는 GitHub에 논문 PDF·원문·인용문·논문 이미지·추출 후보를 올리지 않고, reaction/chemical/solution(용매·용질)/DOI/저자만 논문 정보로 다루도록 제한합니다. 내부 ID·조건·근거 위치·검토 상태는 연결과 검수를 위해 유지합니다. GitHub 수집은 metadata-only이며 PDF 작업 캐시를 업로드하지 않습니다. 로컬 원본은 Git 밖에서만 처리합니다. 과거 커밋의 원문 인용문·그림이 실제 확인되었으므로 현재 파일 정리와 역사 삭제를 구분하고, 저장소 공개 전환이나 공유 역사 재작성은 자동 수행하지 않습니다.
+
 - 공용 작업 공간: GitHub 저장소 `chemryu/chembrain`
 - 실행 소스 브랜치: `codex/gpt-agent-workflow`
 - 위키·진행 상태·회차 보고서의 원본 브랜치: `codex/gpt-workflow-records` — 게시 완료; 최종 보고서는 실행 소스와 분리해 기록

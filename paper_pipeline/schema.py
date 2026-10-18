@@ -1,13 +1,10 @@
 """Portable v1 contract shared with ``src/libraryData.ts``.
 
-All four entity tables and each row's ID are required. Paper journal/title/DOI/
-authors, chemical name/kind/aliases, solution solvents/solutes/concentration/
-concentration_unit, and reaction name/status/reactants/products/targets/steps/
-evidence/yield_percent are required. Unknown scientific numbers and units use
-explicit null; absent required fields are rejected, never invented. Optional
-notes, structure metadata, year and generated_at may be absent or null. Required
-array fields may be empty except reaction reactants/products/evidence. Every
-nested step/solute/evidence must be an object with its required fields.
+All entity tables and IDs are required. Papers contain only ID, DOI and authors.
+Known chemistry, solutions, stage conditions and evidence locators use explicit
+allowlists at every nested object. Unknown numbers/units use explicit null.
+Optional bounded technical annotations may be absent or null. Private document
+text, arbitrary objects and old paper metadata are not portable library data.
 
 Only JSON values, finite numbers, strings of <=3000 UTF-16 code units and a
 serialized UTF-8 package <=5 MB are transferable. Document payload keys are
@@ -88,6 +85,42 @@ def _compact(value):
         raise ValueError('Only JSON values may be transferred')
 
 
+_ALLOWED = {
+    'papers': {'id', 'doi', 'authors'},
+    'chemicals': {'id', 'name', 'kind', 'aliases', 'smiles', 'inchikey', 'formula', 'molecular_weight', 'notes'},
+    'solutions': {'id', 'solvents', 'solutes', 'concentration', 'concentration_unit'},
+    'reactions': {'id', 'name', 'reactants', 'products', 'targets', 'yield_percent', 'yield_basis', 'status', 'steps', 'evidence', 'notes'},
+}
+_LEGACY_PAPER = {'title', 'journal', 'year', 'notes'}
+
+
+def _keys(value, allowed):
+    if not isinstance(value, dict) or set(value) - allowed:
+        raise ValueError('Only explicitly allowed normalized fact fields may be transferred')
+
+
+def project_legacy_library(data):
+    """Explicit non-mutating projection of known old-v1 paper metadata only.
+
+    Callers must preserve the original private local bytes before replacing them.
+    This helper does not turn arbitrary/unknown document fields into valid facts.
+    """
+    if not isinstance(data, dict) or not isinstance(data.get('papers'), list):
+        raise ValueError('Expected known legacy-v1 package')
+    projected = copy.deepcopy(data)
+    for paper in projected['papers']:
+        _keys(paper, _ALLOWED['papers'] | _LEGACY_PAPER)
+        if ('title' in paper and (not _string(paper['title']) or not paper['title'])
+                or 'journal' in paper and not _string(paper['journal'])
+                or 'notes' in paper and not _optional_string(paper['notes'])
+                or 'year' in paper and paper['year'] is not None and
+                (not _number(paper['year'], 1500, 3000) or int(paper['year']) != paper['year'])):
+            raise ValueError('Invalid known legacy paper metadata')
+        for field in _LEGACY_PAPER:
+            paper.pop(field, None)
+    return validate(projected)
+
+
 def _validate(data, *, allow_duplicate_doi=False):
     if not isinstance(data, dict) or isinstance(data.get('schema_version'), bool) or data.get('schema_version') != 1:
         raise ValueError('Expected Chembrain package schema_version 1')
@@ -108,6 +141,7 @@ def _validate(data, *, allow_duplicate_doi=False):
             raise ValueError('Missing entity table: ' + kind)
         ids[kind] = set()
         for row in data[kind]:
+            _keys(row, _ALLOWED[kind])
             identifier = row.get('id') if isinstance(row, dict) else None
             if not _string(identifier) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,120}', identifier) or identifier in ids[kind]:
                 raise ValueError('Invalid or duplicate entity ID in ' + kind)
@@ -115,11 +149,8 @@ def _validate(data, *, allow_duplicate_doi=False):
     data = copy.deepcopy(data)
     seen = set()
     for p in data['papers']:
-        year = p.get('year')
-        if (not _string(p.get('title')) or not p['title'] or not _string(p.get('journal'))
-                or not _strings(p.get('authors')) or not _optional_string(p.get('notes'))
-                or (year is not None and (not _number(year, 1500, 3000) or int(year) != year))):
-            raise ValueError('Paper title, journal, DOI and authors are required')
+        if not _strings(p.get('authors')):
+            raise ValueError('Paper DOI and authors are required')
         p['doi'] = doi(p.get('doi'))
         if p['doi'] in seen and not allow_duplicate_doi:
             raise ValueError('Paper DOI must be unique')
@@ -137,6 +168,7 @@ def _validate(data, *, allow_duplicate_doi=False):
                 or not _optional_string(s.get('concentration_unit', _MISSING))):
             raise ValueError('Invalid solution metadata')
         for solute in s['solutes']:
+            _keys(solute, {'chemical_id', 'role', 'amount', 'unit'})
             if (not isinstance(solute, dict) or not _string(solute.get('chemical_id'))
                     or solute['chemical_id'] not in ids['chemicals'] or not _string(solute.get('role'))
                     or not _nullable_number(solute.get('amount', _MISSING))
@@ -154,6 +186,7 @@ def _validate(data, *, allow_duplicate_doi=False):
         if not isinstance(r.get('steps'), list):
             raise ValueError('Reaction steps must be an array')
         for step in r['steps']:
+            _keys(step, {'solution_id', 'temperature', 'time', 'notes'})
             if (not isinstance(step, dict) or not _string(step.get('solution_id'))
                     or step['solution_id'] not in ids['solutions']
                     or any(not _optional_string(step.get(f)) for f in ('temperature', 'time', 'notes'))):
@@ -161,6 +194,7 @@ def _validate(data, *, allow_duplicate_doi=False):
         if not isinstance(r.get('evidence'), list) or not r['evidence']:
             raise ValueError('Reaction requires source DOI and PDF page/locator')
         for evidence in r['evidence']:
+            _keys(evidence, {'paper_id', 'page', 'locator'})
             page = evidence.get('page') if isinstance(evidence, dict) else None
             if (not isinstance(evidence, dict) or not _string(evidence.get('paper_id'))
                     or evidence['paper_id'] not in ids['papers']
@@ -206,6 +240,7 @@ def normalize(data):
     for s in data['solutions']:
         s['solvents'] = [chemical_map[x] for x in s['solvents']]
         for solute in s['solutes']:
+            _keys(solute, {'chemical_id', 'role', 'amount', 'unit'})
             solute['chemical_id'] = chemical_map[solute['chemical_id']]
     for r in data['reactions']:
         for field in ('reactants', 'products', 'targets'):

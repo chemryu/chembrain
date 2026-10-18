@@ -1,1 +1,42 @@
-{"paclitaxel": {"smiles": null, "name": "Paclitaxel (Taxol)", "file": "paclitaxel.png"}, "doxycycline": {"smiles": null, "name": "Doxycycline", "file": "doxycycline.png"}, "benzoic-acid": {"smiles": "O=C(O)c1ccccc1", "name": "Benzoic acid", "file": "benzoic-acid.svg"}, "thf": {"smiles": "C1CCOC1", "name": "Tetrahydrofuran", "file": "thf.svg"}, "dcm": {"smiles": "ClCCl", "name": "Dichloromethane", "file": "dcm.svg"}, "toluene": {"smiles": "Cc1ccccc1", "name": "Toluene", "file": "toluene.svg"}, "ethanol": {"smiles": "CCO", "name": "Ethanol", "file": "ethanol.svg"}, "acetonitrile": {"smiles": "CC#N", "name": "Acetonitrile", "file": "acetonitrile.svg"}, "methanol": {"smiles": "CO", "name": "Methanol", "file": "methanol.svg"}, "pyridine": {"smiles": "c1ccncc1", "name": "Pyridine", "file": "pyridine.svg"}}
+{
+  "benzoic-acid": {
+    "smiles": "O=C(O)c1ccccc1",
+    "name": "Benzoic acid",
+    "file": "benzoic-acid.svg"
+  },
+  "thf": {
+    "smiles": "C1CCOC1",
+    "name": "Tetrahydrofuran",
+    "file": "thf.svg"
+  },
+  "dcm": {
+    "smiles": "ClCCl",
+    "name": "Dichloromethane",
+    "file": "dcm.svg"
+  },
+  "toluene": {
+    "smiles": "Cc1ccccc1",
+    "name": "Toluene",
+    "file": "toluene.svg"
+  },
+  "ethanol": {
+    "smiles": "CCO",
+    "name": "Ethanol",
+    "file": "ethanol.svg"
+  },
+  "acetonitrile": {
+    "smiles": "CC#N",
+    "name": "Acetonitrile",
+    "file": "acetonitrile.svg"
+  },
+  "methanol": {
+    "smiles": "CO",
+    "name": "Methanol",
+    "file": "methanol.svg"
+  },
+  "pyridine": {
+    "smiles": "c1ccncc1",
+    "name": "Pyridine",
+    "file": "pyridine.svg"
+  }
+}
