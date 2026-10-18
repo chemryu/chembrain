@@ -1,0 +1,120 @@
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Baran compound 34"':
+        - img
+        - text: Structure not encoded
+        - strong: Baran compound 34
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Baran compound 35"':
+        - img
+        - text: Structure not encoded
+        - strong: Baran compound 35
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 17"':
+        - img
+        - text: Structure not encoded
+        - strong: Holton compound 17
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 18"':
+        - img
+        - text: Structure not encoded
+        - strong: Holton compound 18
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 20b"':
+        - img
+        - text: Structure not encoded
+        - strong: Holton compound 20b
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 21"':
+        - img
+        - text: Structure not encoded
+        - strong: Holton compound 21
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 24b"':
+        - img
+        - text: Structure not encoded
+        - strong: Holton compound 24b
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 25"':
+        - img
+        - text: Structure not encoded
+        - strong: Holton compound 25
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 5"':
+        - img
+        - text: Structure not encoded
+        - strong: Holton compound 5
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 6"':
+        - img
+        - text: Structure not encoded
+        - strong: Holton compound 6
+        - text: Structure pending
+      - text: Selected molecule
+      - 'button "Open molecule: Paclitaxel (Taxol)"':
+        - img
+        - text: Structure not encoded
+        - strong: Paclitaxel (Taxol)
+        - text: C47H51NO14
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Taxol coupling and hydrogenolysis sequence"':
+        - text: Draft · verify source
+        - strong: Taxol coupling and hydrogenolysis sequence
+        - text: 85% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Taxol side-chain coupling and deprotection sequence"':
+        - text: Draft · verify source
+        - strong: Taxol side-chain coupling and deprotection sequence
+        - text: 93% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: DMDO oxidation"':
+        - text: Draft · verify source
+        - strong: DMDO oxidation
+        - text: 49% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Enol-silane formation"':
+        - text: Draft · verify source
+        - strong: Enol-silane formation
+        - text: 94% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: TPAP oxidation"':
+        - text: Draft · verify source
+        - strong: TPAP oxidation
+        - text: 81% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Dieckmann C-ring closure"':
+        - text: Draft · verify source
+        - strong: Dieckmann C-ring closure
+        - text: 93% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Methylmagnesium addition"':
+        - text: Draft · verify source
+        - strong: Methylmagnesium addition
+        - text: 95% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Oxetane ring closure"':
+        - text: Draft · verify source
+        - strong: Oxetane ring closure
+        - text: Yield not reported View conditions & DOI ↗
+      - img
+    - paragraph: Drag the background to pan; drag a card header to arrange it. Click a molecule to explore it or a reaction for conditions and DOI. Use List for a linear view. Layout changes are not saved as chemistry data.
+- contentinfo:
+  - img
+  - text: Only chemistry facts, DOI and authors are shared. Source PDFs and paper images are excluded. Draft structures and conditions require review. 3 papers · 12 draft/curated records · 22 KB data

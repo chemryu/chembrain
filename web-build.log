@@ -1,0 +1,14 @@
+
+> chembrain@0.2.0 build:web
+> tsc -b && vite build
+
+[36mvite v8.3.4 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 1735 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.71 kB │ gzip:   0.48 kB
+dist/assets/index-BntVr_hs.css   61.87 kB │ gzip:  13.02 kB
+dist/assets/index-_Z7W8QHx.js   434.83 kB │ gzip: 137.26 kB
+
+[32m✓ built in 172ms[39m
