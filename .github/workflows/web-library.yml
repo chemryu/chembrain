@@ -51,12 +51,6 @@ jobs:
           npm ci
           python -m pip install playwright==1.62.0
           python -m playwright install --with-deps chromium
-      - uses: actions/cache@v4
-        if: github.event_name == 'schedule' || inputs.collect == true
-        with:
-          path: ${{ runner.temp }}/chembrain-paper-processor
-          key: chembrain-paper-processor-${{ github.run_id }}
-          restore-keys: chembrain-paper-processor-
       - name: Restore durable public DOI retry state
         if: github.event_name == 'schedule' || inputs.collect == true
         run: python scripts/paper_state.py restore --work-dir "$RUNNER_TEMP/chembrain-paper-processor"
@@ -73,7 +67,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: |
-          python -m paper_pipeline weekly --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --out public/library.json
+          python -m paper_pipeline weekly --metadata-only --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --out public/library.json
       - name: Preserve only normalized weekly data
         id: feed
         if: github.event_name == 'schedule' || inputs.collect == true
@@ -95,6 +89,8 @@ jobs:
           FEED_COMMIT: ${{ steps.feed.outputs.commit }}
           LIBRARY_SHA: ${{ steps.feed.outputs.sha256 }}
         run: python scripts/paper_state.py save --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --feed-ref "$GITHUB_REF" --feed-commit "$FEED_COMMIT" --library-sha256 "$LIBRARY_SHA"
+      - name: Reject source document payloads
+        run: python scripts/check_repository_payloads.py
       - name: Capture actual build identity
         id: identity
         run: |
@@ -128,6 +124,8 @@ jobs:
           set -euo pipefail
           python scripts/report_web_build.py
           python scripts/web_smoke.py 2>&1 | tee web-browser.log
+      - name: Reject document payloads in the Pages artifact
+        run: python scripts/check_repository_payloads.py --dist dist
       - name: Record artifact stage
         env: { WEB_PHASE: upload-pages-artifact }
         run: python scripts/report_web_build.py

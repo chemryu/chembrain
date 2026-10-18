@@ -26,7 +26,7 @@ def fixture(tmp_path,monkeypatch,count=1,existing=True,journals=1):
     config=tmp_path/'journals.json';config.write_text(json.dumps({'journals':entries}))
     work=tmp_path/'archive';out=tmp_path/'library.json'
     original=json.loads(CURATED.read_text())
-    original['papers'].append({'id':'user-paper','doi':'10.1021/jacs.personal','title':'My edited title','journal':'JACS','authors':['My author'],'notes':'Keep my private user note'})
+    original['papers'].append({'id':'user-paper','doi':'10.1021/jacs.personal','authors':['My author']})
     if existing:out.write_text(json.dumps(original))
     items={journal['issn']:[{'DOI':f'10.1021/jacs.durable-{journal["id"]}-{i}','type':'journal-article','ISSN':[journal['issn']],'title':[f'Durable {i}'],'author':[{'given':'Ada','family':'Chemist'}]} for i in range(count)] for journal in entries}
     calls=[]
@@ -42,7 +42,7 @@ def fixture(tmp_path,monkeypatch,count=1,existing=True,journals=1):
         assert cursor in ('*','page-two')
         return json.dumps({'message':{'items':selected[offset:offset+100],'total-results':len(selected),'next-cursor':'page-two'}}).encode()
     monkeypatch.setattr(CrossrefClient,'_get',get)
-    def run(max_pages=3):return pipeline.weekly(config,work,out,CURATED,max_pages)
+    def run(max_pages=3):return pipeline.weekly(config,work,out,CURATED,max_pages,metadata_only=True)
     def assert_recovered():
         data=validate(json.loads(out.read_text()));counts=Counter(p['doi'] for p in data['papers'])
         assert all(counts[item['DOI']]==1 for journal_items in items.values() for item in journal_items)

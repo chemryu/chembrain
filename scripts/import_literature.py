@@ -23,7 +23,7 @@ from server.models import ReactionInput, SourceMetadataInput  # noqa: E402
 
 
 def preflight(manifest: dict, attachments: Path) -> dict[str, Path]:
-    """Check every PDF, structure, and quote before making the first API write."""
+    """Check local PDF identity, structures and locators; verify optional local-only quotes."""
     paths = {}
     pages = {}
     for source in manifest["sources"]:
@@ -53,7 +53,7 @@ def preflight(manifest: dict, attachments: Path) -> dict[str, Path]:
         for item in reaction["evidence"]:
             if item["source"] not in pages or not 1 <= item["page"] <= len(pages[item["source"]]):
                 raise ValueError(f"잘못된 자료/페이지: {reaction['key']}")
-            if " ".join(item["quote"].split()) not in pages[item["source"]][item["page"] - 1]:
+            if item.get("quote") and " ".join(item["quote"].split()) not in pages[item["source"]][item["page"] - 1]:
                 raise ValueError(f"원문과 일치하지 않는 인용: {reaction['key']}, {item['source']} p.{item['page']}")
             evidence.append({"source_id": item["source"], **{k: v for k, v in item.items() if k != "source"}})
         ReactionInput(**{**reaction, "evidence": evidence})

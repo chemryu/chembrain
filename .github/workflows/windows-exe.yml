@@ -34,6 +34,8 @@ jobs:
           npm ci 2>&1 | tee -a dependencies.log
           python -m pip install playwright==1.62.0 2>&1 | tee -a dependencies.log
           python -m playwright install chromium 2>&1 | tee -a dependencies.log
+      - name: Reject source document payloads
+        run: python scripts/check_repository_payloads.py
       - id: validation
         name: Build English interface and test API
         shell: bash

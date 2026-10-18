@@ -1,7 +1,7 @@
 """Separate weekly paper processor. PDFs/review candidates never enter the web bundle."""
 import argparse
 from datetime import datetime,timedelta,timezone
-import hashlib,json,re,sys,tempfile,urllib.parse
+import hashlib,json,os,re,sys,tempfile,urllib.parse
 from pathlib import Path
 import pymupdf
 from .schema import doi,key,validate,normalize
@@ -21,6 +21,7 @@ def private_work(path):
  return path
 
 def ingest(pdf,work,explicit_doi=None):
+ if os.environ.get("GITHUB_ACTIONS"):raise ValueError("PDF ingestion is disabled in GitHub Actions")
  pdf=Path(pdf);work=private_work(work);work.mkdir(parents=True,exist_ok=True)
  if pdf.stat().st_size>30*1024*1024:raise ValueError('PDF exceeds 30 MB')
  digest=hashlib.sha256(pdf.read_bytes()).hexdigest()
@@ -126,9 +127,11 @@ def prepare_anchors(config,work,out):
  return {'journals':[slug for slug,_,_ in pending]}
 
 
-def weekly(config,work,out,curated,max_pages=3):
+def weekly(config,work,out,curated,max_pages=3,metadata_only=False):
  from server.jacs_collection import CrossrefClient,_licensed_pdf,_save_pdf,_utc,_attachment_valid
  from server.store import Store
+ # Environment policy cannot be disabled by a missing or false CLI flag.
+ metadata_only=bool(metadata_only or os.environ.get("GITHUB_ACTIONS"))
  prepare_anchors(config,work,out)
  config=json.loads(Path(config).read_text());work=private_work(work);work.mkdir(parents=True,exist_ok=True)
  data=normalize(json.loads(Path(curated).read_text()))
@@ -138,15 +141,15 @@ def weekly(config,work,out,curated,max_pages=3):
    ids={r['id'] for r in data[table]};data[table].extend(r for r in previous[table] if r['id'] not in ids)
   data['generated_at']=previous.get('generated_at')
   data=normalize(data)
- known={p['doi'] for p in data['papers']};report={'journals':[],'pdf_policy':'explicit_open_license_only','failures':[]};metadata_states=[]
+ known={p['doi'] for p in data['papers']};report={'journals':[],'pdf_policy':'metadata_only' if metadata_only else 'local_explicit_open_license_only','failures':[]};metadata_states=[]
  for journal in config['journals']:
   if not journal.get('enabled',True):continue
   slug=journal['id'];issn=journal['issn']
   if not re.fullmatch(r'[a-z0-9-]+',slug) or not re.fullmatch(r'\d{4}-[\dX]{4}',issn):raise ValueError('Invalid journal configuration')
   folder=work/slug;folder.mkdir(exist_ok=True);statefile=folder/'state.json';state=_journal_state(statefile)
   pendingfile=folder/'pending.json'
-  if pendingfile.exists() and pendingfile.stat().st_size>PENDING_BYTES:raise ValueError('Pending work exceeds bound')
-  pending=json.loads(pendingfile.read_text())['items'] if pendingfile.exists() else {}
+  if not metadata_only and pendingfile.exists() and pendingfile.stat().st_size>PENDING_BYTES:raise ValueError('Pending work exceeds bound')
+  pending=json.loads(pendingfile.read_text())['items'] if not metadata_only and pendingfile.exists() else {}
   if not isinstance(pending,dict):raise ValueError('Invalid pending work')
   if len(pending)>PENDING_LIMIT:raise ValueError('Pending work exceeds bound')
   now=datetime.now(timezone.utc);start=now-timedelta(days=14)
@@ -160,11 +163,11 @@ def weekly(config,work,out,curated,max_pages=3):
   if resume:
    start=datetime.fromisoformat(resume['start']).replace(tzinfo=timezone.utc);until=resume['until'];cursor=resume['cursor'];processed=resume['processed'];crawl_started=resume['started_at']
   if str(start.date())>until:raise ValueError('Invalid metadata window order')
-  store=Store(folder/'archive');fresh={};attempts=0;reused=0;reviews=0;blocked=0;deferred=0
+  store=None if metadata_only else Store(folder/'archive');fresh={};attempts=0;reused=0;reviews=0;blocked=0;deferred=0
   def add_paper(item):
    identifier=doi(item['DOI'])
    if identifier not in known:
-    paper={'id':key('paper',identifier),'doi':identifier,'title':str(item.get('title',['Untitled'])[0])[:1000],'journal':journal['name'],'authors':[' '.join(str(a.get(k,'')) for k in ('given','family')).strip() for a in item.get('author',[]) if isinstance(a,dict)],'notes':'Public Crossref bibliography. Reaction extraction and article identity require review.'}
+    paper={'id':key('paper',identifier),'doi':identifier,'authors':[' '.join(str(a.get(k,'')) for k in ('given','family')).strip() or str(a.get('name','')).strip() for a in item.get('author',[]) if isinstance(a,dict)]}
     data['papers'].append(paper);known.add(identifier)
    return identifier
   try:
@@ -179,7 +182,7 @@ def weekly(config,work,out,curated,max_pages=3):
     for item in items:
      if item.get('type')!='journal-article' or issn not in item.get('ISSN',[]):continue
      identifier=add_paper(item);count+=1
-     if slug!='jacs':continue
+     if metadata_only or slug!='jacs':continue
      attachment=store.get_metadata('jacs_collection_attachments',{}).get(identifier)
      valid=attachment and _attachment_valid(store,identifier,attachment)
      if valid and _review_valid(folder,identifier,attachment):continue
@@ -244,7 +247,7 @@ def weekly(config,work,out,curated,max_pages=3):
    except Exception as error:
     entry['status']='failed';pending.pop(identifier,None);pending[identifier]=entry;_save_pending(pendingfile,pending)
     report['failures'].append(slug+' PDF/review: '+type(error).__name__)
-  report['journals'].append({'journal':slug,'bibliographic_items':count,'pdfs_saved':pdfs,'pdf_work_attempted':attempts,'pdfs_reused':reused,'reviews_created':reviews,'pending':len(pending),'deferred':deferred,'oa_unverified':blocked,'window_start':start.date().isoformat(),'complete':complete,'metadata_complete':complete,'downloads_complete':not pending,'pdf_resolver':'ACS explicit CC license' if slug=='jacs' else 'DOI-only; local PDF ingestion available'})
+  report['journals'].append({'journal':slug,'bibliographic_items':count,'pdfs_saved':pdfs,'pdf_work_attempted':attempts,'pdfs_reused':reused,'reviews_created':reviews,'pending':len(pending),'deferred':deferred,'oa_unverified':blocked,'window_start':start.date().isoformat(),'complete':complete,'metadata_complete':complete,'downloads_complete':None if metadata_only else not pending,'pdf_resolver':'disabled: metadata only' if metadata_only else ('ACS explicit CC license' if slug=='jacs' else 'DOI-only; local PDF ingestion available')})
  # Keep outputs compact. Neither archive paths nor review text are exported.
  if not report['failures']:data['generated_at']=datetime.now(timezone.utc).isoformat()
  write_json(out,validate(data))
@@ -263,7 +266,7 @@ def main():
  a=sub.add_parser('ingest');a.add_argument('pdfs',nargs='+');a.add_argument('--work-dir',type=Path,required=True);a.add_argument('--doi')
  a=sub.add_parser('export');a.add_argument('--curated',type=Path,required=True);a.add_argument('--out',type=Path,required=True)
  a=sub.add_parser('anchor');a.add_argument('--config',default='paper_pipeline/journals.json');a.add_argument('--work-dir',type=Path,required=True);a.add_argument('--out',type=Path,required=True)
- a=sub.add_parser('weekly');a.add_argument('--config',default='paper_pipeline/journals.json');a.add_argument('--work-dir',type=Path,required=True);a.add_argument('--curated',default='examples/total-synthesis.json');a.add_argument('--out',type=Path,required=True);a.add_argument('--max-pages',type=int,default=3)
+ a=sub.add_parser('weekly');a.add_argument('--config',default='paper_pipeline/journals.json');a.add_argument('--work-dir',type=Path,required=True);a.add_argument('--curated',default='examples/total-synthesis.json');a.add_argument('--out',type=Path,required=True);a.add_argument('--max-pages',type=int,default=3);a.add_argument('--metadata-only',action='store_true',help='Collect DOI/authors only; never process PDF work (mandatory in GitHub Actions)')
  args=p.parse_args()
  if args.command=='ingest':
   if args.doi and len(args.pdfs)!=1:p.error('--doi applies to a single PDF')
@@ -273,6 +276,6 @@ def main():
  elif args.command=='anchor':print(json.dumps(prepare_anchors(args.config,args.work_dir,args.out)))
  else:
   if not 1<=args.max_pages<=20:p.error('--max-pages must be 1–20')
-  report=weekly(args.config,args.work_dir,args.out,args.curated,args.max_pages);print(json.dumps(report));return 1 if report['failures'] else 0
+  report=weekly(args.config,args.work_dir,args.out,args.curated,args.max_pages,metadata_only=args.metadata_only);print(json.dumps(report));return 1 if report['failures'] else 0
  return 0
 if __name__=='__main__':raise SystemExit(main())

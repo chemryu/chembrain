@@ -6,17 +6,17 @@ from paper_pipeline.schema import validate
 from server.chemistry import describe_molecule,molecule_svg
 
 D={'schema_version':1,'papers':[],'chemicals':[],'solutions':[],'reactions':[]}
-def paper(id,doi,title,journal,year,authors):
- D['papers'].append(dict(id=id,doi=doi,title=title,journal=journal,year=year,authors=authors.split(';'),notes='Curated from uploaded main article; supporting information not supplied for this route.'))
+def paper(id,doi,authors):
+ D['papers'].append(dict(id=id,doi=doi,authors=authors.split(';')))
 def chem(id,name,kind='compound',smiles=None,aliases=None,formula=None):
  c=dict(id=id,name=name,kind=kind,smiles=smiles,aliases=aliases or [],notes='' if smiles else 'Structure not encoded; compound label is local to the cited paper.')
  if formula:c['formula']=formula
  if smiles:
   c.update(describe_molecule(smiles));p=Path('public/structures');p.mkdir(exist_ok=True);(p/(id+'.svg')).write_text(molecule_svg(smiles))
  D['chemicals'].append(c);return id
-paper('holton','10.1021/ja00083a067','First Total Synthesis of Taxol. 2. Completion of the C and D Rings','JACS',1994,'Robert A. Holton;Hyeong-Baik Kim;Carmen Somoza;Feng Liang;Ronald J. Biediger;P. Douglas Boatman;Mitsuru Shindo;Chase C. Smith;Soekchan Kim;Hossain Nadizadeh;Yukio Suzuki;Chunlin Tao;Phong Vu;Suhan Tang;Pingsheng Zhang;Krishna K. Murthi;Lisa N. Gentile;Jyanwei H. Liu')
-paper('charest','10.1126/science.1109755','A Convergent Enantioselective Route to Structurally Diverse 6-Deoxytetracycline Antibiotics','Science',2005,'Mark G. Charest;Christian D. Lerner;Jason D. Brubaker;Dionicio R. Siegel;Andrew G. Myers')
-paper('baran','10.1021/jacs.0c03592','Two-Phase Synthesis of Taxol','JACS',2020,'Yuzuru Kanda;Hugh Nakamura;Shigenobu Umemiya;Ravi Kumar Puthukanoori;Venkata Ramana Murthy Appala;Gopi Krishna Gaddamanugu;Bheema Rao Paraselli;Phil S. Baran')
+paper('holton','10.1021/ja00083a067','Robert A. Holton;Hyeong-Baik Kim;Carmen Somoza;Feng Liang;Ronald J. Biediger;P. Douglas Boatman;Mitsuru Shindo;Chase C. Smith;Soekchan Kim;Hossain Nadizadeh;Yukio Suzuki;Chunlin Tao;Phong Vu;Suhan Tang;Pingsheng Zhang;Krishna K. Murthi;Lisa N. Gentile;Jyanwei H. Liu')
+paper('charest','10.1126/science.1109755','Mark G. Charest;Christian D. Lerner;Jason D. Brubaker;Dionicio R. Siegel;Andrew G. Myers')
+paper('baran','10.1021/jacs.0c03592','Yuzuru Kanda;Hugh Nakamura;Shigenobu Umemiya;Ravi Kumar Puthukanoori;Venkata Ramana Murthy Appala;Gopi Krishna Gaddamanugu;Bheema Rao Paraselli;Phil S. Baran')
 chem('paclitaxel','Paclitaxel (Taxol)',aliases=['Taxol','(-)-Taxol'],formula='C47H51NO14')
 chem('doxycycline','Doxycycline',aliases=['(-)-Doxycycline'],formula='C22H24N2O8')
 chem('benzoic-acid','Benzoic acid',smiles='O=C(O)c1ccccc1')

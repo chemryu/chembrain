@@ -4,9 +4,6 @@
     {
       "id": "holton",
       "doi": "10.1021/ja00083a067",
-      "title": "First Total Synthesis of Taxol. 2. Completion of the C and D Rings",
-      "journal": "JACS",
-      "year": 1994,
       "authors": [
         "Robert A. Holton",
         "Hyeong-Baik Kim",
@@ -26,30 +23,22 @@
         "Krishna K. Murthi",
         "Lisa N. Gentile",
         "Jyanwei H. Liu"
-      ],
-      "notes": "Curated from uploaded main article; supporting information not supplied for this route."
+      ]
     },
     {
       "id": "charest",
       "doi": "10.1126/science.1109755",
-      "title": "A Convergent Enantioselective Route to Structurally Diverse 6-Deoxytetracycline Antibiotics",
-      "journal": "Science",
-      "year": 2005,
       "authors": [
         "Mark G. Charest",
         "Christian D. Lerner",
         "Jason D. Brubaker",
         "Dionicio R. Siegel",
         "Andrew G. Myers"
-      ],
-      "notes": "Curated from uploaded main article; supporting information not supplied for this route."
+      ]
     },
     {
       "id": "baran",
       "doi": "10.1021/jacs.0c03592",
-      "title": "Two-Phase Synthesis of Taxol",
-      "journal": "JACS",
-      "year": 2020,
       "authors": [
         "Yuzuru Kanda",
         "Hugh Nakamura",
@@ -59,8 +48,7 @@
         "Gopi Krishna Gaddamanugu",
         "Bheema Rao Paraselli",
         "Phil S. Baran"
-      ],
-      "notes": "Curated from uploaded main article; supporting information not supplied for this route."
+      ]
     }
   ],
   "chemicals": [

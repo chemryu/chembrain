@@ -5,6 +5,10 @@ import pytest
 from paper_pipeline.schema import normalize,validate
 from paper_pipeline.__main__ import ingest,weekly,prepare_anchors
 ROOT=Path(__file__).resolve().parents[1]
+@pytest.fixture(autouse=True)
+def local_processor_environment(monkeypatch):
+ monkeypatch.delenv('GITHUB_ACTIONS',raising=False)
+
 def sample():return json.loads((ROOT/'examples/total-synthesis.json').read_text())
 def test_starter_has_no_paper_body_and_has_page_evidence():
  d=validate(sample());assert len(d['papers'])==3 and len(d['reactions'])==12
@@ -53,7 +57,7 @@ def test_weekly_verified_oa_goes_only_to_private_archive(tmp_path,monkeypatch):
  monkeypatch.setattr(CrossrefClient,'pdf',lambda *a:pdf)
  out=tmp_path/'library.json';report=weekly(ROOT/'paper_pipeline/journals.json',tmp_path/'archive',out,ROOT/'examples/total-synthesis.json')
  assert not report['failures'];assert report['journals'][0]['pdfs_saved']==1
- assert list((tmp_path/'archive').rglob('*.pdf'));assert 'jacs_pdfs' not in out.read_text();assert 'Fixture' in out.read_text()
+ assert list((tmp_path/'archive').rglob('*.pdf'));assert 'jacs_pdfs' not in out.read_text();assert next(p for p in json.loads(out.read_text())['papers'] if p['doi']==item['DOI'])=={'id':__import__('paper_pipeline.schema',fromlist=['key']).key('paper',item['DOI']),'doi':item['DOI'],'authors':['Ada Chemist']}
  repeat=weekly(ROOT/'paper_pipeline/journals.json',tmp_path/'archive',out,ROOT/'examples/total-synthesis.json');assert repeat['journals'][0]['pdfs_saved']==0
 
 # Controlled public-gateway fixtures only: no ACS/Crossref requests are made.
@@ -200,3 +204,33 @@ def test_weekly_queue_bound_keeps_metadata_page_retryable(tmp_path,monkeypatch):
  assert state['resume']['cursor']=='*' and 'last_success' not in state
  second=run();assert not second['failures'] and second['journals'][0]['pdfs_saved']==1 and not pending()
  assert len(calls['downloads'])==2
+
+
+@pytest.mark.parametrize('ci,flag',[(False,True),(True,False),(True,True)])
+def test_metadata_only_never_reads_queue_resolves_saves_or_ingests_pdf(tmp_path,monkeypatch,ci,flag):
+ import paper_pipeline.__main__ as pipeline
+ import server.jacs_collection as collector
+ import server.store as storage
+ if ci:monkeypatch.setenv('GITHUB_ACTIONS','true')
+ article={'DOI':'10.1021/jacs.metadata-only','type':'journal-article','ISSN':['0002-7863'],'title':['PRIVATE TITLE'],'abstract':'PRIVATE BODY','author':[{'given':'Ada','family':'Chemist'},{'name':'Chemistry Consortium'}],'license':[{'URL':'PRIVATE LICENSE'}],'link':[{'URL':'PRIVATE PDF ROUTE'}]}
+ def forbidden(*a,**k):raise AssertionError('PDF/private processing is forbidden')
+ monkeypatch.setattr(collector.CrossrefClient,'_get',lambda self,url,*a:json.dumps({'message':{'items':[article],'total-results':1}}).encode() if '/journals/' in url else forbidden())
+ for name in ('_licensed_pdf','_save_pdf','_attachment_valid'):monkeypatch.setattr(collector,name,forbidden)
+ monkeypatch.setattr(collector.CrossrefClient,'pdf',forbidden);monkeypatch.setattr(storage,'Store',forbidden);monkeypatch.setattr(pipeline,'ingest',forbidden);monkeypatch.setattr(pipeline,'_queue_source',forbidden)
+ work=tmp_path/'work';folder=work/'jacs';folder.mkdir(parents=True)
+ # Invalid pending JSON proves metadata collection never even reads it.
+ pending=folder/'pending.json';pending.write_text('PRIVATE INVALID QUEUE')
+ out=tmp_path/'library.json'
+ report=pipeline.weekly(ROOT/'paper_pipeline/journals.json',work,out,ROOT/'examples/total-synthesis.json',metadata_only=flag)
+ assert not report['failures'] and report['pdf_policy']=='metadata_only'
+ assert report['journals'][0]['pdf_work_attempted']==report['journals'][0]['reviews_created']==0
+ assert pending.read_text()=='PRIVATE INVALID QUEUE' and not (folder/'archive').exists() and not (folder/'review').exists()
+ paper=next(p for p in json.loads(out.read_text())['papers'] if p['doi']==article['DOI'])
+ assert set(paper)=={'id','doi','authors'} and paper['authors']==['Ada Chemist','Chemistry Consortium']
+ assert 'PRIVATE' not in out.read_text()
+
+
+def test_github_actions_rejects_direct_pdf_ingest_before_file_access(tmp_path,monkeypatch):
+ monkeypatch.setenv('GITHUB_ACTIONS','true')
+ with pytest.raises(ValueError,match='disabled in GitHub Actions'):
+  ingest(tmp_path/'absent.pdf',tmp_path/'review')

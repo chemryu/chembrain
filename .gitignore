@@ -19,3 +19,13 @@ build/
 .data-desktop/
 .paper-work/
 paper-archive/
+
+# Paper originals and private extraction outputs stay outside GitHub.
+*.[pP][dD][fF]
+*.review.json
+*.paper-text.txt
+attachments/
+private-paper-work/
+*.zip
+*.tar
+*.tgz
