@@ -36,8 +36,11 @@ def test_collected_data_commit_survives_fresh_checkout_terminal_and_http(tmp_pat
     temp=tmp_path/'runner';temp.mkdir()
     env={**os.environ,'GITHUB_WORKSPACE':str(work),'GITHUB_SHA':a,'GITHUB_RUN_ID':'123','GITHUB_REPOSITORY':'fixture/chembrain','RUNNER_TEMP':str(temp),'WEB_PHASE':'build-finished','WEB_PROVENANCE':json.dumps(identity)}
     script=ROOT/'scripts/report_web_build.py'
+    diagnostic=b'Traceback: actionable browser assertion\n'+b'  - DOM snapshot line\n'*600+b'Failure summary retained\n'
+    (work/'web-browser.log').write_bytes(diagnostic)
     first=subprocess.run([sys.executable,str(script)],env=env,capture_output=True,text=True)
     assert first.returncode==0,first.stderr
+    (work/'web-browser.log').unlink()
     # A later job checks out the workflow trigger; it must retain data B from the receipt.
     git(work,'checkout',a)
     env.pop('WEB_PROVENANCE');env.update(WEB_TERMINAL='1',WEB_PHASE='terminal',WEB_RESULT='blocked')
@@ -48,6 +51,7 @@ def test_collected_data_commit_survives_fresh_checkout_terminal_and_http(tmp_pat
     assert d['provenance']==identity and d['page_url'] is None
     stored=json.loads(git(work,'show','FETCH_HEAD:status.json'))
     assert stored['provenance']==identity
+    assert subprocess.check_output(['git','show','FETCH_HEAD:web-browser.log'],cwd=work)==diagnostic
     with pytest.raises(ValueError,match='changed'):
         resolve_identity({**identity,'built_commit':a},identity,a)
     # A code modification cannot masquerade as a collection-only data change.
@@ -55,3 +59,15 @@ def test_collected_data_commit_survives_fresh_checkout_terminal_and_http(tmp_pat
     git(work,'add','.');git(work,'commit','-m','Unreviewed code')
     with pytest.raises(ValueError,match='code differs'):
         capture_identity(work,a)
+
+def test_oversized_browser_diagnostics_keep_assertion_and_terminal_summary(monkeypatch):
+    monkeypatch.syspath_prepend(str(ROOT/'scripts'))
+    from report_web_build import bounded_log
+    beginning=b'Traceback: identify the failed assertion\n'
+    ending=b'\nTerminal browser failure summary\n'
+    payload=beginning+('  DOM diagram π\n'*20000).encode()+ending
+    retained=bounded_log(payload)
+    assert len(retained)<=100000
+    assert retained.startswith(beginning) and retained.endswith(ending)
+    assert b'middle of oversized log omitted' in retained
+    retained.decode('utf-8')

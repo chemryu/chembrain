@@ -78,6 +78,25 @@ def check_synthesis_map(page):
     page.set_viewport_size({'width':390, 'height':844})
     expect(page.locator('.synthesis-map')).to_be_visible()
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'Map mobile horizontal overflow'
+    # QA-SYN-01: on a narrow canvas Focus must use the live dragged card,
+    # including its measured dimensions, instead of the initial layout.
+    graph=page.locator('.synthesis-map')
+    graph.locator('.synthesis-canvas').scroll_into_view_if_needed()
+    graph.get_by_role('button',name='Focus selected molecule',exact=True).click()
+    page.wait_for_timeout(250)
+    target=graph.locator('.react-flow__node[data-id="chemical:doxycycline"]')
+    before=target.get_attribute('style')
+    header=target.locator('.synthesis-drag').bounding_box()
+    x=header['x']+header['width']/2;y=header['y']+header['height']/2
+    page.mouse.move(x,y);page.mouse.down();page.mouse.move(x+200,y,steps=12);page.mouse.up()
+    expect(target).not_to_have_attribute('style',before)
+    graph.get_by_role('button',name='Focus selected molecule',exact=True).click()
+    page.wait_for_function('''()=>{
+      const node=document.querySelector('.react-flow__node[data-id="chemical:doxycycline"]')?.getBoundingClientRect();
+      const canvas=document.querySelector('.synthesis-canvas')?.getBoundingClientRect();
+      return node&&canvas&&node.x>=canvas.x&&node.right<=canvas.right&&node.y>=canvas.y&&node.bottom<=canvas.bottom;
+    }''')
+    assert page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')") == original
     page.set_viewport_size({'width':1440, 'height':1000})
     assert page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')") == original
     # Real edits refresh the graph and invalidate stale inspectors. The temporary

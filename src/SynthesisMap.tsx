@@ -56,10 +56,12 @@ export function SynthesisMap({library,selectedId,onSelectMolecule,onSelectReacti
  useEffect(()=>{setNodes(current=>current.map(node=>node.type==='synthesisReaction'?{...node,data:{...node.data,active:node.data.reaction.id===activeReactionId}}:node));},[activeReactionId,projected,setNodes]);
  function focusSelected(duration=180){
   if(!instance)return;
-  const selected=graph.nodes.find(node=>node.id===graph.selectedNodeId);
+  const selected=instance.getNode(graph.selectedNodeId);
   if((canvas.current?.clientWidth||0)<560&&selected){
    // Keep the selected card readable on a phone; pan or Fit to inspect branches.
-   void instance.setCenter(selected.position.x+SYNTHESIS_NODE_WIDTH/2-45,selected.position.y+SYNTHESIS_NODE_HEIGHT/2,{zoom:0.75,duration});
+   const width=selected.measured?.width??selected.width??SYNTHESIS_NODE_WIDTH;
+   const height=selected.measured?.height??selected.height??SYNTHESIS_NODE_HEIGHT;
+   void instance.setCenter(selected.position.x+width/2-45,selected.position.y+height/2,{zoom:0.75,duration});
   }else void instance.fitView({nodes:graph.focusNodeIds.map(id=>({id})),padding:0.25,minZoom:0.55,maxZoom:0.9,duration});
  }
  useEffect(()=>{
