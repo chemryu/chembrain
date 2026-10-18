@@ -3,7 +3,7 @@
 This branch contains no archives, review candidates or local file paths. Archive
 bytes remain in the processor workspace/cache, not in this durable queue index.
 """
-import argparse,json,os,re,subprocess,tempfile
+import argparse,hashlib,json,os,re,subprocess,tempfile
 from pathlib import Path
 
 REF='refs/heads/build/paper-state'
@@ -47,16 +47,48 @@ def read_remote(root):
 
 def restore(root,work):
     _,snapshot=read_remote(root)
+    journals=snapshot['journals'] if snapshot else {}
+    # Cached advancing progress is never authoritative. A cancelled publication
+    # may have left it ahead of the feed; only the durable index can restore it.
+    work=Path(work)
+    if work.exists():
+        for directory in work.iterdir():
+            if directory.is_dir() and re.fullmatch('[a-z0-9-]+',directory.name) and 'state' not in journals.get(directory.name,{}):
+                (directory/'state.json').unlink(missing_ok=True)
     if snapshot is None:return 'NO_DURABLE_STATE_YET'
-    for slug,files in snapshot['journals'].items():
+    for slug,files in journals.items():
         directory=Path(work)/slug;directory.mkdir(parents=True,exist_ok=True)
         for name,value in files.items():
             path=directory/(name+'.json');temporary=path.with_suffix('.tmp')
             temporary.write_text(json.dumps(value,separators=(',',':')));temporary.replace(path)
     return 'RESTORED_PUBLIC_PENDING_AND_CHECKPOINTS'
 
-def save(root,work,run_id,source):
-    snapshot={'version':1,'run_id':str(run_id),'source':source,'journals':{}}
+def acknowledged_feed(root,feed_ref,feed_commit,library_sha256):
+    """A local commit is insufficient: require the advertised origin and bytes."""
+    if not isinstance(feed_ref,str) or not feed_ref.startswith('refs/heads/') or feed_ref==REF:
+        raise ValueError('Expected the published feed branch ref')
+    if git(root,'check-ref-format',feed_ref,check=False).returncode:
+        raise ValueError('Invalid feed ref')
+    if not isinstance(feed_commit,str) or not re.fullmatch('[0-9a-f]{40}',feed_commit):
+        raise ValueError('Invalid feed commit')
+    if not isinstance(library_sha256,str) or not re.fullmatch('[0-9a-f]{64}',library_sha256):
+        raise ValueError('Invalid library digest')
+    path=Path(root)/'public/library.json'
+    if path.stat().st_size>5_000_000:raise ValueError('Public library exceeds bound')
+    if hashlib.sha256(path.read_bytes()).hexdigest()!=library_sha256:
+        raise ValueError('Local library digest differs from expected publication')
+    blob=subprocess.run(['git','show',feed_commit+':public/library.json'],cwd=root,capture_output=True,check=True,timeout=45).stdout
+    if hashlib.sha256(blob).hexdigest()!=library_sha256:
+        raise ValueError('Feed commit library digest differs from local output')
+    advertised=git(root,'ls-remote','origin',feed_ref).stdout.split()
+    if advertised!=[feed_commit,feed_ref]:
+        raise ValueError('Origin has not acknowledged this exact feed commit/ref')
+    return {'ref':feed_ref,'commit':feed_commit,'library_sha256':library_sha256}
+
+
+def save(root,work,run_id,source,*,feed_ref,feed_commit,library_sha256):
+    publication=acknowledged_feed(root,feed_ref,feed_commit,library_sha256)
+    snapshot={'version':1,'run_id':str(run_id),'source':source,'feed':publication,'journals':{}}
     work=Path(work)
     if work.exists():
         for folder in work.iterdir():
@@ -85,8 +117,11 @@ def save(root,work,run_id,source):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation',choices=['restore','save']);parser.add_argument('--work-dir',type=Path,required=True)
+    parser.add_argument('--feed-ref');parser.add_argument('--feed-commit');parser.add_argument('--library-sha256')
     args=parser.parse_args();root=Path(os.environ['GITHUB_WORKSPACE'])
-    result=restore(root,args.work_dir) if args.operation=='restore' else save(root,args.work_dir,os.environ['GITHUB_RUN_ID'],os.environ['GITHUB_SHA'])
+    if args.operation=='save' and not all((args.feed_ref,args.feed_commit,args.library_sha256)):
+        parser.error('save requires --feed-ref, --feed-commit and --library-sha256')
+    result=restore(root,args.work_dir) if args.operation=='restore' else save(root,args.work_dir,os.environ['GITHUB_RUN_ID'],os.environ['GITHUB_SHA'],feed_ref=args.feed_ref,feed_commit=args.feed_commit,library_sha256=args.library_sha256)
     print(result)
 
 if __name__=='__main__':main()

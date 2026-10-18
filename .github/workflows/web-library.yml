@@ -60,6 +60,13 @@ jobs:
       - name: Restore durable public DOI retry state
         if: github.event_name == 'schedule' || inputs.collect == true
         run: python scripts/paper_state.py restore --work-dir "$RUNNER_TEMP/chembrain-paper-processor"
+      - name: Preserve initial replay anchors against acknowledged feed
+        if: github.event_name == 'schedule' || inputs.collect == true
+        run: |
+          set -euo pipefail
+          python -m paper_pipeline anchor --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --out public/library.json
+          LIBRARY_SHA=$(sha256sum public/library.json | cut -d' ' -f1)
+          python scripts/paper_state.py save --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --feed-ref "$GITHUB_REF" --feed-commit "$GITHUB_SHA" --library-sha256 "$LIBRARY_SHA"
       - name: Weekly separate paper processor
         id: collection
         if: github.event_name == 'schedule' || inputs.collect == true
@@ -67,12 +74,11 @@ jobs:
         timeout-minutes: 5
         run: |
           python -m paper_pipeline weekly --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --out public/library.json
-      - name: Preserve durable public DOI retry state
-        if: always() && (steps.collection.outcome == 'success' || steps.collection.outcome == 'failure') && (github.event_name == 'schedule' || inputs.collect == true)
-        run: python scripts/paper_state.py save --work-dir "$RUNNER_TEMP/chembrain-paper-processor"
       - name: Preserve only normalized weekly data
+        id: feed
         if: github.event_name == 'schedule' || inputs.collect == true
         run: |
+          set -euo pipefail
           python -m paper_pipeline export --curated public/library.json --out public/library.json
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -81,6 +87,14 @@ jobs:
             git commit -m 'Update compact public journal bibliography'
             git push origin HEAD:${{ github.ref_name }}
           fi
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(sha256sum public/library.json | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+      - name: Preserve advanced state after acknowledged feed publication
+        if: success() && steps.feed.outcome == 'success'
+        env:
+          FEED_COMMIT: ${{ steps.feed.outputs.commit }}
+          LIBRARY_SHA: ${{ steps.feed.outputs.sha256 }}
+        run: python scripts/paper_state.py save --work-dir "$RUNNER_TEMP/chembrain-paper-processor" --feed-ref "$GITHUB_REF" --feed-commit "$FEED_COMMIT" --library-sha256 "$LIBRARY_SHA"
       - name: Capture actual build identity
         id: identity
         run: |

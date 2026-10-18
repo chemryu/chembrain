@@ -3,7 +3,7 @@ from pathlib import Path
 import pymupdf
 import pytest
 from paper_pipeline.schema import normalize,validate
-from paper_pipeline.__main__ import ingest,weekly
+from paper_pipeline.__main__ import ingest,weekly,prepare_anchors
 ROOT=Path(__file__).resolve().parents[1]
 def sample():return json.loads((ROOT/'examples/total-synthesis.json').read_text())
 def test_starter_has_no_paper_body_and_has_page_evidence():
@@ -34,10 +34,17 @@ def test_weekly_provider_failure_preserves_curated_data_and_checkpoint(tmp_path,
  from server.jacs_collection import CrossrefClient
  def fail(*a,**k):raise RuntimeError('private query details')
  monkeypatch.setattr(CrossrefClient,'_get',fail)
- out=tmp_path/'library.json';report=weekly(ROOT/'paper_pipeline/journals.json',tmp_path/'archive',out,ROOT/'examples/total-synthesis.json')
+ out=tmp_path/'library.json';work=tmp_path/'archive'
+ prepared=prepare_anchors(ROOT/'paper_pipeline/journals.json',work,out)
+ anchor=json.loads((work/'jacs/state.json').read_text())
+ assert prepared=={'journals':['jacs']} and set(anchor)=={'resume'}
+ assert anchor['resume']['cursor']=='*' and anchor['resume']['processed']==0
+ report=weekly(ROOT/'paper_pipeline/journals.json',work,out,ROOT/'examples/total-synthesis.json')
  assert report['failures'];assert 'private query' not in json.dumps(report)
  assert len(validate(json.loads(out.read_text()))['reactions'])==12
- assert not (tmp_path/'archive/jacs/state.json').exists()
+ # An unavailable provider may retain only the original, nonadvancing anchor;
+ # retry must not silently move the initial window to a later date.
+ assert json.loads((work/'jacs/state.json').read_text())==anchor
 def test_weekly_verified_oa_goes_only_to_private_archive(tmp_path,monkeypatch):
  from server.jacs_collection import CrossrefClient
  item={'DOI':'10.1021/jacs.fixture','type':'journal-article','ISSN':['0002-7863'],'title':['Fixture'], 'author':[{'given':'Ada','family':'Chemist'}], 'license':[{'URL':'https://creativecommons.org/licenses/by/4.0/','content-version':'vor','start':{'date-time':'2020-01-01T00:00:00Z'}}], 'link':[{'URL':'https://pubs.acs.org/doi/pdf/10.1021/jacs.fixture','content-type':'application/pdf','content-version':'vor'}]}
@@ -88,6 +95,20 @@ def queue_fixture(tmp_path,monkeypatch,count=11):
  return clock,items,current,calls,run,pending,work,out
 
 
+def leave_metadata_overlap(clock,run,monkeypatch):
+ from datetime import datetime,timezone
+ import paper_pipeline.__main__ as pipeline
+ # A fixed checkpoint-derived fourteen-day lookback intentionally rediscovers
+ # October 4 on the next pass. Advance metadata once with downloads deferred,
+ # then exercise pending work after that article truly leaves the next window.
+ clock['now']=datetime(2026,10,24,tzinfo=timezone.utc)
+ with monkeypatch.context() as context:
+  context.setattr(pipeline,'PDF_WORK_LIMIT',0)
+  metadata=run();assert not metadata['failures']
+  assert metadata['journals'][0]['pdf_work_attempted']==0
+ clock['now']=datetime(2026,10,31,tzinfo=timezone.utc)
+
+
 def test_weekly_pending_eleventh_pdf_survives_metadata_overlap_and_is_idempotent(tmp_path,monkeypatch):
  from datetime import datetime,timezone
  clock,items,current,calls,run,pending,work,out=queue_fixture(tmp_path,monkeypatch)
@@ -98,7 +119,7 @@ def test_weekly_pending_eleventh_pdf_survives_metadata_overlap_and_is_idempotent
  deferred=items[-1]['DOI'];source=pending()[deferred]['source']
  assert source['DOI']==deferred and source['license']==current[deferred]['license'] and source['link']==current[deferred]['link']
  assert json.loads((work/'jacs/state.json').read_text())['last_success'].startswith('2026-10-17')
- clock['now']=datetime(2026,10,24,tzinfo=timezone.utc)
+ leave_metadata_overlap(clock,run,monkeypatch)
  second=run();j=second['journals'][0]
  assert calls['windows'][-1]=='2026-10-10' and j['bibliographic_items']==0
  assert not second['failures'] and j['pdfs_saved']==j['pdf_work_attempted']==1 and j['downloads_complete'] and not pending()
@@ -119,7 +140,7 @@ def test_weekly_failed_attempts_are_bounded_and_retried_with_fresh_identity(tmp_
  # Metadata completion/checkpoint is distinct from the durable failed downloads.
  assert j['metadata_complete'] and not j['downloads_complete']
  assert len(pending())==11
- calls['fail_pdfs'].clear();clock['now']=datetime(2026,10,24,tzinfo=timezone.utc)
+ leave_metadata_overlap(clock,run,monkeypatch);calls['fail_pdfs'].clear()
  second=run();assert second['journals'][0]['pdfs_saved']==10 and len(pending())==1
  assert len(calls['refreshes'])==10
  third=run();assert third['journals'][0]['pdfs_saved']==1 and not pending()
@@ -130,7 +151,7 @@ def test_weekly_failed_attempts_are_bounded_and_retried_with_fresh_identity(tmp_
 def test_weekly_pending_revalidates_current_license_and_doi_before_download(tmp_path,monkeypatch,changed):
  from datetime import datetime,timezone
  clock,items,current,calls,run,pending,work,out=queue_fixture(tmp_path,monkeypatch)
- run();identifier=items[-1]['DOI'];clock['now']=datetime(2026,10,24,tzinfo=timezone.utc)
+ run();identifier=items[-1]['DOI'];leave_metadata_overlap(clock,run,monkeypatch)
  if changed=='revoked':current[identifier]['license']=[]
  elif changed=='expired':current[identifier]['license'][0]['end']={'date-time':'2026-10-20T00:00:00Z'}
  elif changed=='wrong-doi':current[identifier]['DOI']='10.1021/jacs.other'
@@ -161,7 +182,7 @@ def test_weekly_saved_pdf_with_failed_review_is_reprocessed_without_redownload(t
  monkeypatch.setattr(pipeline,'ingest',real_ingest)
  # Retry local processing after the article has left the metadata overlap. Its
  # current license may be absent: processing the archived file makes no fetch.
- clock['now']=datetime(2026,10,24,tzinfo=timezone.utc)
+ leave_metadata_overlap(clock,run,monkeypatch)
  current[items[0]['DOI']]['license']=[]
  second=run();j=second['journals'][0]
  assert not second['failures'] and j['pdfs_saved']==0 and j['pdfs_reused']==1 and j['reviews_created']==1
