@@ -7,7 +7,10 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "build:web": "tsc -b && VITE_WEB_LIBRARY=1 vite build"
+    "build:web": "tsc -b && vite build",
+    "build:portable": "tsc -b && vite build --mode portable --outDir dist-portable && node scripts/package_browser.mjs",
+    "dev:desktop": "vite --mode desktop --host 127.0.0.1",
+    "build:desktop": "tsc -b && vite build --mode desktop"
   },
   "dependencies": {
     "@xyflow/react": "12.12.0",
@@ -16,6 +19,7 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@types/node": "24.10.0",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2",
     "@vitejs/plugin-react": "6.1.2",

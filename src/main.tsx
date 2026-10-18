@@ -2080,6 +2080,6 @@ function ReactionForm({
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {import.meta.env.VITE_WEB_LIBRARY === "1" ? <MolecularLibrary /> : <App />}
+    {import.meta.env.MODE === "desktop" ? <App /> : <MolecularLibrary />}
   </React.StrictMode>,
 );

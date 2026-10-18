@@ -1,3 +1,9 @@
+# Current request — 20261018-program-update-05
+
+User: “이제 프로그램 업데이트 해줘 말한대로”. Make the requested molecule-first metadata-only browser program the ordinary entry/build, preserve the explicit legacy desktop path, and provide a tested single-file browser preview while existing Pages remains blocked. No new Public permission, main merge, schedule activation or shared-history rewrite. Source and download need new exact-SHA Independent QA and Revision, then Wiki. See this run planning. Earlier requests remain in full below.
+
+---
+
 # Current request — 20261018-metadata-only-04
 
 User: “일단 github에 논문 pdf는 안올라가게 하고 논문 내에선 내가 언급한 reaction, chemical, solution (solvent, solute), doi, 저자들만 정보로 취급하게 해줘”.

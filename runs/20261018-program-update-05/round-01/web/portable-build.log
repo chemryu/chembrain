@@ -1,0 +1,15 @@
+
+> chembrain@0.2.0 build:portable
+> tsc -b && vite build --mode portable --outDir dist-portable && node scripts/package_browser.mjs
+
+[36mvite v8.3.4 [32mbuilding client environment for portable...[36m[39m
+transforming...
+✓ 1731 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-portable/index.html                   0.70 kB │ gzip:  0.47 kB
+dist-portable/assets/style-DpAnX4E6.css   57.45 kB │ gzip: 12.06 kB
+dist-portable/assets/index-CyEmzKgv.js   289.51 kB │ gzip: 83.70 kB
+
+[32m✓ built in 219ms[39m
+PORTABLE_PACKAGE_PASS Chembrain.html 463557 bytes sha256=843a7e610582352dfc0e30be310133834684084b20125f89bf894fb5934da10a source=aaf4d8b13d4604e98458cd6eec59cc8205254bae

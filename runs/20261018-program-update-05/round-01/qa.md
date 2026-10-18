@@ -1,0 +1,41 @@
+# Independent QA — browser program update / round 01
+
+Exact source reviewed: **aaf4d8b13d4604e98458cd6eec59cc8205254bae**, based on 6280794c87e7867b0ccd2e2d4f6924814917997a. Read AGENTS.md/current request, Planning, Development and changed entry/configuration, packaging, portable browser checks, workflows, documentation and browser storage/import code. Source, tests, dist-portable and release were not modified by QA. No push, visibility/history operation, policy bypass or alternative-browser attempt was made.
+
+## Findings and disposition
+
+**Unresolved material code findings: 0.** Local hosted behavior and the standalone program's offline HTTP-document behavior pass. **Actual file:// acceptance is pending CI evidence**, because the managed local Chromium policy refuses file navigation. HTTP-only execution is not represented as file execution. Do not approve the downloadable local-file deliverable until exact-source actual-file evidence is available. Pages deployment and historical Public clearance remain separate.
+
+## Independent verification
+
+- `CHEMBRAIN_BASE=/chembrain/ npm run build:web`: PASS (TypeScript and production Vite build). `build:web` and ordinary `build` now have the identical cross-platform command, without a POSIX-only environment assignment.
+- Started ordinary `npm run dev -- --port 4179 --strictPort` without starting Python. Actual Chromium confirmed Your molecular library, initial Select a molecule, zero reaction cards and zero /api requests; no browser errors. The QA development server was then stopped.
+- `scripts/web_smoke.py`: PASS on the independently rebuilt /chembrain/ hosted artifact. Includes initial screen, related reactions/solutions, DOI deduplication, malformed editor recovery, persistence/import, Python contract parity, DOI/authors boundary, legacy exact-byte backup and failure recovery, exports/subpath/mobile/no backend requests.
+- Focused `test_portable_contract.py`, `test_repository_payloads.py`, `test_web_library_data.py`: **10 PASS** (1.17 seconds). `git diff --check`: PASS.
+- `scripts/portable_smoke.py --http-only`: PASS on the existing exact-source release, without rebuilding or replacing it. It executes an in-memory loopback HTTP document with offline context and all additional requests rejected. Embedded SVG loading, initial empty panel, related records, molecule/reaction/solution/author editing, reload, compact download/import into a fresh profile, repeated-import preservation, unknown-field rejection, mobile layout, storage failure preservation and malicious raw-text fixtures pass. **This mode does not establish file:// compatibility.**
+- Artifact inspection/manifest verification: release/Chembrain.html is **463557 bytes**, SHA-256 **843a7e610582352dfc0e30be310133834684084b20125f89bf894fb5934da10a**. Manifest source is the exact reviewed aaf4d8b commit. Embedded library digest **7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb** matches public/library.json. The portable smoke verifies all listed checksums and the decoded JavaScript digest; no PDF/cropped-paper payload markers were found.
+
+## Review conclusions
+
+The ordinary entry now selects MolecularLibrary; only explicit desktop mode selects the retained App. Explicit desktop commands are propagated to setup helpers, legacy development script and Windows workflow. Static inspection verifies that selection/caller change; Linux source checks do not establish a new Windows EXE approval.
+
+The portable Vite mode embeds the same strict library and generated SMILES SVGs, suppressing dynamic asset loading. Packaging permits the expected entry/CSS assets and rejects unexpected chunks, module dependencies, external CSS resources and extra shell resources. JS and CSS enter the outer document as base64 and are decoded into DOM textContent after HTML parsing; malicious closing script/style/comment fixture values retain their text semantics without creating attacker scripts. Decoded code is inspected rather than declaring the base64 shell itself free of hidden data.
+
+Portable startup uses the embedded validated seed without fetch. Fresh-browser compact imports correctly take precedence over starter rows so transferring a JSON backup retains user edits; once browser data has been saved, later imports retain those existing edits. Failed saves update neither working data nor the only stored original. Read failures expose the seed but block unsafe mutation/export rather than overwriting inaccessible personal data. Valid stored data remains exportable after primary-write failure. Legacy migration retains its verified exact-byte backup-before-replacement boundary.
+
+Actions artifact upload names only the HTML, README, manifest and checksum file. No raw paper, private review work, legacy backup or whole-work cache is introduced. Program documentation correctly limits file-browser storage to the current browser/path/profile and recommends JSON backup before moves/updates; no installed EXE, stable cross-path storage, synchronization or automatic weekly update is promised.
+
+The previous historical audit still records two old quotation JSON blobs and two copied paper images, with remote caches/artifacts unverified. New clean artifacts do not clear that history. No repository Public conversion, history rewrite, main merge, account setting or scheduler activation is included. Source review does not claim a live Pages site. Root is collecting the exact new CI receipt; its outcome is not inferred here. Append actual evidence when available while preserving this chronology, then submit the complete report to Revision and Wiki.
+
+
+## Final evidence supplement — exact-source actual-file CI now available
+
+The earlier local managed-browser limitation remains accurately recorded above; it is now resolved for this preview acceptance by actual CI browser evidence, not by a local policy bypass. I independently compared all **nine** captured raw CI files byte-for-byte with immutable receipt **8ad7371b089fafad09bfbc222cd565e5cc3a28b5** using Git object reads, and checked each manifest byte count and SHA-256. CI run **39102813926** identifies workflow/built source **aaf4d8b13d4604e98458cd6eec59cc8205254bae**, matching the unchanged checkout and local/CI browser manifests.
+
+- CI tests: **284 passed, 1 skipped**; hosted build/browser checks PASS. The retained skip is platform-specific, not represented as a Windows execution approval.
+- `portable-browser.log`: **PASS on actual file:// HTML** with offline context and all additional resource requests rejected; zero app network/assets. Evidence covers initial empty panel, molecule filter, deduplicated DOI/authors reference, chemistry/solution/author edits, reload, JSON transfer to a fresh profile, invalid import rejection, unavailable/full storage preservation, mobile layout, malicious text fixtures and unexpected chunk rejection.
+- Local `release/Chembrain.html` is **463557 bytes**, SHA-256 **843a7e610582352dfc0e30be310133834684084b20125f89bf894fb5934da10a**. Its browser manifest is identical to the CI manifest. Public library digest is **7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb**, matching both.
+- CI reports portable artifact upload SUCCESS, ID **12127033101**, digest **ef31fe4f69971b576390986cfb5f564f2a331512002e314d80a99d6f63d115d2**. The hosted artifact archive was **not independently downloaded**, so this establishes exact-source build/browser and upload evidence, not an independent archive inspection.
+- This exact run records a **new Pages 403** (`Resource not accessible by integration`); deployment/access SKIPPED, `page_url=null`. Collection SKIPPED. Neither a live public site nor weekly collection execution is approved by these checks.
+
+**Final local browser-preview verdict: PASS; unresolved material source findings: 0.** Downloading the preview and opening `Chembrain.html` in a browser is supported by the actual-file evidence. Keep JSON backups before moving or replacing the file because browser/path/profile storage can differ. Existing repository **Public-history clearance remains NOT CLEARED**: historical quotations/copied images persist and remote artifact/cache contents remain unverified. No visibility change, history rewrite, policy bypass, Windows EXE approval or independent artifact-archive download was performed.

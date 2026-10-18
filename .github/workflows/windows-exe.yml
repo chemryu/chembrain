@@ -41,7 +41,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm run build 2>&1 | tee interface.log
+          npm run build:desktop 2>&1 | tee interface.log
           python -m pytest -q 2>&1 | tee api.log
       - id: packaging
         name: Package and test the EXE

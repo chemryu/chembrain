@@ -1,6 +1,19 @@
 # ChemBrain 진행 위키
 
-## 현재 상태 — 정보 범위 제한 / metadata-only round-01
+## 현재 상태 — 설치 없는 브라우저 프로그램 업데이트 / program-update round-01
+
+**다운로드 브라우저 미리보기 READY / Independent QA·Revision 지적 0건 — Pages403·기존 역사 Public 미승인은 별도 유지**
+
+- 실행 `20261018-program-update-05 / round-01`, 고정·푸시 소스 **`aaf4d8b13d4604e98458cd6eec59cc8205254bae`**. [Planning](runs/20261018-program-update-05/round-01/planning.md) → [Development](runs/20261018-program-update-05/round-01/development.md) → [Independent QA 전체 원문](runs/20261018-program-update-05/round-01/qa.md) → [Revision 전체 원문](runs/20261018-program-update-05/round-01/revision.md) → [Wiki 기록](runs/20261018-program-update-05/round-01/wiki-record.md)·[인계](runs/20261018-program-update-05/round-01/handoff.md) 완료. 두 독립 검토는 정확한 새 소스의 미해결 material 지적 **0건**, bounded browser preview **PASS**입니다. 이전 승인으로 대체하지 않았습니다.
+- 일반 개발·빌드가 영어 molecular library를 기본으로 열며 Python API 없이 동작합니다. 처음엔 반응 패널이 비어 있고 분자를 선택하면 관련 반응이 나옵니다. 논문 정보는 반응·chemical·solution(용매·용질)·DOI·저자 범위이며 참조는 DOI별 중복 제거합니다. 기존 desktop은 명시적 별도 mode로 유지됩니다.
+- **[브라우저 프로그램 다운로드](https://github.com/chemryu/chembrain/actions/runs/39102813926/artifacts/12127033101)**: GitHub 로그인 → artifact ZIP 다운로드/압축 해제 → `Chembrain.html` 더블클릭 → Edge/Chrome에서 사용합니다. Python·Node·개인 AI API 설치 없이 실행합니다. 이것은 설치형 EXE나 게시된 웹사이트가 아닌 다운로드 미리보기입니다.
+- 실제 HTML **463557 bytes**, SHA-256 **`843a7e610582352dfc0e30be310133834684084b20125f89bf894fb5934da10a`**. CI artifact ID **12127033101**, reported archive digest `ef31fe4f69971b576390986cfb5f564f2a331512002e314d80a99d6f63d115d2`. [delivery.json](runs/20261018-program-update-05/round-01/delivery.json)에 소스/파일/CI identity를 보존합니다. 로컬 HTML/CI manifest 일치를 확인했지만 artifact archive 자체를 독립 다운로드했다고 주장하지 않습니다.
+- 정확한 실제 CI [39102813926](https://github.com/chemryu/chembrain/actions/runs/39102813926), 불변 영수증 **`8ad7371b089fafad09bfbc222cd565e5cc3a28b5`**: **284 PASS / Windows DPAPI 1 SKIP**, hosted build/browser·payload gate PASS, **실제 file:// HTML 오프라인 브라우저 PASS**. 추가 요청 전부 차단/앱 요청 0건, 편집·재실행·JSON backup/import·저장 오류 보존·mobile·악성 embedding 검사 포함. QA/Revision은 [9개 원본](runs/20261018-program-update-05/round-01/web/manifest.json)을 불변 영수증과 bytes/hash 대조했습니다. 로컬 관리 브라우저의 file 정책 차단은 그대로 기록하며 다른 CI runner의 실제 파일 검증과 구분합니다.
+- 편집은 현재 브라우저·프로필·파일 위치의 로컬 저장입니다. **파일을 교체·이동하거나 브라우저를 바꾸기 전에 JSON Backup을 저장하고 Import로 옮기세요.** 동기화·자동 업데이트·경로 간 동일 저장을 보장하지 않습니다. 원본 PDF·원문·논문 crop이나 private legacy backup은 프로그램 배포에 포함하지 않습니다.
+- 새 CI도 Pages 설정 **403 Resource not accessible by integration**, 배포/HTTP 접근 **NOT RUN**, URL **null**입니다. collection **SKIP**, 주간 작업 미활성·PC 예약 미설치·Box 직접 저장/동기화 없음·새 Windows EXE 승인 없음입니다. 기존 Git 역사 인용문 JSON 2개·copied crop 2개와 원격 artifact/cache UNVERIFIED를 유지하므로 **기존 저장소 Public 전환 미승인**입니다. visibility 변경/역사 재작성/main merge를 수행하지 않았습니다.
+- root가 cloud 환경 draft의 소스·install·start 설정을 저장했지만 **환경 Publish 필요**입니다. 환경 설정 Publish는 앱 파일 실행이나 Pages 게시와 별개이며 앱 추가 승인 gate가 아닙니다. 앱 코드 수정 지적이 없어 빈 다음 Planning을 만들지 않고 미리보기 전달로 종료합니다.
+
+## 이전 상태 — 정보 범위 제한 / metadata-only round-01
 
 **현재 소스 정책 검수 PASS / 두 독립 역할 material 지적 0건 — Public 준비 미승인·Pages403**
 

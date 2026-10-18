@@ -1,0 +1,7 @@
+# Final handoff — Wiki to Planning / user delivery
+
+Source `aaf4d8b13d4604e98458cd6eec59cc8205254bae`. **Both Independent QA and Revision PASS / unresolved material source findings0**. Complete reports and their hashes are preserved in wiki-record.md; nine raw CI files/manifest and delivery.json bind this source to actual-file offline browser evidence. No next source-repair round is opened.
+
+Deliver the install-free browser preview: https://github.com/chemryu/chembrain/actions/runs/39102813926/artifacts/12127033101 . Extract ZIP and double-click Chembrain.html using Edge/Chrome. HTML463557bytes SHA256`843a7e610582352dfc0e30be310133834684084b20125f89bf894fb5934da10a`. No Python/Node/personal AI API needed. Before moving/updating, export Backup JSON and restore with Import; browser/path/profile storage is not synchronization. Artifact upload and exact-source build/browser evidence are verified; independent artifact archive download is not claimed.
+
+External follow-up only: Pages new403 means no public URL/deployment/access evidence. Existing shared history NOT CLEARED for Public due old quotations/copied images; remote caches/artifacts unverified. Public toggle/history rewrite/new repository require separate authorized decision. No Box direct write, weekly activation, installed PC schedule, production release or new Windows EXE approval. Cloud draft source/install/start saved requires environment Publish separately from app/site delivery. All old runs/Windows evidence remain preserved.

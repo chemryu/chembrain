@@ -11,4 +11,4 @@ else
   .venv/bin/python -m pip install --require-hashes -r requirements.lock
 fi
 if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
-npm run build
+npm run build:desktop
