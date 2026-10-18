@@ -1,0 +1,71 @@
+{
+  "commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+  "built_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+  "provenance": {
+    "schema_version": 1,
+    "workflow_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+    "built_commit": "02d0dff2ce66a00f10e0c873baea80fa6f94e963",
+    "library_sha256": "7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb"
+  },
+  "run_id": "39141206671",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39141206671",
+  "reported_at": "2026-10-18T15:39:02.912432+00:00",
+  "status": "blocked",
+  "terminal": true,
+  "phase": "terminal",
+  "page_url": null,
+  "facts": {
+    "build": {
+      "result": "success",
+      "outputs": {
+        "facts": "{\n  \"collection\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"feed\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"identity\": {\n    \"outputs\": {\n      \"value\": \"{\\\"schema_version\\\":1,\\\"workflow_commit\\\":\\\"02d0dff2ce66a00f10e0c873baea80fa6f94e963\\\",\\\"built_commit\\\":\\\"02d0dff2ce66a00f10e0c873baea80fa6f94e963\\\",\\\"library_sha256\\\":\\\"7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb\\\"}\"\n    },\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"tests\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"app\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"browser\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"portable\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"portable_artifact\": {\n    \"outputs\": {\n      \"artifact-id\": \"12140894328\",\n      \"artifact-digest\": \"d5ba0bad0030913a63c36824123dd4ae2561c5034556cab32e1daa23eb331ee2\",\n      \"artifact-url\": \"https://github.com/chemryu/chembrain/actions/runs/39141206671/artifacts/12140894328\"\n    },\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  }\n}",
+        "provenance": "{\"schema_version\":1,\"workflow_commit\":\"02d0dff2ce66a00f10e0c873baea80fa6f94e963\",\"built_commit\":\"02d0dff2ce66a00f10e0c873baea80fa6f94e963\",\"library_sha256\":\"7853ba5d2b335c274733b8c726ac7b80c899e9d51bfd42295279ea75df2452bb\"}"
+      }
+    },
+    "publish": {
+      "result": "failure",
+      "outputs": {
+        "facts": "{\n  \"config\": {\n    \"outputs\": {},\n    \"outcome\": \"failure\",\n    \"conclusion\": \"failure\"\n  },\n  \"deployment\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"access\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  }\n}"
+      }
+    }
+  },
+  "independent_qa": "SEPARATE_REVIEW_REQUIRED; preview only",
+  "phases": [
+    {
+      "phase": "dependencies",
+      "at": "2026-10-18T15:36:07.491283+00:00"
+    },
+    {
+      "phase": "tests",
+      "at": "2026-10-18T15:37:03.184412+00:00"
+    },
+    {
+      "phase": "browser-build",
+      "at": "2026-10-18T15:37:33.058250+00:00"
+    },
+    {
+      "phase": "browser-checks",
+      "at": "2026-10-18T15:37:39.329872+00:00"
+    },
+    {
+      "phase": "upload-pages-artifact",
+      "at": "2026-10-18T15:38:31.873855+00:00"
+    },
+    {
+      "phase": "build-finished",
+      "at": "2026-10-18T15:38:36.654072+00:00"
+    },
+    {
+      "phase": "configure-pages",
+      "at": "2026-10-18T15:38:49.401109+00:00"
+    },
+    {
+      "phase": "publish-finished",
+      "at": "2026-10-18T15:38:53.188075+00:00"
+    },
+    {
+      "phase": "terminal",
+      "at": "2026-10-18T15:39:02.912483+00:00"
+    }
+  ]
+}
