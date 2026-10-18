@@ -1,6 +1,19 @@
 # ChemBrain 진행 위키
 
-## 현재 상태 — 합성 brainstorming Map / synthesis-map round-02
+## 현재 상태 — 실제 분자 구조 / structures round-01
+
+**오프라인 분자 구조 미리보기 READY / 별도 QA·Revision material 지적 0건 — 새 Pages403·역사 Public 미승인은 별도 유지**
+
+- 정확한 고정·푸시 소스 **`b38260d5c0f97a7d7b08711dde178555658df136`**, 실행 `20261018-structures-07 / round-01`. 별도 [Planning](runs/20261018-structures-07/round-01/planning.md) → [Development](runs/20261018-structures-07/round-01/development.md) → 별도 [QA 전체 원문](runs/20261018-structures-07/round-01/qa.md) → 별도 [Revision 전체 원문](runs/20261018-structures-07/round-01/revision.md) → [Wiki](runs/20261018-structures-07/round-01/wiki-record.md)·[전달](runs/20261018-structures-07/round-01/handoff.md) 완료입니다. 이전 소스의 승인을 가져오지 않았고, 두 최종 독립 역할은 **bounded download preview PASS / 지적 0건**입니다.
+- 현재 SMILES를 RDKit2026.9.1로 그려 library 타일·선택 분자 큰 구조·합성 Map에 표시합니다. 새로 가져오거나 편집한 SMILES도 그리며, 이름 변경은 구조를 지우지 않습니다. 잘못되거나 없는 입력·엔진 사용 불가에는 명시적 안내를 표시합니다. 엔진/WASM을 HTML에 포함하므로 앱 실행 중 외부 registry/CDN/API를 호출하지 않습니다.
+- Paclitaxel·doxycycline 부모 구조 두 개를 공개 ChEMBL snapshot 원본 ID/SMILES와 RDKit 입체·분자식·InChIKey로 검증해 추가했습니다. 전체 **49개 중 10개 구조 인코딩**, 39개는 미확인이고 **논문 번호만 있는 중간체 22개는 구조를 추측하지 않았습니다.** 반응 12개는 계속 draft입니다. 부모 doxycycline과 논문의 hydrochloride isolate를 구분하고 기존 note를 유지합니다. 원문 PDF·crop은 포함하지 않습니다.
+- **[업데이트 프로그램 다운로드](https://github.com/chemryu/chembrain/actions/runs/39148232731/artifacts/12143773443)**: GitHub 로그인 → ZIP 다운로드·압축 해제 → `Chembrain.html`을 Edge/Chrome에서 엽니다. Python·Node·AI API 키 설치 없이 사용합니다. 기존 파일에서 **Backup JSON**, 새 파일에서 **Import package**로 옮기세요. 예전 데이터의 두 target 구조가 비어 있으면 **Add verified example structures**로 명시적으로 추가합니다. 기존 사용자 구조·이름/정체성 변경·메모·반응·용액을 덮어쓰지 않으며, 변경 전 정확한 기존 bytes를 브라우저 안에 비공개 백업합니다. 저장·백업 실패 시 원본을 유지합니다.
+- 실제 HTML **5,079,906 bytes**, SHA-256 **`f5c3137adbe840c0530b10870d231ceae28f7bc534c1228979cb41724f737897`**; library digest `7172a3f6970790c5795f074a8861555456eef330648a6591289ded34165df825`. RDKit 버전·WASM hash·license와 CI artifact ID12143773443은 [delivery.json](runs/20261018-structures-07/round-01/delivery.json)에 보존했습니다. CI-reported archive digest는 `39b86d57530c38c6c374c989a3e29b06ea566688b0a544e50ce95680cc1dca26`; ZIP 자체를 독립 다운로드했다고 주장하지 않습니다.
+- 새 실제 [CI39148232731](https://github.com/chemryu/chembrain/actions/runs/39148232731), 불변 영수증 **`1df362f303bb14ba60e9e70fe45cf894fce2f866`**: **297 PASS / Windows DPAPI 1 SKIP**, hosted build/browser·portable build·**실제 file:// 오프라인 browser PASS**입니다. 실제 SVG 결합 경로, 입체/전하/분리된 비예시 구조, 편집/오류 복구·구버전 private upgrade와 기존 Map/저장 검사를 포함합니다. 개발 로컬 8개 명령 PASS; QA 별도 22개 집중·실제 snapshot 원본 확인·hosted/HTTP-only portable·엔진 불가 안내, Revision 별도 12개 집중·자체 실제 구조 편집 probe도 PASS입니다. [9개 CI 원본](runs/20261018-structures-07/round-01/web/receipt-files.json)의 bytes/hash와 불변 Git receipt를 대조했습니다. 실제 HTML/CI manifest·library hash 일치이며 로컬 file 정책은 우회하지 않았습니다.
+- 실제 사용량 제한 이후 사용자가 이어서 진행하도록 요청해 같은 독립 QA가 재개·완료했습니다. 중단 전 완료 출력이 없던 browser 작업은 PASS로 세지 않고 다시 실행해 완료를 확인했습니다. 자동 타이머나 상시 agent를 활성화하지 않았습니다.
+- 이번 CI도 실제 Pages 설정 **새 403 Resource not accessible by integration**, 배포/HTTP **NOT RUN**, URL null입니다. 기존 역사 인용문/crop과 원격 Actions storage UNVERIFIED로 Public 전환 미승인, main/history/권한 변경 없음입니다. collection SKIP·주간 미활성·PC/Box 미동기화·브라우저 프로필/파일 위치 저장 한계는 유지합니다. [환경 초안](runs/20261018-structures-07/round-01/environment-draft.json)은 저장소 SHA/start만 갱신 저장했으며 기존 install/network/secrets를 유지했습니다. **환경 Publish 필요**, runtime 적용/새 task 복원은 미검증이고 웹사이트 게시와 별개입니다. 코드 지적 0건으로 새 수정 회차 없이 다운로드 미리보기 전달로 종료합니다.
+
+## 이전 상태 — 합성 brainstorming Map / synthesis-map round-02
 
 **다운로드 합성 Map 미리보기 READY / 별도 QA·Revision material 지적 0건 — 새 Pages403·과거 역사 Public 미승인은 별도 유지**
 

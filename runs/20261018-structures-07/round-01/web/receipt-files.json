@@ -1,0 +1,45 @@
+{
+  "receipt_commit": "1df362f303bb14ba60e9e70fe45cf894fce2f866",
+  "source_commit": "b38260d5c0f97a7d7b08711dde178555658df136",
+  "files": {
+    "browser-manifest.json": {
+      "bytes": 759,
+      "sha256": "dca0fc653facb55f2c5c7e2439b26cabba03b0823a421e09a94e2d382d52e429"
+    },
+    "pages-config.json": {
+      "bytes": 102,
+      "sha256": "d5f4c7ca7e87f504320eaa47a94d7103ff611a138891713ab577410df78e8a97"
+    },
+    "pages-config.log": {
+      "bytes": 95,
+      "sha256": "2133ccf2720c2e773774e8eb645b17387c8a13de3fe7d05ede7c3641a0c06187"
+    },
+    "portable-browser.log": {
+      "bytes": 837,
+      "sha256": "a8c20260ffa23fb60b1e9caebcf7fc23bb414342b4a2e2b50379f63a92bc2add"
+    },
+    "portable-build.log": {
+      "bytes": 1738,
+      "sha256": "93fc6024669871ab398a3fa120420272ee8e8e15d5fea3c7f6421cdf66d1d70a"
+    },
+    "status.json": {
+      "bytes": 3790,
+      "sha256": "b0ee4fbc12370b8f6beef09cd3e89ce4587434e2505bd5422d219c3adc9a605b"
+    },
+    "web-browser.log": {
+      "bytes": 751,
+      "sha256": "f18eb9d6c875ac8d231b31b09dcbe7944730d4e6d7a666dbcd1eef271f93115b"
+    },
+    "web-build.log": {
+      "bytes": 1462,
+      "sha256": "6dbda6175e494c34ab5d2aed300f0e0c1606c2edfc9fbacd355ba4ff2c928eba"
+    },
+    "web-tests.log": {
+      "bytes": 982,
+      "sha256": "eb5d30373d4ba219312012c4e5879033c8fdcfc5f011b882913a60c088b4803c"
+    }
+  },
+  "local_manifest_equals_ci": true,
+  "local_html_sha256": "f5c3137adbe840c0530b10870d231ceae28f7bc534c1228979cb41724f737897",
+  "artifact_zip_independently_downloaded": false
+}

@@ -1,0 +1,25 @@
+.structure-diagram {
+ display:block;
+ width:100%;
+ max-width:100%;
+ height:auto;
+ aspect-ratio:5 / 3;
+ object-fit:contain;
+ background:#fff;
+ border-radius:8px;
+}
+.structure-fallback {
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+ padding:10px;
+ box-sizing:border-box;
+ color:#526173;
+ font-size:12px;
+ text-align:center;
+ background:#f3f6fa;
+}
+.structure-diagram-large {max-height:360px;}
+.structure-fallback small {max-width:42em;line-height:1.5;}

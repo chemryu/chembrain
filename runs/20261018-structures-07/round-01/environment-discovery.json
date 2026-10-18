@@ -1,0 +1,24 @@
+{
+  "repositories": [
+    {
+      "name": "chemryu/chembrain",
+      "host": "github.com",
+      "commit": "b38260d5c0f97a7d7b08711dde178555658df136",
+      "mount_path": "chembrain"
+    }
+  ],
+  "classified_dependency_caches_and_metadata": [
+    "Empty /workspace/.git platform placeholder, not a repository",
+    "chembrain/node_modules",
+    "chembrain/.venv",
+    "chembrain/.pytest_cache",
+    "chembrain/server/__pycache__",
+    "chembrain/scripts/__pycache__",
+    "chembrain/tests/__pycache__",
+    "chembrain/workflowkit/__pycache__",
+    "chembrain/paper_pipeline/__pycache__",
+    "chembrain/.cache/uv",
+    "chembrain/.cache/npm"
+  ],
+  "errors": []
+}

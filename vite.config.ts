@@ -1,12 +1,18 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { readFileSync, readdirSync } from "node:fs";
+import { gzipSync } from "node:zlib";
 const portableModule = "virtual:chembrain-portable-data";
+const rdkitModule = "virtual:chembrain-rdkit-wasm";
 export default defineConfig(({mode}) => ({
   plugins: [react(), {
     name: "chembrain-portable-data",
-    resolveId(id) { if (id === portableModule) return "\0" + portableModule; },
+    resolveId(id) { if (id === portableModule || id === rdkitModule) return "\0" + id; },
     load(id) {
+      if (id === "\0" + rdkitModule) {
+        const bytes = readFileSync(new URL("./node_modules/@rdkit/rdkit/dist/RDKit_minimal.wasm", import.meta.url));
+        return "export default " + JSON.stringify(gzipSync(bytes, { level: 9 }).toString("base64")) + ";";
+      }
       if (id !== "\0" + portableModule) return;
       if (mode !== "portable") return "export const library=null;export const depictions={};";
       const library = JSON.parse(readFileSync(new URL("./public/library.json", import.meta.url), "utf8"));

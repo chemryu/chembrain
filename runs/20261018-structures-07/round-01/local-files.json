@@ -1,0 +1,41 @@
+{
+  "source_commit": "b38260d5c0f97a7d7b08711dde178555658df136",
+  "files": {
+    "checks.json": {
+      "bytes": 1129,
+      "sha256": "d8e672dda11c5defbcb1c65f71457615494522241f97d1dee0ebd0a276856fcb"
+    },
+    "portable-build.log": {
+      "bytes": 1644,
+      "sha256": "ce616c576145000fd8fad7b6d0f15344873a52b1c8c4c746672d4a3852c97dde"
+    },
+    "portable-http.log": {
+      "bytes": 866,
+      "sha256": "4be00fb2adcf40061638f834d1b3bba218e363a838e8f728bef9750700d99a00"
+    },
+    "portable-payload.log": {
+      "bytes": 65,
+      "sha256": "2565e30842b71fd73ae403a24785bf086a162153a40599e1a3e83529b1ebd785"
+    },
+    "python.log": {
+      "bytes": 920,
+      "sha256": "a3966f80405fcbed0c3121881231aaa5e829abd3b0ae9c2990acb7b65eb2639b"
+    },
+    "source-payload.log": {
+      "bytes": 83,
+      "sha256": "1d0d06b46b516047ac730a7b3e0a398d5703cffbfa5889c825e6d3b11def61ce"
+    },
+    "web-browser.log": {
+      "bytes": 751,
+      "sha256": "f18eb9d6c875ac8d231b31b09dcbe7944730d4e6d7a666dbcd1eef271f93115b"
+    },
+    "web-build.log": {
+      "bytes": 1368,
+      "sha256": "b9ecd23e332984c8d2da7d2ab7029b3f0df1ccf3ae52be0de8c1df8dd427a76d"
+    },
+    "web-payload.log": {
+      "bytes": 65,
+      "sha256": "2565e30842b71fd73ae403a24785bf086a162153a40599e1a3e83529b1ebd785"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "draft_id": "a3552723-4d36-40f1-84be-07f1391d95b6~cecfgdraft_6ad284a0831c8191890e572d9068e6ba",
+  "repositories": [
+    {
+      "commit": "b38260d5c0f97a7d7b08711dde178555658df136",
+      "host": "github.com",
+      "mount_path": "chembrain",
+      "name": "chemryu/chembrain"
+    }
+  ],
+  "requires_publish": true,
+  "status": "saved",
+  "fields_written": [
+    "repositories",
+    "start_skill"
+  ],
+  "install_script_preserved": true,
+  "network_and_secrets_preserved": true,
+  "runtime_applied": false,
+  "environment_published": false,
+  "fresh_task_restore_verified": false
+}

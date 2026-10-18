@@ -1,3 +1,4 @@
 {
-  "svg": "Chemical diagrams generated only from encoded SMILES with RDKit; source PDF figures and crops are excluded."
+  "svg": "Chemical diagrams generated only from encoded SMILES with RDKit; source PDF figures and crops are excluded.",
+  "verified_parent_structures": "Paclitaxel and doxycycline use the exact isomeric SMILES in examples/verified-structures.json; immutable source attribution and locally computed identity/stereochemistry checks are recorded separately there. Doxycycline is indexed as neutral parent, not its paper-reported hydrochloride isolate."
 }

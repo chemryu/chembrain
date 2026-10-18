@@ -1,0 +1,67 @@
+{
+  "python": {
+    "returncode": 0,
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "-q"
+    ]
+  },
+  "web-build": {
+    "returncode": 0,
+    "command": [
+      "npm",
+      "run",
+      "build:web"
+    ]
+  },
+  "web-browser": {
+    "returncode": 0,
+    "command": [
+      ".venv/bin/python",
+      "scripts/web_smoke.py"
+    ]
+  },
+  "web-payload": {
+    "returncode": 0,
+    "command": [
+      ".venv/bin/python",
+      "scripts/check_repository_payloads.py",
+      "--dist",
+      "dist"
+    ]
+  },
+  "portable-build": {
+    "returncode": 0,
+    "command": [
+      "npm",
+      "run",
+      "build:portable"
+    ]
+  },
+  "portable-http": {
+    "returncode": 0,
+    "command": [
+      ".venv/bin/python",
+      "scripts/portable_smoke.py",
+      "--http-only"
+    ]
+  },
+  "portable-payload": {
+    "returncode": 0,
+    "command": [
+      ".venv/bin/python",
+      "scripts/check_repository_payloads.py",
+      "--dist",
+      "dist-portable"
+    ]
+  },
+  "source-payload": {
+    "returncode": 0,
+    "command": [
+      ".venv/bin/python",
+      "scripts/check_repository_payloads.py"
+    ]
+  }
+}

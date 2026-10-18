@@ -70,7 +70,8 @@ export async function packageBrowser({ buildDir = path.join(root, 'dist-portable
   }
   const javascript = await readFile(scriptFile, 'utf8');
   const css = await Promise.all(cssFiles.map(file => readFile(file, 'utf8')));
-  const packaged = inlinePortableHtml(html, javascript, css);
+  const notice = await readFile(path.join(root, 'packaging', 'RDKit-LICENSE.txt'), 'utf8');
+  const packaged = inlinePortableHtml(html, javascript, css) + '\n<!-- Bundled RDKit MinimalLib 2026.9.1\n' + notice.replaceAll('--', '—') + '\n-->\n';
   const commit = sourceCommit || process.env.CHEMBRAIN_SOURCE_SHA || execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
   assert(/^[a-f\d]{40}$/i.test(commit), 'Portable source commit must be a full Git SHA.');
   const version = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).version;
@@ -87,6 +88,7 @@ export async function packageBrowser({ buildDir = path.join(root, 'dist-portable
     sha256: sha256(output),
     library_sha256: sha256(library),
     javascript_sha256: sha256(Buffer.from(javascript, 'utf8')),
+    structure_renderer: {package:'@rdkit/rdkit',version:JSON.parse(await readFile(path.join(root,'node_modules/@rdkit/rdkit/package.json'),'utf8')).version,wasm_sha256:sha256(await readFile(path.join(root,'node_modules/@rdkit/rdkit/dist/RDKit_minimal.wasm')))},
     styles_sha256: css.map(text => sha256(Buffer.from(text, 'utf8'))),
   };
   await mkdir(outputDir, { recursive: true });
