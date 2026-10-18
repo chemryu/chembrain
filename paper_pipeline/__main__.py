@@ -71,9 +71,65 @@ def _review_valid(folder,identifier,attachment):
  except (OSError,ValueError,KeyError,TypeError,AttributeError):return False
 
 
+def _timestamp(value):
+ if not isinstance(value,str):raise ValueError('Invalid metadata timestamp')
+ parsed=datetime.fromisoformat(value)
+ if parsed.tzinfo is None:raise ValueError('Metadata timestamps require a timezone')
+ return parsed
+
+
+def _journal_state(path):
+ if path.exists() and path.stat().st_size>256_000:raise ValueError('Metadata progress exceeds bound')
+ state=json.loads(path.read_text()) if path.exists() else {}
+ if not isinstance(state,dict) or set(state)-{'last_success','resume'}:raise ValueError('Invalid metadata progress')
+ if 'last_success' in state:_timestamp(state['last_success'])
+ if 'resume' in state:
+  resume=state['resume']
+  if not isinstance(resume,dict) or set(resume)!={'cursor','start','until','processed','started_at'}:raise ValueError('Invalid metadata replay anchor')
+  if not isinstance(resume['cursor'],str) or not resume['cursor'] or len(resume['cursor'])>200_000:raise ValueError('Invalid metadata cursor')
+  if type(resume['processed']) is not int or resume['processed']<0:raise ValueError('Invalid metadata processed count')
+  for field in ('start','until'):
+   value=resume[field]
+   if not isinstance(value,str) or not re.fullmatch(r'\d{4}-\d{2}-\d{2}',value):raise ValueError('Invalid metadata window')
+   datetime.fromisoformat(value)
+  if resume['start']>resume['until']:raise ValueError('Invalid metadata window order')
+  _timestamp(resume['started_at'])
+ return state
+
+
+def prepare_anchors(config,work,out):
+ """Persist only initial replay windows, without advancing metadata progress.
+
+ CI saves these anchors against its already-published feed before discovery.
+ Standalone weekly uses this same preparation so its first failed output can be
+ replayed even when a later retry's normal fourteen-day window has moved on.
+ """
+ config=json.loads(Path(config).read_text());work=private_work(work)
+ if not isinstance(config,dict) or not isinstance(config.get('journals'),list):raise ValueError('Invalid journal configuration')
+ previous=validate(json.loads(Path(out).read_text())) if Path(out).exists() else {}
+ checkpoint=previous.get('generated_at');checkpoint=_timestamp(checkpoint) if checkpoint else None
+ now=datetime.now(timezone.utc);start=now-timedelta(days=14)
+ if checkpoint:start=checkpoint-timedelta(days=14)
+ if start.date()>now.date():raise ValueError('Invalid metadata window order')
+ pending=[];seen=set()
+ # Check every enabled journal before writing anything. A malformed checkpoint
+ # must never be silently replaced by a newly narrowed discovery window.
+ for journal in config['journals']:
+  if not isinstance(journal,dict):raise ValueError('Invalid journal configuration')
+  if not journal.get('enabled',True):continue
+  slug=journal.get('id');issn=journal.get('issn')
+  if not isinstance(slug,str) or not re.fullmatch(r'[a-z0-9-]+',slug) or slug in seen or not isinstance(issn,str) or not re.fullmatch(r'\d{4}-[\dX]{4}',issn):raise ValueError('Invalid journal configuration')
+  seen.add(slug);statefile=work/slug/'state.json';state=_journal_state(statefile)
+  if not state:
+   pending.append((slug,statefile,{'resume':{'cursor':'*','start':str(start.date()),'until':str(now.date()),'processed':0,'started_at':now.isoformat()}}))
+ for _,path,state in pending:write_json(path,state)
+ return {'journals':[slug for slug,_,_ in pending]}
+
+
 def weekly(config,work,out,curated,max_pages=3):
  from server.jacs_collection import CrossrefClient,_licensed_pdf,_save_pdf,_utc,_attachment_valid
  from server.store import Store
+ prepare_anchors(config,work,out)
  config=json.loads(Path(config).read_text());work=private_work(work);work.mkdir(parents=True,exist_ok=True)
  data=normalize(json.loads(Path(curated).read_text()))
  if Path(out).exists():
@@ -82,12 +138,12 @@ def weekly(config,work,out,curated,max_pages=3):
    ids={r['id'] for r in data[table]};data[table].extend(r for r in previous[table] if r['id'] not in ids)
   data['generated_at']=previous.get('generated_at')
   data=normalize(data)
- known={p['doi'] for p in data['papers']};report={'journals':[],'pdf_policy':'explicit_open_license_only','failures':[]}
+ known={p['doi'] for p in data['papers']};report={'journals':[],'pdf_policy':'explicit_open_license_only','failures':[]};metadata_states=[]
  for journal in config['journals']:
   if not journal.get('enabled',True):continue
   slug=journal['id'];issn=journal['issn']
   if not re.fullmatch(r'[a-z0-9-]+',slug) or not re.fullmatch(r'\d{4}-[\dX]{4}',issn):raise ValueError('Invalid journal configuration')
-  folder=work/slug;folder.mkdir(exist_ok=True);statefile=folder/'state.json';state=json.loads(statefile.read_text()) if statefile.exists() else {}
+  folder=work/slug;folder.mkdir(exist_ok=True);statefile=folder/'state.json';state=_journal_state(statefile)
   pendingfile=folder/'pending.json'
   if pendingfile.exists() and pendingfile.stat().st_size>PENDING_BYTES:raise ValueError('Pending work exceeds bound')
   pending=json.loads(pendingfile.read_text())['items'] if pendingfile.exists() else {}
@@ -95,11 +151,15 @@ def weekly(config,work,out,curated,max_pages=3):
   if len(pending)>PENDING_LIMIT:raise ValueError('Pending work exceeds bound')
   now=datetime.now(timezone.utc);start=now-timedelta(days=14)
   checkpoint=state.get('last_success') or data.get('generated_at')
-  if checkpoint:start=min(start,datetime.fromisoformat(checkpoint)-timedelta(days=7))
+  # A checkpoint-derived window start is fixed across delayed retries. Taking
+  # min(now-14d, checkpoint-7d) would narrow a recent checkpoint's first failed
+  # window as the clock advances, losing late-indexed bibliography-only items.
+  if checkpoint:start=_timestamp(checkpoint)-timedelta(days=14)
   gateway=CrossrefClient();cursor='*';count=0;pdfs=0;complete=False;until=str(now.date());processed=0;crawl_started=now.isoformat()
   resume=state.get('resume')
   if resume:
    start=datetime.fromisoformat(resume['start']).replace(tzinfo=timezone.utc);until=resume['until'];cursor=resume['cursor'];processed=resume['processed'];crawl_started=resume['started_at']
+  if str(start.date())>until:raise ValueError('Invalid metadata window order')
   store=Store(folder/'archive');fresh={};attempts=0;reused=0;reviews=0;blocked=0;deferred=0
   def add_paper(item):
    identifier=doi(item['DOI'])
@@ -109,15 +169,13 @@ def weekly(config,work,out,curated,max_pages=3):
    return identifier
   try:
    for _ in range(max_pages):
-    # Save the current page before processing it. Queue saturation/provider
-    # interruption can replay this page safely without losing an eligible DOI.
+    # Buffer the current page before processing it. Nothing here becomes
+    # durable until its bibliography has reached the normalized output.
     state['resume']={'cursor':cursor,'start':str(start.date()),'until':until,'processed':processed,'started_at':crawl_started}
     query=urllib.parse.urlencode({'filter':f'from-pub-date:{start.date()},until-pub-date:{until},type:journal-article','rows':100,'cursor':cursor})
     message=json.loads(gateway._get('https://api.crossref.org/journals/'+issn+'/works?'+query,{'api.crossref.org'},8*1024*1024))['message']
     items=message['items']
     if not isinstance(items,list) or len(items)>100:raise ValueError('Invalid provider page')
-    # Only persist resume after a real page was received. Failed first discovery
-    # leaves the prior metadata checkpoint untouched.
     for item in items:
      if item.get('type')!='journal-article' or issn not in item.get('ISSN',[]):continue
      identifier=add_paper(item);count+=1
@@ -136,16 +194,16 @@ def weekly(config,work,out,curated,max_pages=3):
     next_cursor=message.get('next-cursor')
     if not next_cursor or next_cursor==cursor:raise ValueError('Provider cursor did not advance')
     cursor=next_cursor
-    state['resume']={'cursor':cursor,'start':str(start.date()),'until':until,'processed':processed,'started_at':crawl_started};write_json(statefile,state)
+    state['resume']={'cursor':cursor,'start':str(start.date()),'until':until,'processed':processed,'started_at':crawl_started}
    if complete:
-    state.pop('resume',None);state['last_success']=crawl_started;write_json(statefile,state)
+    state.pop('resume',None);state['last_success']=crawl_started
    else:
-    write_json(statefile,state);report['failures'].append(slug+': page bound reached; metadata checkpoint retained')
+    report['failures'].append(slug+': page bound reached; metadata checkpoint retained')
   except Exception as error:
-   # Keep a received/partially processed page retryable, including queue-bound
-   # failures. An unavailable first provider request writes no new checkpoint.
-   if count or processed:write_json(statefile,state)
+   # The current page remains retryable, including queue-bound failures. Even
+   # this buffered state is saved only after the final output succeeds.
    report['failures'].append(slug+' metadata: '+type(error).__name__)
+  metadata_states.append((slug,statefile,state))
   # Process insertion-ordered work independently of publication-date discovery.
   # Every refresh/download/review failure consumes an attempt; failures rotate
   # to the end so a blocked DOI cannot starve later eligible work indefinitely.
@@ -189,7 +247,14 @@ def weekly(config,work,out,curated,max_pages=3):
   report['journals'].append({'journal':slug,'bibliographic_items':count,'pdfs_saved':pdfs,'pdf_work_attempted':attempts,'pdfs_reused':reused,'reviews_created':reviews,'pending':len(pending),'deferred':deferred,'oa_unverified':blocked,'window_start':start.date().isoformat(),'complete':complete,'metadata_complete':complete,'downloads_complete':not pending,'pdf_resolver':'ACS explicit CC license' if slug=='jacs' else 'DOI-only; local PDF ingestion available'})
  # Keep outputs compact. Neither archive paths nor review text are exported.
  if not report['failures']:data['generated_at']=datetime.now(timezone.utc).isoformat()
- write_json(out,validate(data));write_json(work/'weekly-report.json',report)
+ write_json(out,validate(data))
+ # One output covers every journal, so defer ALL cursor/checkpoint writes until
+ # its atomic replacement succeeds. Older progress after a state-write failure
+ # safely replays already-exported DOI records; never roll back that output.
+ for slug,statefile,state in metadata_states:
+  try:write_json(statefile,state)
+  except Exception as error:report['failures'].append(slug+' metadata state: '+type(error).__name__)
+ write_json(work/'weekly-report.json',report)
  return report
 
 
@@ -197,6 +262,7 @@ def main():
  p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='command',required=True)
  a=sub.add_parser('ingest');a.add_argument('pdfs',nargs='+');a.add_argument('--work-dir',type=Path,required=True);a.add_argument('--doi')
  a=sub.add_parser('export');a.add_argument('--curated',type=Path,required=True);a.add_argument('--out',type=Path,required=True)
+ a=sub.add_parser('anchor');a.add_argument('--config',default='paper_pipeline/journals.json');a.add_argument('--work-dir',type=Path,required=True);a.add_argument('--out',type=Path,required=True)
  a=sub.add_parser('weekly');a.add_argument('--config',default='paper_pipeline/journals.json');a.add_argument('--work-dir',type=Path,required=True);a.add_argument('--curated',default='examples/total-synthesis.json');a.add_argument('--out',type=Path,required=True);a.add_argument('--max-pages',type=int,default=3)
  args=p.parse_args()
  if args.command=='ingest':
@@ -204,6 +270,7 @@ def main():
   for pdf in args.pdfs:
    result=ingest(pdf,args.work_dir,args.doi);print(json.dumps({'file':Path(pdf).name,'doi':result['doi'],'candidates':len(result['candidates']),'status':'needs_review'}))
  elif args.command=='export':write_json(args.out,normalize(json.loads(args.curated.read_text())))
+ elif args.command=='anchor':print(json.dumps(prepare_anchors(args.config,args.work_dir,args.out)))
  else:
   if not 1<=args.max_pages<=20:p.error('--max-pages must be 1–20')
   report=weekly(args.config,args.work_dir,args.out,args.curated,args.max_pages);print(json.dumps(report));return 1 if report['failures'] else 0
