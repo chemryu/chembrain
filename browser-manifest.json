@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "source_commit": "b38260d5c0f97a7d7b08711dde178555658df136",
+  "app_version": "0.2.0",
+  "preview": true,
+  "format": "single-html-base64-utf8-module",
+  "file": "Chembrain.html",
+  "bytes": 5079906,
+  "sha256": "f5c3137adbe840c0530b10870d231ceae28f7bc534c1228979cb41724f737897",
+  "library_sha256": "7172a3f6970790c5795f074a8861555456eef330648a6591289ded34165df825",
+  "javascript_sha256": "e8b779a24500f6ce8bb9d65211fd6ae3cd52ac82040f7ecc208cd422012b0a61",
+  "structure_renderer": {
+    "package": "@rdkit/rdkit",
+    "version": "2026.9.1",
+    "wasm_sha256": "594ceaed387adc70ea13bfbb2e8eace916f6c782254ed5a6f0f0a0a7a4fe4061"
+  },
+  "styles_sha256": [
+    "d63b2454bf2687fb901651bd7fbfdfc2349fe4839121c7584ca829855ec39ff7"
+  ]
+}
