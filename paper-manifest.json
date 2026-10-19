@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "source_commit": "44cd3b160e8ba2b47052398a8f59ae8704af533c",
+  "preview": true,
+  "format": "single-html-base64-utf8-module",
+  "file": "Chembrain-Paper-Workbench.html",
+  "bytes": 10165047,
+  "sha256": "b0b775cd659265fc35bd7ed7a3bd40debf8dcfe53262266a4a683d47365242db",
+  "javascript_sha256": "7fdb6c3ea9933682a2dced93da6a961590eda21d2b0dda1e7e8fd81d3aa2815e",
+  "styles_sha256": [
+    "448b9754c13b5fe39707296570b94cbc13dd4f6c8e812c5e72fef05395acfadf"
+  ],
+  "engines": {
+    "@rdkit/rdkit": "2026.9.1",
+    "pdfjs-dist": "6.4.299",
+    "openchemlib": "9.25.1"
+  },
+  "worker_transport": "native-module-data-url",
+  "rdkit_wasm_sha256": "594ceaed387adc70ea13bfbb2e8eace916f6c782254ed5a6f0f0a0a7a4fe4061",
+  "pdf_worker_sha256": "9536359f1b8367850d485731ca1d5e45c159a7b7a0912325e539937aa21ceb18",
+  "private_source_documents_included": false
+}
