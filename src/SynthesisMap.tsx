@@ -9,15 +9,32 @@ import './synthesis-map.css';
 type MoleculeMapNode=Node<{chemical:Chemical;selected:boolean;activate:(id:string)=>void;depiction:(chemical:Chemical)=>ReactNode},'synthesisMolecule'>;
 type ReactionMapNode=Node<{reaction:RecordReaction;active:boolean;activate:(id:string)=>void},'synthesisReaction'>;
 type MapNode=MoleculeMapNode|ReactionMapNode;
+function MapActionButton({label,pressed,activate,children}:{label:string;pressed?:boolean;activate:()=>void;children:ReactNode}){
+ const spaceArmed=useRef(false);
+ return <button type="button" className="synthesis-node-button nodrag nopan" aria-label={label} aria-pressed={pressed} onClick={activate}
+  onKeyDown={event=>{
+   if(event.key!=='Enter'&&event.key!==' ')return;
+   // D3 briefly captures every click after a header drag, including a native
+   // keyboard click. Activate directly and cancel that duplicate native click.
+   event.preventDefault();event.stopPropagation();
+   if(event.repeat)return;
+   if(event.key==='Enter')activate();else spaceArmed.current=true;
+  }}
+  onKeyUp={event=>{
+   if(event.key!=='Enter'&&event.key!==' ')return;
+   event.preventDefault();event.stopPropagation();
+   if(event.key===' '){const activateSpace=spaceArmed.current;spaceArmed.current=false;if(activateSpace)activate();}
+  }} onBlur={()=>{spaceArmed.current=false;}}>{children}</button>;
+}
 function MoleculeCard({data}:NodeProps<MoleculeMapNode>){
  return <div className={'synthesis-node synthesis-molecule '+(data.selected?'is-target':'')}>
   <Handle type="target" position={Position.Left}/>
   <div className="synthesis-drag">{data.selected?'Selected molecule':'Molecule'}<span aria-hidden="true">⠿</span></div>
-  <button className="synthesis-node-button nodrag nopan" aria-label={'Open molecule: '+data.chemical.name} onClick={()=>data.activate(data.chemical.id)}>
+  <MapActionButton label={'Open molecule: '+data.chemical.name} activate={()=>data.activate(data.chemical.id)}>
    <div className="synthesis-depiction">{data.depiction(data.chemical)}</div>
    <strong title={data.chemical.name}>{data.chemical.name}</strong>
    <small>{data.chemical.formula||'Structure pending'}</small>
-  </button>
+  </MapActionButton>
   <Handle type="source" position={Position.Right}/>
  </div>;
 }
@@ -25,12 +42,12 @@ function ReactionCard({data}:NodeProps<ReactionMapNode>){
  return <div className={'synthesis-node synthesis-reaction '+(data.active?'is-active':'')}>
   <Handle type="target" position={Position.Left}/>
   <div className="synthesis-drag">Reaction<ArrowRight size={13}/></div>
-  <button className="synthesis-node-button nodrag nopan" aria-label={'Open reaction: '+data.reaction.name} aria-pressed={data.active} onClick={()=>data.activate(data.reaction.id)}>
+  <MapActionButton label={'Open reaction: '+data.reaction.name} pressed={data.active} activate={()=>data.activate(data.reaction.id)}>
    <span className={'synthesis-review '+data.reaction.status}>{data.reaction.status==='reviewed'?'Reviewed record':'Draft · verify source'}</span>
    <strong title={data.reaction.name}>{data.reaction.name}</strong>
    <small>{data.reaction.yield_percent==null?'Yield not reported':data.reaction.yield_percent+'% reported yield'}</small>
    <span className="synthesis-open-detail">View conditions & DOI ↗</span>
-  </button>
+  </MapActionButton>
   <Handle type="source" position={Position.Right}/>
  </div>;
 }

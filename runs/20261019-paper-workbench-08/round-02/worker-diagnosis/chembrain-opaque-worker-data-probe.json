@@ -1,0 +1,45 @@
+{
+  "scope": "HTTP sandbox opaque origin probe; not a file test, no policy bypass",
+  "browser": "154.0.8037.57",
+  "results": [
+    {
+      "senderOrigin": "null",
+      "type": "module",
+      "format": "blob",
+      "event": "error",
+      "documentOrigin": "null",
+      "message": null,
+      "filename": null
+    },
+    {
+      "senderOrigin": "null",
+      "type": "classic",
+      "format": "data",
+      "event": "ready",
+      "documentOrigin": "null",
+      "value": {
+        "ready": true
+      }
+    },
+    {
+      "senderOrigin": "null",
+      "type": "module",
+      "format": "data",
+      "event": "ready",
+      "documentOrigin": "null",
+      "value": {
+        "ready": true
+      }
+    },
+    {
+      "senderOrigin": "null",
+      "type": "classic",
+      "format": "blob",
+      "event": "ready",
+      "documentOrigin": "null",
+      "value": {
+        "ready": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "receipt_commit": "93613c39b6d6cad681e5a2d3d7bc86fa8c615394",
+  "source_commit": "c484897d6ccc504a517406e8a766c8d95a05cb76",
+  "run_id": "39274614887",
+  "files": [
+    {
+      "file": "browser-manifest.json",
+      "bytes": 759,
+      "sha256": "2fb6f44de629d02f4a1d0f9bee51e541b1d2d1f4252cef751f184370c37ca436"
+    },
+    {
+      "file": "paper-browser.log",
+      "bytes": 4361,
+      "sha256": "e0f3c900801a935cc1df7574b689d014c7e5e81b071860bcf6c84f3c5abf034c"
+    },
+    {
+      "file": "paper-build.log",
+      "bytes": 1716,
+      "sha256": "61a4db788c857e55f801045b0cf2220bf5bd82ddfcfe133b149adf34896e287d"
+    },
+    {
+      "file": "paper-manifest.json",
+      "bytes": 824,
+      "sha256": "b4583219d7e6989e5961c236ab6952f0874dd5d4081b1948da76e7bfa5033e33"
+    },
+    {
+      "file": "portable-browser.log",
+      "bytes": 957,
+      "sha256": "56fcad0a1ce1036fd73b67c0b082e2fe9fc7d458fc878c82f41fcc53d1533224"
+    },
+    {
+      "file": "portable-build.log",
+      "bytes": 1738,
+      "sha256": "8fbd4f22435f4be8b1a98e22ec9663e34064320e7233c44c50e789790ffedff8"
+    },
+    {
+      "file": "status.json",
+      "bytes": 3000,
+      "sha256": "1f721e908fa40dba8dbceddc8c0787547ff2e2e93bd8ecf786fb303ea0ed5b6d"
+    },
+    {
+      "file": "web-browser.log",
+      "bytes": 871,
+      "sha256": "8323bb3fd9ac495e14b6333c9e1b430821b73d65fa527b35dc803c6286939ad5"
+    },
+    {
+      "file": "web-build.log",
+      "bytes": 1462,
+      "sha256": "5445fb76522ed09dbbd1f8f0a4197af3bfff23897f9af1022b0c2cff15711fe0"
+    },
+    {
+      "file": "web-tests.log",
+      "bytes": 982,
+      "sha256": "32004659c5bb9ceabaa3b43c171cabfa185824ee3e80053478cc4328bcbd1811"
+    }
+  ]
+}

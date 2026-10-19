@@ -1,5 +1,18 @@
 # ChemBrain 진행 위키
 
+## 현재 상태 — Paper Workbench / round-02 수정 요청
+
+**CHANGES REQUESTED / QA-PW-01 해결·신규 QA-PW-02 P1 1건 — 실제 file:// PDF worker FAIL, round-03 Planning 환류**
+
+- 실행 `20261019-paper-workbench-08 / round-02`, 고정·푸시 소스 **`c484897d6ccc504a517406e8a766c8d95a05cb76`**. 별도 [Planning](runs/20261019-paper-workbench-08/round-02/planning.md) → [Development](runs/20261019-paper-workbench-08/round-02/development.md) → [QA 전체 원문](runs/20261019-paper-workbench-08/round-02/qa.md) → [Revision 전체 원문](runs/20261019-paper-workbench-08/round-02/revision.md) → [Wiki](runs/20261019-paper-workbench-08/round-02/wiki-record.md)·[round-03 Planning 인계](runs/20261019-paper-workbench-08/round-02/handoff.md)입니다. 두 독립 검토 모두 **CHANGES REQUESTED / 미해결 P1 1건 / 전달 미승인**입니다.
+- **QA-PW-01 RESOLVED**: same-ID 용액·반응의 누락된 양/단위/농도·순서 있는 stages/solution links·조건/yield/evidence를 명시적으로 review/apply하며 알려진 충돌·모호한 stage 변경은 전체 candidate를 거절합니다. canonical ID/DOI remapping, 알려진 사용자 값·메모/status 보호, 정확한 private 원본 bytes backup/readback·동시 변경 확인·실패 보존·반복 no-op을 두 독립 역할이 확인했습니다. hosted keyboard/map 회귀도 이번 실제 CI에서 PASS입니다.
+- **QA-PW-02 P1 UNRESOLVED**: 실제 file:// Workbench에서 첫 유효 synthetic PDF를 열면 native worker error 안내가 나오고 canvas0×0/data-rendered=false로 멈춥니다. 핵심 private source-assisted offline workflow가 시작되지 않습니다. **근본 원인 UNRESOLVED**이며 file/opaque origin·Blob module worker는 조사 가설입니다. 로컬 HTTP probe 결과를 실제 CI file 실패의 확정 원인으로 쓰지 않습니다.
+- 개발 로컬 11개 명령 **PASS / Python324 PASS·Windows DPAPI1 SKIP**, hosted/build·두 HTTP-only 프로그램 전달·payload PASS. QA 별도27 집중·adversarial·hosted normal/CPU4 PASS, Revision 별도14 집중 PASS. 로컬 실제 file://는 관리 정책으로 NOT RUN이며 우회하지 않았습니다.
+- 실제 [CI39274614887](https://github.com/chemryu/chembrain/actions/runs/39274614887), 불변 terminal 영수증 **`93613c39b6d6cad681e5a2d3d7bc86fa8c615394`**: Python324/1·hosted build/browser·main portable build/실제 file:// PASS, paper build PASS, **paper 실제 file:// 첫 PDF/native worker FAIL**. 이후 sketcher/source-confirmation/export→main 실제 file 전달은 **NOT RUN**, artifact upload **SKIPPED**, 새 다운로드 없음. [10개 원본/manifest](runs/20261019-paper-workbench-08/round-02/web/receipt-files.json)를 Wiki가 bytes/SHA와 불변 Git bytes 대조했습니다.
+- 두 같은-source HTML identity는 [candidate manifests](runs/20261019-paper-workbench-08/round-02/candidate-manifests.json)와 CI가 일치합니다. Main5111218bytes/SHA`26d1f83ba3887b768a5a8600ad25935c2e37d34db9b34e1eccf1384f1cf8c724`, Paper10161674bytes/SHA`2b2bca186078bc709aff287ba4190d1d62cc42d2cea66835031c11976dc17b0a`. 유효한 hash는 실행 성공이나 전달 승인이 아닙니다. ZIP 독립 다운로드/rehash 없음입니다.
+- publish **SKIPPED**, 이번 Pages 설정/배포/HTTPS **NOT RUN**, URL null이며 새403 관찰은 없습니다. 이전 승인 `b38260d` 구조 다운로드와 거절 round-01 `8cbd5fe`는 역사로 유지합니다. 앞선 기록 `391ef82750922d851b146bd4411ccaed86e37a9b`를 부모로 이 round-02 원문·영수증·진단을 기록 브랜치에 게시했습니다. 실행 소스 HEAD는 그대로 유지했습니다.
+- 다음은 [formal round-03 handoff](runs/20261019-paper-workbench-08/round-02/handoff.md)에 따른 native worker 원래 오류 수집·일반 actual-file offline 호환성 수정입니다. real native worker/pinned embedded bytes·private in-memory 원문·zero external request·기존 receiving/backup/source-check 계약을 유지하고, 정책 우회/대체 browser/CDN/fake-worker/HTTP 대체 없이 새 exact SHA·두 실제 file 프로그램·실제 JSON 전달·별도 QA/Revision을 요구합니다. 자동 정확 화학 그림 OCR/저널 다운로드·주간 활성화·Box sync·상시 agent·main merge·Public/history 변경은 수행하지 않습니다.
+
 ## 현재 상태 — Paper Workbench / round-01 수정 요청
 
 **CHANGES REQUESTED / P1 앱 지적 1건 + 새 CI hosted browser FAIL — 새 두 프로그램 전달 미승인, round-02 Planning 환류**

@@ -9,3 +9,14 @@
 .import-review button{margin:4px 10px 0 0}
 .import-review .import-conflicts{grid-template-columns:1fr;color:#8c3025}
 .import-review .import-conflicts li span{margin-top:6px}
+.import-review dl,.import-retentions dl{margin:10px 0 0}
+.import-review dt,.import-retentions dt{font-size:12px;font-weight:650;color:#596c60;margin:8px 0 4px}
+.import-review dd,.import-retentions dd{margin:0}
+.import-review pre,.import-retentions pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.45;margin:0;padding:8px;background:#f1f5f2;border-radius:6px;max-height:220px;overflow:auto}
+.import-retentions{padding:14px 18px;margin:0 0 20px;border:1px solid #d6e1d8;border-radius:10px;background:#f8faf8;overflow-wrap:anywhere}
+.import-retentions summary{cursor:pointer;font-size:14px;font-weight:600}
+.import-retentions ul{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))}
+.import-retentions li{padding:12px;background:white;border:1px solid #d6e1d8;border-radius:8px;min-width:0}
+.import-retentions small,.import-retentions strong{display:block}
+.import-retentions small{color:#53665a;margin:5px 0}
+.import-retentions p{font-size:13px;margin-bottom:0}

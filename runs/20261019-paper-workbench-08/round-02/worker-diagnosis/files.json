@@ -1,0 +1,15 @@
+{
+  "scope": "Read-only controlled HTTP sandbox probes, not file proof or delivered fix",
+  "files": [
+    {
+      "file": "chembrain-opaque-worker-data-probe.json",
+      "bytes": 910,
+      "sha256": "e54a6361f1603bcdf9f78972c8cf60decb4bd56286255b32482a42a709daf438"
+    },
+    {
+      "file": "chembrain-opaque-real-pdf-worker-probe.json",
+      "bytes": 555,
+      "sha256": "e0b9f7f6ae59caa0baf9a92f07cc2bec9b54f2b0f8d446f5caebdd867cd338cf"
+    }
+  ]
+}

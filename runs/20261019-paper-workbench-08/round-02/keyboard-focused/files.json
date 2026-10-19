@@ -1,0 +1,15 @@
+{
+  "scope": "Prefreeze focused HTTP positive and deliberate pre-fix negative control; not final source or file proof",
+  "files": [
+    {
+      "file": "chembrain-keyboard-round2-check.log",
+      "bytes": 241,
+      "sha256": "97fed1428ee2862b2f8c79e8bc4920b21fe64ab6c2285f55a723089731a032ac"
+    },
+    {
+      "file": "chembrain-keyboard-round2-baseline-check.log",
+      "bytes": 15790,
+      "sha256": "7285ab74218eaf4bf2c59ac54bc2a0fec60385d8b2d266bd2fbb61eb3e5d92b9"
+    }
+  ]
+}

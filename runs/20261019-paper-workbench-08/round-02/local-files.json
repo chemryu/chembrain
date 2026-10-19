@@ -1,0 +1,65 @@
+{
+  "source_commit": "c484897d6ccc504a517406e8a766c8d95a05cb76",
+  "files": [
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/checks.json",
+      "bytes": 4064,
+      "sha256": "f524b0082c616f3ac6ea11e4e0d42fd9409028667955f99676ecdca192e549b0"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/paper-build.log",
+      "bytes": 1622,
+      "sha256": "6f0e12bb47c63dc8f25836f0d89fb23c4477dc6e7ac6b9e34c171de76cc77878"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/paper-http.log",
+      "bytes": 1965,
+      "sha256": "236196f3c89b906a69a890688254d21894ce0704d8ccef8dce57bd9b28b3e6bc"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/paper-payload.log",
+      "bytes": 64,
+      "sha256": "2f252e360ba491897726a732a8d7ec46777601a2812babc06b693da6595d39b4"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/portable-build.log",
+      "bytes": 1644,
+      "sha256": "9868187221d0e91e2749053659952bdf81a4e0c9026f6ad16318d70f38c3ce7b"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/portable-http.log",
+      "bytes": 986,
+      "sha256": "12dba2f0a13852fc7b9904764b30e0d904b1baaac20ae90ed8a4a67f47e0406a"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/portable-payload.log",
+      "bytes": 65,
+      "sha256": "2565e30842b71fd73ae403a24785bf086a162153a40599e1a3e83529b1ebd785"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/python.log",
+      "bytes": 921,
+      "sha256": "cda47d843f0f9428175eb0866e9281c39c80af3115ba8121ae67bd4718856ada"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/source-payload.log",
+      "bytes": 83,
+      "sha256": "473c3293867c6c9142d1834836baa6496c654b79ebb37acd98f5b2ef4cf66d34"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/web-browser.log",
+      "bytes": 871,
+      "sha256": "8323bb3fd9ac495e14b6333c9e1b430821b73d65fa527b35dc803c6286939ad5"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/web-build.log",
+      "bytes": 1368,
+      "sha256": "14574cb8b03df6da6e416e7879fbb3876c04686154d1a9fe95ca6b0db1191f0c"
+    },
+    {
+      "path": "runs/20261019-paper-workbench-08/round-02/local/web-payload.log",
+      "bytes": 65,
+      "sha256": "2565e30842b71fd73ae403a24785bf086a162153a40599e1a3e83529b1ebd785"
+    }
+  ]
+}
