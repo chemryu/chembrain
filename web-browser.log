@@ -1,0 +1,346 @@
+Traceback (most recent call last):
+  File "/home/runner/work/chembrain/chembrain/scripts/web_smoke.py", line 218, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/runner/work/chembrain/chembrain/scripts/web_smoke.py", line 184, in main
+    check_synthesis_map(page)
+  File "/home/runner/work/chembrain/chembrain/scripts/synthesis_map_smoke.py", line 59, in check_synthesis_map
+    expect(inspector).to_be_visible()
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 23332, in to_be_visible
+    self._sync(
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 852, in to_be_visible
+    await self._expect_impl(
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to be visible
+Actual value: None
+Error: element(s) not found 
+Call log:
+  - Expect "to_be_visible" with timeout 5000ms
+  - waiting for get_by_role("region", name="Selected reaction details", exact=True)
+
+Aria snapshot:
+- banner:
+  - link "chembrain .":
+    - /url: /chembrain/
+    - img
+    - text: chembrain .
+  - text: PREVIEW · MOLECULE-FIRST LIBRARY
+  - button "Import package":
+    - img
+    - text: Import package
+  - button "Backup JSON":
+    - img
+    - text: Backup JSON
+- paragraph: LESS PAPER. MORE CHEMISTRY.
+- heading "Your molecular library" [level=1]
+- paragraph: Choose a molecule to explore its synthesis map, conditions and DOI references.
+- text: Saved in this browser Export a backup to move between devices
+- main:
+  - complementary:
+    - heading "Molecular library" [level=2]:
+      - img
+      - text: Molecular library
+    - text: "25"
+    - img
+    - textbox "Search molecular library":
+      - /placeholder: Name, alias or SMILES
+    - button "Doxycycline structure diagram Doxycycline C22H24N2O8":
+      - img "Doxycycline structure diagram"
+      - strong: Doxycycline
+      - text: C22H24N2O8
+    - button "Paclitaxel (Taxol) structure diagram Paclitaxel (Taxol) C47H51NO14" [pressed]:
+      - img "Paclitaxel (Taxol) structure diagram"
+      - strong: Paclitaxel (Taxol)
+      - text: C47H51NO14
+    - button "Structure not encoded Baran compound 19 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Baran compound 19
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Baran compound 20 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Baran compound 20
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Baran compound 21 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Baran compound 21
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Baran compound 22 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Baran compound 22
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Baran compound 34 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Baran compound 34
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Baran compound 35 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Baran compound 35
+      - text: Paper-specific intermediate
+    - button "Benzoic acid structure diagram Benzoic acid C7H6O2":
+      - img "Benzoic acid structure diagram"
+      - strong: Benzoic acid
+      - text: C7H6O2
+    - button "Structure not encoded Charest compound 13 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Charest compound 13
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Charest compound 14 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Charest compound 14
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Charest compound 15 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Charest compound 15
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Charest compound 16 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Charest compound 16
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Charest compound 20 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Charest compound 20
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Charest compound 21 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Charest compound 21
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Charest compound 5 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Charest compound 5
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 17 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 17
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 18 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 18
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 20b Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 20b
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 20c Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 20c
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 21 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 21
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 24b Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 24b
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 25 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 25
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 5 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 5
+      - text: Paper-specific intermediate
+    - button "Structure not encoded Holton compound 6 Paper-specific intermediate":
+      - text: Structure not encoded
+      - strong: Holton compound 6
+      - text: Paper-specific intermediate
+  - paragraph: SELECTED MOLECULE
+  - heading "Paclitaxel (Taxol)" [level=2]
+  - paragraph: C47H51NO14 · RCINICONZNJXQF-MZXODVADSA-N
+  - button "Edit molecule"
+  - figure "Diagram from recorded SMILES · molecular identity does not verify a draft reaction.":
+    - img "Paclitaxel (Taxol) structure diagram"
+    - text: Diagram from recorded SMILES · molecular identity does not verify a draft reaction.
+  - paragraph: "Reference parent structure: CHEMBL428647 in the official RDKit tutorials ChEMBL snapshot. Neutral parent in the cited ChEMBL snapshot tautomer representation; stereochemistry retained."
+  - tablist "Synthesis display":
+    - tab "Map" [selected]
+    - tab "List"
+  - region "Recorded synthesis map":
+    - heading "Recorded synthesis map" [level=3]
+    - paragraph: 8 recorded reactions · 5 connected fragments
+    - text: Selected molecule
+    - paragraph: Arrows show recorded reactants → reaction → products. Target tags group steps; they do not establish chemical connections. Draft records require source review.
+    - note: Separate fragments have unrecorded connecting steps. They are shown apart; no missing transformations are inferred.
+    - button "Zoom in synthesis map":
+      - img
+      - text: Zoom in
+    - button "Zoom out synthesis map":
+      - img
+      - text: Zoom out
+    - button "Fit synthesis map":
+      - img
+      - text: Show all recorded steps
+    - button "Focus selected molecule":
+      - img
+      - text: Focus selected molecule
+    - application "Interactive recorded synthesis graph":
+      - img:
+        - img "Edge from chemical:baran-34 to reaction:b-taxol"
+      - img:
+        - img "Edge from chemical:baran-35 to reaction:b-taxol"
+      - img:
+        - img "Edge from reaction:b-taxol to chemical:paclitaxel"
+      - img:
+        - img "Edge from chemical:holton-24b to reaction:h-taxol"
+      - img:
+        - img "Edge from chemical:holton-25 to reaction:h-taxol"
+      - img:
+        - img "Edge from reaction:h-taxol to chemical:paclitaxel"
+      - img:
+        - img "Edge from chemical:baran-20 to reaction:b-dmdo"
+      - img:
+        - img "Edge from reaction:b-dmdo to chemical:baran-21"
+      - img:
+        - img "Edge from chemical:baran-19 to reaction:b-silyl"
+      - img:
+        - img "Edge from reaction:b-silyl to chemical:baran-20"
+      - img:
+        - img "Edge from chemical:baran-21 to reaction:b-tpap"
+      - img:
+        - img "Edge from reaction:b-tpap to chemical:baran-22"
+      - img:
+        - img "Edge from chemical:holton-5 to reaction:h-dieckmann"
+      - img:
+        - img "Edge from reaction:h-dieckmann to chemical:holton-6"
+      - img:
+        - img "Edge from chemical:holton-17 to reaction:h-methyl"
+      - img:
+        - img "Edge from reaction:h-methyl to chemical:holton-18"
+      - img:
+        - img "Edge from chemical:holton-20b to reaction:h-oxetane"
+      - img:
+        - img "Edge from reaction:h-oxetane to chemical:holton-21"
+      - text: Molecule
+      - 'button "Open molecule: Baran compound 19"':
+        - text: Structure not encoded
+        - strong: Baran compound 19
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Baran compound 20"':
+        - text: Structure not encoded
+        - strong: Baran compound 20
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Baran compound 21"':
+        - text: Structure not encoded
+        - strong: Baran compound 21
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Baran compound 22"':
+        - text: Structure not encoded
+        - strong: Baran compound 22
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Baran compound 34"':
+        - text: Structure not encoded
+        - strong: Baran compound 34
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Baran compound 35"':
+        - text: Structure not encoded
+        - strong: Baran compound 35
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 17"':
+        - text: Structure not encoded
+        - strong: Holton compound 17
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 18"':
+        - text: Structure not encoded
+        - strong: Holton compound 18
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 20b"':
+        - text: Structure not encoded
+        - strong: Holton compound 20b
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 21"':
+        - text: Structure not encoded
+        - strong: Holton compound 21
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 24b"':
+        - text: Structure not encoded
+        - strong: Holton compound 24b
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 25"':
+        - text: Structure not encoded
+        - strong: Holton compound 25
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 5"':
+        - text: Structure not encoded
+        - strong: Holton compound 5
+        - text: Structure pending
+      - text: Molecule
+      - 'button "Open molecule: Holton compound 6"':
+        - text: Structure not encoded
+        - strong: Holton compound 6
+        - text: Structure pending
+      - text: Selected molecule
+      - 'button "Open molecule: Paclitaxel (Taxol)"':
+        - img "Paclitaxel (Taxol) structure diagram"
+        - strong: Paclitaxel (Taxol)
+        - text: C47H51NO14
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Taxol coupling and hydrogenolysis sequence"':
+        - text: Draft · verify source
+        - strong: Taxol coupling and hydrogenolysis sequence
+        - text: 85% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Taxol side-chain coupling and deprotection sequence"':
+        - text: Draft · verify source
+        - strong: Taxol side-chain coupling and deprotection sequence
+        - text: 93% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: DMDO oxidation"':
+        - text: Draft · verify source
+        - strong: DMDO oxidation
+        - text: 49% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Enol-silane formation"':
+        - text: Draft · verify source
+        - strong: Enol-silane formation
+        - text: 94% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: TPAP oxidation"':
+        - text: Draft · verify source
+        - strong: TPAP oxidation
+        - text: 81% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Dieckmann C-ring closure"':
+        - text: Draft · verify source
+        - strong: Dieckmann C-ring closure
+        - text: 93% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Methylmagnesium addition"':
+        - text: Draft · verify source
+        - strong: Methylmagnesium addition
+        - text: 95% reported yield View conditions & DOI ↗
+      - text: Reaction
+      - img
+      - 'button "Open reaction: Oxetane ring closure"':
+        - text: Draft · verify source
+        - strong: Oxetane ring closure
+        - text: Yield not reported View conditions & DOI ↗
+      - img
+    - paragraph: Drag the background to pan; drag a card header to arrange it. Click a molecule to explore it or a reaction for conditions and DOI. Use List for a linear view. Layout changes are not saved as chemistry data.
+- contentinfo:
+  - img
+  - text: Only chemistry facts, DOI and authors are shared. Source PDFs and paper images are excluded. Draft structures and conditions require review. 3 papers · 12 draft/curated records · 22 KB data

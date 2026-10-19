@@ -1,0 +1,57 @@
+{
+  "commit": "8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d",
+  "built_commit": "8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d",
+  "provenance": {
+    "schema_version": 1,
+    "workflow_commit": "8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d",
+    "built_commit": "8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d",
+    "library_sha256": "7172a3f6970790c5795f074a8861555456eef330648a6591289ded34165df825"
+  },
+  "run_id": "39204595894",
+  "run_url": "https://github.com/chemryu/chembrain/actions/runs/39204595894",
+  "reported_at": "2026-10-19T05:29:10.504868+00:00",
+  "status": "blocked",
+  "terminal": true,
+  "phase": "terminal",
+  "page_url": null,
+  "facts": {
+    "build": {
+      "result": "failure",
+      "outputs": {
+        "facts": "{\n  \"collection\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"feed\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"identity\": {\n    \"outputs\": {\n      \"value\": \"{\\\"schema_version\\\":1,\\\"workflow_commit\\\":\\\"8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d\\\",\\\"built_commit\\\":\\\"8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d\\\",\\\"library_sha256\\\":\\\"7172a3f6970790c5795f074a8861555456eef330648a6591289ded34165df825\\\"}\"\n    },\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"tests\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"app\": {\n    \"outputs\": {},\n    \"outcome\": \"success\",\n    \"conclusion\": \"success\"\n  },\n  \"browser\": {\n    \"outputs\": {},\n    \"outcome\": \"failure\",\n    \"conclusion\": \"failure\"\n  },\n  \"portable\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"paper_workbench\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  },\n  \"portable_artifact\": {\n    \"outputs\": {},\n    \"outcome\": \"skipped\",\n    \"conclusion\": \"skipped\"\n  }\n}",
+        "provenance": "{\"schema_version\":1,\"workflow_commit\":\"8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d\",\"built_commit\":\"8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d\",\"library_sha256\":\"7172a3f6970790c5795f074a8861555456eef330648a6591289ded34165df825\"}"
+      }
+    },
+    "publish": {
+      "result": "skipped",
+      "outputs": {}
+    }
+  },
+  "independent_qa": "SEPARATE_REVIEW_REQUIRED; preview only",
+  "phases": [
+    {
+      "phase": "dependencies",
+      "at": "2026-10-19T05:26:55.032510+00:00"
+    },
+    {
+      "phase": "tests",
+      "at": "2026-10-19T05:27:52.441976+00:00"
+    },
+    {
+      "phase": "browser-build",
+      "at": "2026-10-19T05:28:12.582566+00:00"
+    },
+    {
+      "phase": "browser-checks",
+      "at": "2026-10-19T05:28:19.879876+00:00"
+    },
+    {
+      "phase": "build-finished",
+      "at": "2026-10-19T05:28:59.565520+00:00"
+    },
+    {
+      "phase": "terminal",
+      "at": "2026-10-19T05:29:10.504901+00:00"
+    }
+  ]
+}
