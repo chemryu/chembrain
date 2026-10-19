@@ -1,0 +1,22 @@
+
+> chembrain@0.2.0 build:paper
+> tsc -b && vite build --mode paper-portable --outDir dist-paper && node scripts/package_paper.mjs
+
+vite v8.3.4 building client environment for paper-portable...
+transforming...
+[plugin rolldown:vite-resolve] Module "node:fs" has been externalized for browser compatibility, imported by "/workspace/chembrain/node_modules/@rdkit/rdkit/dist/RDKit_minimal.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin rolldown:vite-resolve] Module "node:crypto" has been externalized for browser compatibility, imported by "/workspace/chembrain/node_modules/@rdkit/rdkit/dist/RDKit_minimal.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+✓ 1740 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-paper/paper.html                     0.68 kB │ gzip:     0.47 kB
+dist-paper/assets/style-hT6lYTLS.css     27.46 kB │ gzip:     5.56 kB
+dist-paper/assets/paper-D2tzCffa.js   7,585.39 kB │ gzip: 4,083.20 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.59s
+PAPER_PACKAGE_PASS 10165047 bytes sha256=b0b775cd659265fc35bd7ed7a3bd40debf8dcfe53262266a4a683d47365242db source=bc39eda53b22a5b333e9fd7d432005653beab546

@@ -79,7 +79,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Mozilla PDF.js 6.4.299
-PDF.js modification notice: the main-thread external/CDN and fake-worker network imports are replaced at build time with explicit offline errors. A bundled native local Blob worker is required; parser and worker bytes are unmodified.
+PDF.js modification notice: the main-thread external/CDN and fake-worker network imports are replaced at build time with explicit offline errors. A bundled native local module worker using an embedded data URL is required; parser and worker bytes are unmodified.
 
 
                                  Apache License

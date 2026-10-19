@@ -1,0 +1,13 @@
+PAPER_WORKER_OPAQUE_READY_ONLY_PASS: normal HTTP sandbox; exact pinned native module; terminated; PDF parse/render/text required separately
+PAPER_CHECK: source PDF, checked chemistry, strict facts export and private reload passed
+PAPER_CHECK: explicit sketcher transfer, relative-stereo refusal, PDF bounds and failure preservation passed
+PAPER_WORKER_FAILURE_RECOVERY_PASS: forced native error/messageerror settle, close, and real PDF reselect/render/text
+PAPER_CHECK: private storage failure retained the last valid workspace and backup
+PAPER_TRANSFER_CHECK: empty persisted all ordered source facts, protected local edits and exact backup; repeated import was a no-op
+PAPER_TRANSFER_CHECK: partial persisted all ordered source facts, protected local edits and exact backup; repeated import was a no-op
+PAPER_TRANSFER_CHECK: facts-only-empty persisted all ordered source facts, protected local edits and exact backup; repeated import was a no-op
+PAPER_TRANSFER_CHECK: empty-composition persisted all ordered source facts, protected local edits and exact backup; repeated import was a no-op
+PAPER_TRANSFER_CHECK: prefix persisted all ordered source facts, protected local edits and exact backup; repeated import was a no-op
+PAPER_TRANSFER_CHECK: known conditions/amounts/units/concentration/yield/basis, stage order, composition and roles all require visible reconciliation; no writes
+PAPER_TRANSFER_CHECK: fact-only backup write/readback, primary quota, stale review and concurrent-backup failures preserved primary and working route
+PAPER_HTTP_ONLY_PASS: mocked HTTP bytes (file:// NOT VERIFIED); exact pinned native data-URL module PDF worker, rendered canvas and explicit candidates; no DOI auto-selection, no invented image chemistry/OCR; checked stereo/charge/fragments, solution/recorded arrows, strict downloaded facts → explicit main import, exact backup/local-note preservation and idempotency; private hash pairing/reload, mismatched/encrypted/over-limit PDF rejection; MOL sketcher explicit transfer; zero external requests; source=bc39eda53b22a5b333e9fd7d432005653beab546 paper_sha256=b0b775cd659265fc35bd7ed7a3bd40debf8dcfe53262266a4a683d47365242db main_sha256=26d1f83ba3887b768a5a8600ad25935c2e37d34db9b34e1eccf1384f1cf8c724

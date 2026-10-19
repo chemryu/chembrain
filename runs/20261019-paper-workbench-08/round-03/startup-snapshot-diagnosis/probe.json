@@ -1,0 +1,14 @@
+{
+  "scope": "Read-only controlled fetch-scheduling delay, HTTP frozen bc39 main; not assertion weakening or conclusive historical event trace",
+  "old_fixture_snapshot_while_notice_visible": {
+    "legacy_primary": true,
+    "exact_backup": true,
+    "completed_grid_count": 0
+  },
+  "after_completed_grid_boundary": {
+    "normalized_paper_fields": true,
+    "chemistry_preserved": true,
+    "exact_backup_preserved": true,
+    "page_errors": 0
+  }
+}

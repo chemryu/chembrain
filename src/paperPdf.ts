@@ -1,6 +1,8 @@
 import { AnnotationMode, getDocument, PDFWorker, VerbosityLevel } from 'pdfjs-dist';
 import type { PDFDocumentLoadingTask, PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist';
 import compressedWorker from 'virtual:chembrain-pdf-worker';
+import { workerDataUrl, workerDiagnostic } from './paperWorkerTransport';
+import type { WorkerFailureEvent, WorkerStage } from './paperWorkerTransport';
 
 export { extractCandidates } from './paperPdfCandidates';
 export type { DoiCandidate, SmilesCandidate, PaperCandidates } from './paperPdfCandidates';
@@ -33,7 +35,7 @@ function readableError(error: unknown, action: string): Error {
   return new Error(`PDF ${action} failed. The file may be damaged or require unsupported fonts, images, or features. Try an unencrypted PDF in a current Chrome or Edge browser.`);
 }
 
-async function workerBlob(): Promise<Blob> {
+async function workerUrl(): Promise<string> {
   if (typeof Worker === 'undefined' || typeof DecompressionStream === 'undefined' || !globalThis.crypto?.subtle) {
     throw new Error('PDF review needs a current Chrome or Edge browser with local module workers and gzip support.');
   }
@@ -41,7 +43,7 @@ async function workerBlob(): Promise<Blob> {
   const compressed = new Uint8Array(raw.length);
   for (let index = 0; index < raw.length; index++) compressed[index] = raw.charCodeAt(index);
   const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'));
-  return new Blob([await new Response(stream).arrayBuffer()], { type: 'text/javascript' });
+  return workerDataUrl(new Uint8Array(await new Response(stream).arrayBuffer()));
 }
 
 /**
@@ -69,12 +71,57 @@ export async function readPdf(file: File): Promise<PaperPdf> {
   let closed = false;
   let closing: Promise<void> | undefined;
   let workerFailure: Error | undefined;
+  let stage: WorkerStage = 'construction';
+  let diagnosticCount = 0;
+  let rejectWorker!: (reason: Error) => void;
+  const failedWorker = new Promise<never>((_resolve, reject) => { rejectWorker = reject; });
+  // A native event may arrive between operations, when no race is observing it.
+  void failedWorker.catch(() => undefined);
+  const diagnose = (event: WorkerFailureEvent, detail: Parameters<typeof workerDiagnostic>[2] = {}) => {
+    if (diagnosticCount++ >= 3) return;
+    console.warn('PDF worker diagnostic', workerDiagnostic(event, stage, detail, {
+      userAgent: navigator.userAgent, protocol: location.protocol, origin: globalThis.origin,
+    }));
+  };
+  const failWorker = () => {
+    if (closed || workerFailure) return;
+    workerFailure = new Error('PDF worker could not run locally. Reopen the PDF in a current Chrome or Edge browser that allows local module workers.');
+    rejectWorker(workerFailure);
+    void destroy().catch(() => undefined);
+  };
+  const onWorkerError = (event: ErrorEvent) => {
+    // Default browser reporting can include the complete multi-megabyte data URL.
+    event.preventDefault();
+    diagnose('error', { message: event.message, filename: event.filename, name: event.error?.name, line: event.lineno, column: event.colno });
+    failWorker();
+  };
+  const onMessageError = (event: MessageEvent) => {
+    event.preventDefault();
+    diagnose('messageerror'); // Never inspect or print event.data.
+    failWorker();
+  };
+  const workerOperation = async <T>(operation: Promise<T>): Promise<T> => {
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([operation, failedWorker, new Promise<never>((_resolve, reject) => {
+        timeout = setTimeout(() => {
+          diagnose('timeout');
+          const error = new Error('PDF operation took too long. Reopen a smaller or simpler unencrypted PDF.');
+          workerFailure = error;
+          rejectWorker(error);
+          reject(error);
+          void destroy().catch(() => undefined);
+        }, LOAD_TIMEOUT_MS);
+      })]);
+    } finally { clearTimeout(timeout); }
+  };
 
   const destroy = (): Promise<void> => {
     if (closing) return closing;
     closed = true;
+    if (!workerFailure) rejectWorker(abortError());
     renderEpoch++;
-    activeRender?.cancel();
+    try { activeRender?.cancel(); } catch { /* Native worker may already be gone. */ }
     closing = (async () => {
       let timeout: ReturnType<typeof setTimeout> | undefined;
       try {
@@ -86,31 +133,45 @@ export async function readPdf(file: File): Promise<PaperPdf> {
         ]);
       } finally {
         clearTimeout(timeout);
-        pdfWorker?.destroy();
-        nativeWorker?.terminate();
-        if (url) URL.revokeObjectURL(url);
-        activeRender = undefined;
-        document = undefined;
+        try { pdfWorker?.destroy(); }
+        finally {
+          try {
+            nativeWorker?.removeEventListener('error', onWorkerError);
+            nativeWorker?.removeEventListener('messageerror', onMessageError);
+            nativeWorker?.terminate();
+          } finally {
+            // Data URLs need no revocation. Drop every owner after terminating.
+            url = undefined;
+            nativeWorker = undefined;
+            pdfWorker = undefined;
+            loading = undefined;
+            activeRender = undefined;
+            document = undefined;
+            data = new ArrayBuffer(0);
+          }
+        }
       }
     })();
     return closing;
   };
   const assertPage = (page: number): PDFDocumentProxy => {
-    if (closed || !document) throw abortError();
     if (workerFailure) throw workerFailure;
+    if (closed || !document) throw abortError();
     if (!Number.isSafeInteger(page) || page < 1 || page > document.numPages) throw new Error(`PDF page must be between 1 and ${document.numPages}.`);
     return document;
   };
 
   try {
-    url = URL.createObjectURL(await workerBlob());
-    nativeWorker = new Worker(url, { type: 'module', name: 'chembrain-local-pdf' });
-    let rejectWorker!: (reason: Error) => void;
-    const failedWorker = new Promise<never>((_resolve, reject) => { rejectWorker = reject; });
-    nativeWorker.addEventListener('error', () => {
-      workerFailure = new Error('PDF worker could not run locally. Use a current Chrome or Edge browser that allows local module workers.');
-      rejectWorker(workerFailure);
-    });
+    url = await workerUrl();
+    try { nativeWorker = new Worker(url, { type: 'module', name: 'chembrain-local-pdf' }); }
+    catch (error) {
+      diagnose('constructor', { name: error instanceof Error ? error.name : undefined });
+      throw new Error('PDF worker could not start locally. Use a current Chrome or Edge browser that allows local module workers.');
+    }
+    url = undefined; // Worker owns its script; do not retain another encoded copy.
+    nativeWorker.addEventListener('error', onWorkerError);
+    nativeWorker.addEventListener('messageerror', onMessageError);
+    stage = 'loading';
     pdfWorker = PDFWorker.create({ port: nativeWorker, verbosity: VerbosityLevel.ERRORS });
     loading = getDocument({
       data: new Uint8Array(data), worker: pdfWorker,
@@ -122,30 +183,25 @@ export async function readPdf(file: File): Promise<PaperPdf> {
       maxImageSize: 25_000_000, canvasMaxAreaInBytes: 16_000_000,
       verbosity: VerbosityLevel.ERRORS,
     });
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-    try {
-      document = await Promise.race([
-        loading.promise, failedWorker,
-        new Promise<never>((_resolve, reject) => {
-          timeout = setTimeout(() => reject(new Error('PDF loading took too long. Try a smaller or simpler unencrypted PDF.')), LOAD_TIMEOUT_MS);
-        }),
-      ]);
-    } finally { clearTimeout(timeout); }
+    document = await workerOperation(loading.promise);
     if (document.numPages > PDF_MAX_PAGES) throw new Error('PDF files must contain 400 pages or fewer. Split the file locally before review.');
-    const metadata = await document.getMetadata();
+    stage = 'metadata';
+    const metadata = await workerOperation(document.getMetadata());
     if ((metadata.info as Record<string, unknown>).EncryptFilterName) {
       throw new Error('PDF encrypted documents are not supported. Open an unencrypted copy locally.');
     }
     const pageCount = document.numPages;
+    stage = 'ready';
     return {
       fingerprint: hash, hash, pageCount,
       async getPageText(pageNumber) {
         const pdf = assertPage(pageNumber);
         let page: PDFPageProxy | undefined;
         try {
-          page = await pdf.getPage(pageNumber);
+          stage = 'text';
+          page = await workerOperation(pdf.getPage(pageNumber));
           if (closed) throw abortError();
-          const content = await page.getTextContent({ includeMarkedContent: false, disableNormalization: false });
+          const content = await workerOperation(page.getTextContent({ includeMarkedContent: false, disableNormalization: false }));
           if (closed) throw abortError();
           const parts: string[] = [];
           let length = 0;
@@ -177,7 +233,8 @@ export async function readPdf(file: File): Promise<PaperPdf> {
         let page: PDFPageProxy | undefined;
         let render: RenderTask | undefined;
         try {
-          page = await pdf.getPage(pageNumber);
+          stage = 'render';
+          page = await workerOperation(pdf.getPage(pageNumber));
           if (closed || epoch !== renderEpoch) throw abortError();
           const base = page.getViewport({ scale: 1 });
           if (!(base.width > 0 && base.height > 0 && Number.isFinite(base.width) && Number.isFinite(base.height))) throw new Error('PDF page dimensions are not valid.');
@@ -188,7 +245,7 @@ export async function readPdf(file: File): Promise<PaperPdf> {
           if (!canvas.getContext('2d')) throw new Error('PDF page canvas is unavailable in this browser.');
           render = page.render({ canvas, viewport, annotationMode: AnnotationMode.DISABLE, background: 'rgb(255,255,255)' });
           activeRender = render;
-          await render.promise;
+          await workerOperation(render.promise);
           if (closed || epoch !== renderEpoch) throw abortError();
         } catch (error) {
           if (epoch === renderEpoch) { canvas.width = 0; canvas.height = 0; }

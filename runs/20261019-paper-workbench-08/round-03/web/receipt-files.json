@@ -1,0 +1,27 @@
+{
+  "receipt_commit": "f94c3d1ddd9cdd3c2dca006d8e6f0f4b4e54be17",
+  "source_commit": "bc39eda53b22a5b333e9fd7d432005653beab546",
+  "run_id": "39278014757",
+  "files": [
+    {
+      "file": "status.json",
+      "bytes": 3000,
+      "sha256": "c725a0cd8d36674d9aecdd63a1ab4e967ca6b8a70338d7ce0bdbc2eab9c775c0"
+    },
+    {
+      "file": "web-browser.log",
+      "bytes": 605,
+      "sha256": "32499c2ab291c1bbb88d6eaa2569f3d38bdef8e3f7bed7c7bc05a751d43a2d7e"
+    },
+    {
+      "file": "web-build.log",
+      "bytes": 1462,
+      "sha256": "968c53adc4f5a31944e40a1cf2438ff13dc4ecdeba1a386824ee15df737a4c4a"
+    },
+    {
+      "file": "web-tests.log",
+      "bytes": 982,
+      "sha256": "12d7c98fbf481cb87482000dc492a2a8be675e339507f3ea0adbad44a106ea57"
+    }
+  ]
+}

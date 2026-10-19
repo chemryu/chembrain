@@ -1,5 +1,18 @@
 # ChemBrain 진행 위키
 
+## 현재 상태 — Paper Workbench / round-03 수정 요청
+
+**CHANGES REQUESTED / 신규 QA-PW-03 P2 fixture race — QA-PW-01 해결, QA-PW-02 실제 file 검증 미완료, round-04 Planning 환류**
+
+- 고정·푸시 소스 **`bc39eda53b22a5b333e9fd7d432005653beab546`**. 별도 [Planning](runs/20261019-paper-workbench-08/round-03/planning.md) → [Development](runs/20261019-paper-workbench-08/round-03/development.md) → [QA 전체 원문](runs/20261019-paper-workbench-08/round-03/qa.md) → [Revision 전체 원문](runs/20261019-paper-workbench-08/round-03/revision.md) → [Wiki 기록](runs/20261019-paper-workbench-08/round-03/wiki-record.md)·[round-04 Planning 인계](runs/20261019-paper-workbench-08/round-03/handoff.md). 두 독립 역할 모두 CHANGES REQUESTED, 새 required-test P2 1건과 실제 file acceptance gate 미완료이며 전달물 없음입니다.
+- **QA-PW-03 P2**: metadata fixture가 `networkidle` 직후 migration 완료 전 primary/backup을 읽고, 이후 notice를 기다려도 이미 잡은 문자열이 갱신되지 않습니다. root·QA의 제어된 fetch-start 지연 probe는 notice·정확한 backup이 있어도 grid 전에는 legacy primary, grid 완료 후 새 snapshot은 strict DOI/authors와 모든 chemistry/backup을 보존함을 확인했습니다. 테스트 동기화 결함이며 정확한 과거 runner 시간 순서를 재구성한 것은 아닙니다. 앱 allowlist/data-loss 결함으로 쓰지 않습니다.
+- **QA-PW-01 RESOLVED** 유지. worker는 동일 pinned bytes를 genuine native data-URL module로 전달하고 finite private diagnostics/cleanup·strict URL/byte/hash guard를 추가했습니다. 로컬 PDF/worker HTTP parse/render/text/transfer·failure/reselect PASS이나 **QA-PW-02 실제 file acceptance는 NOT VERIFIED**입니다. 이번 CI는 worker에 도달하지 않아 옛 worker 오류 재발도 해결도 관찰하지 않았습니다.
+- 개발 로컬11명령 PASS, Python **341 PASS/Windows DPAPI1 SKIP**, hosted·양쪽 HTTP-only·payload PASS. QA39 focused와 실제 native HTTP timeout/reselect PASS, Revision source/integrity 독립 확인. 로컬 actual-file은 관리 정책으로 NOT RUN이며 우회하지 않았습니다. opaque-origin worker probe는 ready-only입니다.
+- 실제 [CI39278014757](https://github.com/chemryu/chembrain/actions/runs/39278014757), 불변 영수증 **`f94c3d1ddd9cdd3c2dca006d8e6f0f4b4e54be17`**: Python341/1·hosted build PASS, **hosted browser FAIL web_smoke.py152**. 이후 hosted map/receiving·main portable·paper build/양쪽 actual-file/전체 전달은 SKIPPED/NOT RUN. artifact upload·publish SKIPPED, 새 다운로드/CI portable manifest 없음. Pages 설정/배포/HTTPS NOT RUN, URL null, 새403 없음. [4개 원본/해시](runs/20261019-paper-workbench-08/round-03/web/receipt-files.json)를 Wiki가 불변 Git bytes와 대조했습니다.
+- [로컬 manifest](runs/20261019-paper-workbench-08/round-03/candidate-manifests.json)의 Main5111218bytes/SHA`26d1f83ba3887b768a5a8600ad25935c2e37d34db9b34e1eccf1384f1cf8c724`, Paper10165047bytes/SHA`b0b775cd659265fc35bd7ed7a3bd40debf8dcfe53262266a4a683d47365242db`는 실제 로컬 bytes와 일치합니다. 같은 main bytes나 HTTP PASS로 새 소스의 actual-file 승인을 승계하지 않습니다. ZIP 독립 download/rehash 없음입니다.
+- 다음은 [formal round-04 handoff](runs/20261019-paper-workbench-08/round-03/handoff.md): 모든 metadata profile에서 `.molecular-grid` count1 완료를 기다린 **뒤** primary·backup fresh snapshot, 명시적 held-fetch 회귀, 모든 strict/exact backup·failure/reload/export assertion 유지. 새 SHA와 전체 required hosted/두 actual-file/PDF worker·실제 JSON 전달·artifact 증거 및 별도 QA/Revision이 필요합니다. 앱 변경·sleep/retry·assertion 완화가 아닙니다.
+- 게시된 records **`28798f6f04d29a0abca22e06e1e45775a6ab2fec`**는 round-02까지입니다. **round-03 기록 commit/push는 root 작업으로 아직 pending**입니다. c484/8cbd 거절·b382 historical accepted 구조 다운로드와 모든 이전 원문은 유지합니다. PDF/private source·사용자 edits/backup·strict 공용 데이터·영어 UI 범위, Pages/Public/history/Box/주간 미활성/main 미병합·상시 agent 미활성 제한은 그대로입니다.
+
 ## 현재 상태 — Paper Workbench / round-02 수정 요청
 
 **CHANGES REQUESTED / QA-PW-01 해결·신규 QA-PW-02 P1 1건 — 실제 file:// PDF worker FAIL, round-03 Planning 환류**

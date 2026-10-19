@@ -1,0 +1,131 @@
+{
+  "source_commit": "bc39eda53b22a5b333e9fd7d432005653beab546",
+  "checks": {
+    "python": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "elapsed_seconds": 22.15,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/python.log",
+      "sha256": "828115fd08b1c727b6488da2932bc19d1be4ed0735573678a0cbb6117d08a34b"
+    },
+    "web-build": {
+      "returncode": 0,
+      "command": [
+        "npm",
+        "run",
+        "build:web"
+      ],
+      "elapsed_seconds": 5.31,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/web-build.log",
+      "sha256": "446af38918bf22528e3968cc96200f123a21d87b3d487a54d2e04607047c3fb5",
+      "environment": {
+        "CHEMBRAIN_BASE": "/chembrain/"
+      }
+    },
+    "web-browser": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/web_smoke.py"
+      ],
+      "elapsed_seconds": 39.45,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/web-browser.log",
+      "sha256": "8323bb3fd9ac495e14b6333c9e1b430821b73d65fa527b35dc803c6286939ad5"
+    },
+    "web-payload": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/check_repository_payloads.py",
+        "--dist",
+        "dist"
+      ],
+      "elapsed_seconds": 0.06,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/web-payload.log",
+      "sha256": "2565e30842b71fd73ae403a24785bf086a162153a40599e1a3e83529b1ebd785"
+    },
+    "portable-build": {
+      "returncode": 0,
+      "command": [
+        "npm",
+        "run",
+        "build:portable"
+      ],
+      "elapsed_seconds": 5.86,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/portable-build.log",
+      "sha256": "e9daef27fd28f1182c61dd540fbee2a5ad774089aff1aa139047da26878601b8"
+    },
+    "portable-http": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/portable_smoke.py",
+        "--http-only"
+      ],
+      "elapsed_seconds": 60.44,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/portable-http.log",
+      "sha256": "703fd9ffbc7655c9fe011a6102890422548a73d970e864de20b89f1de1423547"
+    },
+    "portable-payload": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/check_repository_payloads.py",
+        "--dist",
+        "dist-portable"
+      ],
+      "elapsed_seconds": 0.06,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/portable-payload.log",
+      "sha256": "2565e30842b71fd73ae403a24785bf086a162153a40599e1a3e83529b1ebd785"
+    },
+    "paper-build": {
+      "returncode": 0,
+      "command": [
+        "npm",
+        "run",
+        "build:paper"
+      ],
+      "elapsed_seconds": 5.8,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/paper-build.log",
+      "sha256": "f8a237d3573ce57b9f1e74c9d9bcbeea81582f687f8055e8ebe8890c8a7a1563"
+    },
+    "paper-http": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/paper_workbench_smoke.py",
+        "--http-only"
+      ],
+      "elapsed_seconds": 71.01,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/paper-http.log",
+      "sha256": "730a148700cd509e6d4d1d0a9c1f10a98cf08c82758e09a64bb9414fa55e6ccc"
+    },
+    "paper-payload": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/check_repository_payloads.py",
+        "--dist",
+        "dist-paper"
+      ],
+      "elapsed_seconds": 0.07,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/paper-payload.log",
+      "sha256": "2f252e360ba491897726a732a8d7ec46777601a2812babc06b693da6595d39b4"
+    },
+    "source-payload": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/check_repository_payloads.py"
+      ],
+      "elapsed_seconds": 0.06,
+      "log": "runs/20261019-paper-workbench-08/round-03/local/source-payload.log",
+      "sha256": "12041ceb9eb43b0ea43b43cfd927d8154b83257cd622229bb5a82c0c9632142a"
+    }
+  }
+}

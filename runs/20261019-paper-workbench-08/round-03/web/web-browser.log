@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/runner/work/chembrain/chembrain/scripts/web_smoke.py", line 218, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/runner/work/chembrain/chembrain/scripts/web_smoke.py", line 178, in main
+    check_metadata_boundary(browser,url)
+  File "/home/runner/work/chembrain/chembrain/scripts/web_smoke.py", line 152, in check_metadata_boundary
+    assert all(set(row)=={'id','doi','authors'} for row in projected['papers'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
