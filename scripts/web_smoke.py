@@ -116,7 +116,7 @@ def check_metadata_boundary(browser,url):
  legacy['solutions'][0]['concentration']=0.125
  raw=json.dumps(legacy,indent=3,ensure_ascii=False)+'\n'  # byte-exact backup, not reserialization
  key='chembrain.normalized-library.v1'
- for failure in [None,'backup','primary','unknown']:
+ for failure,delayed in [(None,False),(None,True),('backup',False),('primary',False),('unknown',False)]:
   context=browser.new_context()
   page=context.new_page();errors=[]
   page.on('pageerror',lambda error:errors.append(str(error)))
@@ -133,8 +133,32 @@ def check_metadata_boundary(browser,url):
     if((failure==='backup'&&k.includes('.legacy-backup.'))||(failure==='primary'&&k===key))throw new DOMException('Test storage full','QuotaExceededError');
     return write.call(this,k,v);
    };
-  })();'''.replace('INITIAL',json.dumps(initial)).replace('FAILURE',json.dumps(failure)))
+   if(DELAYED && localStorage.getItem(key)===INITIAL){
+    const fetch=window.fetch.bind(window),pending=[];
+    let released=false;
+    window.__releaseLibrary=()=>{released=true;for(const resume of pending.splice(0))resume();};
+    window.fetch=(...args)=>String(args[0]).endsWith('/library.json')&&!released
+     ?new Promise((resolve,reject)=>{pending.push(()=>fetch(...args).then(resolve,reject));window.__libraryHeld=true;})
+     :fetch(...args);
+   }
+  })();'''.replace('INITIAL',json.dumps(initial)).replace('FAILURE',json.dumps(failure)).replace('DELAYED',json.dumps(delayed)))
   page.goto(url,wait_until='networkidle')
+  if delayed:
+   # Negative control: networkidle and the backup notice can both precede
+   # primary migration. Hold fetch initiation rather than an in-flight request.
+   assert page.evaluate('window.__libraryHeld===true')
+   expect(page.get_by_role('status')).to_contain_text('backed up privately')
+   expect(page.locator('.molecular-grid')).to_have_count(0)
+   early=page.evaluate('(k)=>localStorage.getItem(k)',key)
+   assert early==raw
+   assert page.evaluate("Object.keys(localStorage).filter(k=>k.includes('.legacy-backup.')).map(k=>localStorage.getItem(k))")==[raw]
+   assert not all(set(row)=={'id','doi','authors'} for row in json.loads(early)['papers'])
+   # Controlled slow-start input, not a readiness sleep: removing the wait
+   # below captures the unchanged legacy bytes and fails strict projection.
+   page.evaluate('setTimeout(()=>window.__releaseLibrary(),1000)')
+  # The grid renders only after load's finally, including error/recovery paths.
+  # Capture fresh primary AND backup bytes after that lifecycle boundary.
+  expect(page.locator('.molecular-grid')).to_have_count(1,timeout=15000)
   actual=page.evaluate('(k)=>localStorage.getItem(k)',key)
   backups=page.evaluate("Object.keys(localStorage).filter(k=>k.includes('.legacy-backup.')).map(k=>localStorage.getItem(k))")
   if failure in ['backup','unknown']:
@@ -151,8 +175,13 @@ def check_metadata_boundary(browser,url):
     projected=json.loads(actual)
     assert all(set(row)=={'id','doi','authors'} for row in projected['papers'])
     for table in ['chemicals','reactions','solutions']:assert projected[table]==legacy[table],table
+    if delayed:
+     assert early==raw and actual!=early
+     print('METADATA_DELAYED_START_PASS: early legacy snapshot rejected; completed migration preserves strict facts and exact private backup',flush=True)
     page.reload(wait_until='networkidle')
+    expect(page.locator('.molecular-grid')).to_have_count(1,timeout=15000)
     assert page.evaluate('(k)=>localStorage.getItem(k)',key)==actual
+    assert page.evaluate("Object.keys(localStorage).filter(k=>k.includes('.legacy-backup.')).map(k=>localStorage.getItem(k))")==[raw]
     with page.expect_download() as download:page.get_by_role('button',name='Backup JSON',exact=True).click()
     exported=json.loads(Path(download.value.path()).read_text())
     assert exported==projected
