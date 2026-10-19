@@ -1,6 +1,18 @@
 # ChemBrain 진행 위키
 
-## 현재 상태 — 실제 분자 구조 / structures round-01
+## 현재 상태 — Paper Workbench / round-01 수정 요청
+
+**CHANGES REQUESTED / P1 앱 지적 1건 + 새 CI hosted browser FAIL — 새 두 프로그램 전달 미승인, round-02 Planning 환류**
+
+- 실행 `20261019-paper-workbench-08 / round-01`, 정확한 고정·푸시 소스 **`8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d`**. 별도 [Planning](runs/20261019-paper-workbench-08/round-01/planning.md) → [Development](runs/20261019-paper-workbench-08/round-01/development.md) → [QA 전체 원문](runs/20261019-paper-workbench-08/round-01/qa.md) → [Revision 전체 원문](runs/20261019-paper-workbench-08/round-01/revision.md) → [Wiki](runs/20261019-paper-workbench-08/round-01/wiki-record.md)·[다음 Planning 인계](runs/20261019-paper-workbench-08/round-01/handoff.md)입니다. 두 독립 역할 모두 **CHANGES REQUESTED / QA-PW-01 P1 1건**이며 이전 `b38260d` 구조 미리보기의 승인·다운로드는 과거 버전용으로만 보존합니다.
+- 별도 Paper Workbench는 로컬 PDF 메모리 보기·text 후보·사용자 구조 인코딩/그리기·출처 확인·명시적 반응/용액 연결·strict JSON 전달을 구현했습니다. 원문과 후보는 private이며 전문/PDF를 GitHub나 compact export에 넣지 않습니다. **자동 화학 그림 인식이나 완전한 논문 정보 추출은 구현하지 않았습니다.** 본 후보는 검수에서 문제를 찾아 아직 사용자 전달물이 아닙니다.
+- **QA-PW-01 P1**: 기존 ID 반응의 빈 stages, 기존 용액의 null 농도·용질 양/단위를 새 checked 사실로 채워도 main receiving planner가 조용히 기존 빈 값을 유지합니다. 새 stage용 solution만 추가되고 반응 링크가 빠지는 재현도 있습니다. QA와 Revision이 각각 실제 TypeScript helper로 확인했습니다. non-null 사용자 값은 보존하되 missing facts·순서 있는 stages/solution links·조건/양·yield/evidence 차이를 명시적으로 review/apply 또는 충돌로 보여야 합니다. 정확한 원본 private backup·전체 검증·실패 보존·반복 idempotence를 유지하는 수정이 필요합니다.
+- 개발 로컬 11개 명령 **PASS**, 전체 **316 PASS / Windows DPAPI 1 SKIP**, main/별도 paper HTTP-only 두 프로그램 E2E·build·payload PASS입니다. QA 별도 19개 집중, Revision 별도 14개 집중 검사는 PASS지만 새로 재현한 same-ID 누락을 덮지 않습니다. 기존 빈 stage fixture가 빠져 있었습니다. 로컬 실제 file://는 관리 정책으로 NOT RUN이고 우회하지 않았습니다.
+- 새 실제 [CI39204595894](https://github.com/chemryu/chembrain/actions/runs/39204595894), 불변 영수증 **`546a9afe693f52c5165d76651748dd0984c56924`**: tests **316 PASS / 1 SKIP**, app build PASS이나 **hosted browser FAIL**입니다. 이번에는 traceback head가 보존되어 `synthesis_map_smoke.py:59`의 reaction inspector가 drag 후 keyboard focus/Enter 과정에서 나오지 않는 assertion을 확인했습니다. **근본 원인은 UNRESOLVED**이며 QA-PW-01이나 예전 잃어버린 CI 원인과 같다고 가정하지 않습니다. [4개 원본과 manifest](runs/20261019-paper-workbench-08/round-01/web/receipt-files.json)를 Wiki가 불변 Git bytes·hash와 대조했습니다.
+- CI main portable·Paper Workbench·두 프로그램 실제 file://·artifact upload는 **SKIP/NOT RUN**, 새 다운로드 없음입니다. publish도 생략되어 이번 Pages 설정·배포·HTTP 모두 NOT RUN, URL null입니다. 이전 Pages403은 역사이며 이번에 새로 관찰한 403이라고 쓰지 않습니다. 다음 [round-02 Planning](runs/20261019-paper-workbench-08/round-01/handoff.md)은 missing-stage/solution facts·source evidence remapping/backup/실제 두 프로그램 old-ID fixture와 별도 CI keyboard 실패 진단을 모두 다룹니다. 검사 약화 없이 새 SHA·actual-file 증거와 두 독립 검수로 돌아옵니다.
+- 원문/개인 데이터 경계·영어 UI·기존 사용자 편집·strict DOI/저자·기록된 합성 연결만 표시하는 범위를 유지합니다. Git 역사 quotation/crop·원격 Actions storage UNVERIFIED로 Public 미승인, main/history/권한/Box 변경 없음, 저널 다운로드·주간 작업은 미활성 그대로입니다. 소스는 수정하지 않고 정식 Revision → Wiki → Planning을 마친 뒤 다음 Development를 시작합니다.
+
+## 이전 상태 — 실제 분자 구조 / structures round-01
 
 **오프라인 분자 구조 미리보기 READY / 별도 QA·Revision material 지적 0건 — 새 Pages403·역사 Public 미승인은 별도 유지**
 

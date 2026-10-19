@@ -10,12 +10,16 @@
     "build:web": "tsc -b && vite build",
     "build:portable": "tsc -b && vite build --mode portable --outDir dist-portable && node scripts/package_browser.mjs",
     "dev:desktop": "vite --mode desktop --host 127.0.0.1",
-    "build:desktop": "tsc -b && vite build --mode desktop"
+    "build:desktop": "tsc -b && vite build --mode desktop",
+    "dev:paper": "vite --mode paper-portable --host 127.0.0.1",
+    "build:paper": "tsc -b && vite build --mode paper-portable --outDir dist-paper && node scripts/package_paper.mjs"
   },
   "dependencies": {
     "@rdkit/rdkit": "2026.9.1",
     "@xyflow/react": "12.12.0",
     "lucide-react": "0.468.0",
+    "openchemlib": "9.25.1",
+    "pdfjs-dist": "6.4.299",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },

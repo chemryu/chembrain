@@ -1,0 +1,4 @@
+PAPER_CHECK: source PDF, checked chemistry, strict facts export and private reload passed
+PAPER_CHECK: explicit sketcher transfer, relative-stereo refusal, PDF bounds and failure preservation passed
+PAPER_CHECK: private storage failure retained the last valid workspace and backup
+PAPER_HTTP_ONLY_PASS: mocked HTTP bytes (file:// NOT VERIFIED); real local blob PDF worker, rendered canvas and explicit candidates; no DOI auto-selection, no invented image chemistry/OCR; checked stereo/charge/fragments, solution/recorded arrows, strict downloaded facts → explicit main import, exact backup/local-note preservation and idempotency; private hash pairing/reload, mismatched/encrypted/over-limit PDF rejection; MOL sketcher explicit transfer; zero external requests; source=8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d paper_sha256=388d1a1bfd0f52808ca213f90cbcb472c7cd34e5f7f33175df70bfbb957d70b2 main_sha256=2070ff18299d094f8bfc1b44cfa19aa16a57f8a58e54e90585c4d4846c81e068

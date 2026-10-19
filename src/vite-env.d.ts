@@ -7,3 +7,5 @@ declare module "virtual:chembrain-portable-data" {
   export const library: unknown;
   export const depictions: Record<string, string>;
 }
+
+declare module 'virtual:chembrain-pdf-worker' { const gzipBase64:string; export default gzipBase64; }

@@ -13,6 +13,7 @@ from playwright.sync_api import expect, sync_playwright
 from synthesis_map_smoke import check_synthesis_map
 from structure_smoke import check_structures,wait_for_seed_tile_images
 from structure_upgrade_smoke import check_structure_upgrade
+from import_handoff_smoke import check_import_handoff
 
 ROOT = Path(__file__).resolve().parents[1]
 STORE = 'chembrain.normalized-library.v1'
@@ -119,6 +120,7 @@ def edit_and_transfer(browser, url, document=None):
     startup(page, url)
     check_structures(page)
     check_structure_upgrade(page)
+    check_import_handoff(page)
     check_synthesis_map(page)
     with page.expect_download() as initial_download:
         page.get_by_role('button', name='Backup JSON', exact=True).click()
@@ -277,7 +279,7 @@ def main():
         finally:
             browser.close()
     mode = 'HTTP_ONLY_PORTABLE_PASS: in-memory HTTP document (file:// NOT VERIFIED)' if args.http_only else 'PORTABLE_BROWSER_PASS: actual file:// HTML'
-    print(mode + ', offline and all additional resource requests rejected; zero app network/assets; bundled renderer real target/selected/map vector structures, imported stereo/charged/multifragment SMILES, rename/edit/invalid recovery, structure JSON backup/import, private verified-example upgrade; default synthesis map, pan/zoom/fit, keyboard node/detail navigation, branches/gaps, Map/List and mobile; initial empty reaction panel, molecule filter, one DOI/authors reference, chemical/reaction/solution/paper edits, reload, backup/profile import, unknown import rejected, unavailable/full storage retains originals, mobile, malicious raw-text fixture and unexpected chunks rejected; source=' + manifest['source_commit'] + ' html_sha256=' + manifest['sha256'])
+    print(mode + ', offline and all additional resource requests rejected; zero app network/assets; bundled renderer real target/selected/map vector structures, imported stereo/charged/multifragment SMILES, rename/edit/invalid recovery, structure JSON backup/import, private verified-example upgrade; explicit paper handoff, blank-structure/label preview and exact backup, canonical equivalence and collision protection; default synthesis map, pan/zoom/fit, keyboard node/detail navigation, branches/gaps, Map/List and mobile; initial empty reaction panel, molecule filter, one DOI/authors reference, chemical/reaction/solution/paper edits, reload, backup/profile import, unknown import rejected, unavailable/full storage retains originals, mobile, malicious raw-text fixture and unexpected chunks rejected; source=' + manifest['source_commit'] + ' html_sha256=' + manifest['sha256'])
 
 
 if __name__ == '__main__':

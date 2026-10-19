@@ -1,0 +1,12 @@
+.paper-sketcher{min-width:0;margin:16px 0;padding:16px;border:1px solid #c6d5d0;border-radius:12px;background:#f7faf8;color:#243b32}
+.paper-sketcher h3{margin:0 0 8px;font-size:17px}
+.paper-sketcher p{margin:8px 0;line-height:1.5;font-size:14px;overflow-wrap:anywhere}
+.paper-sketcher-canvas{width:100%;height:390px;min-width:0;overflow:hidden;border:1px solid #b4c8be;border-radius:7px;background:white}
+.paper-sketcher-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:12px}
+.paper-sketcher-actions button{margin:0}
+.paper-sketcher-file{display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-width:100%;font-size:14px;font-weight:600}
+.paper-sketcher-file input{min-width:0;max-width:100%;font:inherit}
+.paper-sketcher-help{color:#52665b}
+.paper-sketcher .paper-sketcher-notice{padding:10px;border:1px solid #b6d4c4;border-radius:6px;background:#eaf5ee}
+.paper-sketcher .paper-sketcher-error{color:#8a291f;border-color:#e4b9ae;background:#fff2ed}
+@media(max-width:600px){.paper-sketcher{padding:10px}.paper-sketcher-canvas{height:370px}.paper-sketcher-actions{align-items:stretch}.paper-sketcher-actions button{white-space:normal}.paper-sketcher-file{width:100%}}

@@ -1,0 +1,45 @@
+{
+  "main": {
+    "schema_version": 1,
+    "source_commit": "8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d",
+    "app_version": "0.2.0",
+    "preview": true,
+    "format": "single-html-base64-utf8-module",
+    "file": "Chembrain.html",
+    "bytes": 5096218,
+    "sha256": "2070ff18299d094f8bfc1b44cfa19aa16a57f8a58e54e90585c4d4846c81e068",
+    "library_sha256": "7172a3f6970790c5795f074a8861555456eef330648a6591289ded34165df825",
+    "javascript_sha256": "e607c5590ca34eecc43ee464edc0cead792694c7b360464b209889ee07f4a79e",
+    "structure_renderer": {
+      "package": "@rdkit/rdkit",
+      "version": "2026.9.1",
+      "wasm_sha256": "594ceaed387adc70ea13bfbb2e8eace916f6c782254ed5a6f0f0a0a7a4fe4061"
+    },
+    "styles_sha256": [
+      "02a6c7597c467bbe6be1d78a16c010cf87b0cc5f54073ba8bb417b74ded49181"
+    ]
+  },
+  "paper": {
+    "schema_version": 1,
+    "source_commit": "8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d",
+    "preview": true,
+    "format": "single-html-base64-utf8-module",
+    "file": "Chembrain-Paper-Workbench.html",
+    "bytes": 10160614,
+    "sha256": "388d1a1bfd0f52808ca213f90cbcb472c7cd34e5f7f33175df70bfbb957d70b2",
+    "javascript_sha256": "c7b04cbe6e3ce8eb759ef846497a2f8fc983fe4aadb2682114b5381b6cdd86ca",
+    "styles_sha256": [
+      "448b9754c13b5fe39707296570b94cbc13dd4f6c8e812c5e72fef05395acfadf"
+    ],
+    "engines": {
+      "@rdkit/rdkit": "2026.9.1",
+      "pdfjs-dist": "6.4.299",
+      "openchemlib": "9.25.1"
+    },
+    "rdkit_wasm_sha256": "594ceaed387adc70ea13bfbb2e8eace916f6c782254ed5a6f0f0a0a7a4fe4061",
+    "pdf_worker_sha256": "9536359f1b8367850d485731ca1d5e45c159a7b7a0912325e539937aa21ceb18",
+    "private_source_documents_included": false
+  },
+  "approved": false,
+  "reason": "QA-PW-01 existing stage/solution facts silently lost"
+}

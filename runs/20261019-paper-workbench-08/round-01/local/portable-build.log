@@ -1,0 +1,22 @@
+
+> chembrain@0.2.0 build:portable
+> tsc -b && vite build --mode portable --outDir dist-portable && node scripts/package_browser.mjs
+
+vite v8.3.4 building client environment for portable...
+transforming...
+✓ 1744 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-portable/index.html                     0.70 kB │ gzip:     0.47 kB
+dist-portable/assets/style-DglxvZO3.css     63.92 kB │ gzip:    13.44 kB
+dist-portable/assets/index-BNbY0Dns.js   3,756.31 kB │ gzip: 2,590.72 kB
+
+✓ built in 818ms
+PORTABLE_PACKAGE_PASS Chembrain.html 5096218 bytes sha256=2070ff18299d094f8bfc1b44cfa19aa16a57f8a58e54e90585c4d4846c81e068 source=8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d
+[plugin rolldown:vite-resolve] Module "node:crypto" has been externalized for browser compatibility, imported by "/workspace/chembrain/node_modules/@rdkit/rdkit/dist/RDKit_minimal.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin rolldown:vite-resolve] Module "node:fs" has been externalized for browser compatibility, imported by "/workspace/chembrain/node_modules/@rdkit/rdkit/dist/RDKit_minimal.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

@@ -7,6 +7,7 @@ from playwright.sync_api import sync_playwright,expect
 from synthesis_map_smoke import check_synthesis_map
 from structure_smoke import check_structures,wait_for_seed_tile_images
 from structure_upgrade_smoke import check_structure_upgrade
+from import_handoff_smoke import check_import_handoff
 ROOT=Path(__file__).resolve().parents[1]
 class Handler(SimpleHTTPRequestHandler):
  def do_GET(self):
@@ -179,6 +180,7 @@ def main():
    expect(page.locator('.web-reaction')).to_have_count(0);expect(page.get_by_text('All reactions',exact=True)).to_have_count(0);expect(page.get_by_text('Organic synthesis',exact=True)).to_have_count(0)
    check_structures(page)
    check_structure_upgrade(page)
+   check_import_handoff(page)
    check_synthesis_map(page)
    wait_for_seed_tile_images(page)
    page.screenshot(path='/tmp/chembrain-web-library.png',full_page=True)
@@ -211,6 +213,6 @@ def main():
    assert not errors,errors
    assert not any('/api/' in r or not r.startswith(url.split('/chembrain')[0]) for r in requests),requests
    browser.close()
-   print('WEB_LIBRARY_BROWSER_PASS: real vector target/selected/map structures, imported stereo/charged/multifragment SMILES, rename/edit/invalid recovery, structure JSON backup/import, private verified-example upgrade; default recorded synthesis map, branches, gap notice, pan/zoom/fit, keyboard node/detail navigation, no exploration writes, map mobile and List fallback; empty initial panel, molecule-related records, stage solutions, one DOI reference, edit/reload/import preservation, malformed-editor correction/cancel/storage, Python-export browser import, metadata-only DOI/authors display/export, byte-exact legacy backup and storage-failure recovery, unknown-field rejection, no copied paper assets, backup, subpath assets and mobile; no backend API.')
+   print('WEB_LIBRARY_BROWSER_PASS: real vector target/selected/map structures, imported stereo/charged/multifragment SMILES, rename/edit/invalid recovery, structure JSON backup/import, private verified-example upgrade; explicit paper handoff, blank-structure/label preview and exact backup, canonical equivalence and collision protection; default recorded synthesis map, branches, gap notice, pan/zoom/fit, keyboard node/detail navigation, no exploration writes, map mobile and List fallback; empty initial panel, molecule-related records, stage solutions, one DOI reference, edit/reload/import preservation, malformed-editor correction/cancel/storage, Python-export browser import, metadata-only DOI/authors display/export, byte-exact legacy backup and storage-failure recovery, unknown-field rejection, no copied paper assets, backup, subpath assets and mobile; no backend API.')
  finally:server.shutdown();server.server_close()
 if __name__=='__main__':main()

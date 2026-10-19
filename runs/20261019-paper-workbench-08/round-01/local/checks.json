@@ -1,0 +1,95 @@
+{
+  "source_commit": "8cbd5fe2fa92da03169922e1cc7a43bb59b0a89d",
+  "checks": {
+    "python": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q"
+      ]
+    },
+    "web-build": {
+      "returncode": 0,
+      "command": [
+        "npm",
+        "run",
+        "build:web"
+      ]
+    },
+    "web-browser": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/web_smoke.py"
+      ]
+    },
+    "web-payload": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/check_repository_payloads.py",
+        "--dist",
+        "dist"
+      ]
+    },
+    "portable-build": {
+      "returncode": 0,
+      "command": [
+        "npm",
+        "run",
+        "build:portable"
+      ]
+    },
+    "portable-http": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/portable_smoke.py",
+        "--http-only"
+      ]
+    },
+    "portable-payload": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/check_repository_payloads.py",
+        "--dist",
+        "dist-portable"
+      ]
+    },
+    "paper-build": {
+      "returncode": 0,
+      "command": [
+        "npm",
+        "run",
+        "build:paper"
+      ]
+    },
+    "paper-http": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/paper_workbench_smoke.py",
+        "--http-only"
+      ]
+    },
+    "paper-payload": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/check_repository_payloads.py",
+        "--dist",
+        "dist-paper"
+      ]
+    },
+    "source-payload": {
+      "returncode": 0,
+      "command": [
+        ".venv/bin/python",
+        "scripts/check_repository_payloads.py"
+      ]
+    }
+  }
+}

@@ -31,3 +31,7 @@ private-paper-work/
 *.zip
 *.tar
 *.tgz
+
+# Independent private-paper workbench build products.
+dist-paper/
+paper-manifest.json

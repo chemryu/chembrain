@@ -1,5 +1,6 @@
 import createRDKitModule, { type MainModule, type Mol } from '@rdkit/rdkit';
 import compressedWasm from 'virtual:chembrain-rdkit-wasm';
+import {molecularFormula} from './molecularFormula';
 
 /** Rendering is derived from current SMILES; images never enter library JSON. */
 export type StructureResult =
@@ -42,6 +43,24 @@ async function initialize():Promise<MainModule> {
 function module():Promise<MainModule> {
  if(!modulePromise)modulePromise=initialize();
  return modulePromise;
+}
+
+export type StructureInspection={smiles:string;canonical_smiles:string;formula:string;inchikey:string;molecular_weight:number;engine:string;fragments:number;unassigned_stereocenters:number};
+
+/** Compute identity from the actual graph. Source agreement is a separate human check. */
+export async function inspectStructure(smiles:string):Promise<StructureInspection> {
+ if(!smiles.trim()||smiles.length>MAX_SMILES_LENGTH)throw new Error('Enter a SMILES below 3000 characters.');
+ const rdkit=await module();let molecule:Mol|null=null;
+ try{
+  molecule=rdkit.get_mol(smiles);
+  if(!molecule||!molecule.is_valid()||!molecule.get_num_atoms())throw new Error('Invalid SMILES.');
+  const descriptors=JSON.parse(molecule.get_descriptors()) as Record<string,number>;
+  const canonical_smiles=molecule.get_smiles();
+  const formula=molecularFormula(molecule.get_json());
+  const inchikey=rdkit.get_inchikey_for_inchi(molecule.get_inchi());
+  if(!formula||!inchikey||!Number.isFinite(descriptors.amw))throw new Error('This structure cannot be normalized.');
+  return {smiles,canonical_smiles,formula,inchikey,molecular_weight:Math.round(descriptors.amw*100)/100,engine:'RDKit '+rdkit.version(),fragments:canonical_smiles.split('.').length,unassigned_stereocenters:descriptors.NumUnspecifiedAtomStereoCenters??0};
+ }finally{molecule?.delete();}
 }
 
 async function draw(smiles:string):Promise<StructureResult> {
