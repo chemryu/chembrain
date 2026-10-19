@@ -1,4 +1,18 @@
-# Separate paper processor
+# Separate paper tools
+
+The install-free **Chembrain-Paper-Workbench.html** is the source-assisted chemistry curation program, separate from **Chembrain.html**, the main molecular library. Open both in current Chrome/Edge. No Python or AI API key is needed for these HTML files. Download both from the same source-bound browser artifact.
+
+Workbench reads a local PDF in memory, previews its pages, suggests explicit text SMILES/DOIs, and provides an offline molecular sketcher or single-record MOL/SDF import. It does not recognize arbitrary scheme drawings automatically. Compare each encoded structure/stereochemistry against the source and confirm its identity, then connect explicit reactants/products and stage-specific solutions. Export facts includes checked rows only; private drafts, original PDFs, text, images and workspace review proofs are excluded. Public paper rows remain ID/DOI/authors only. Undefined stereo and parent/salt form require source review; parser validity is not a scientific match.
+
+For the current missing-chemical issue, use the main app's Backup JSON with **Load library draft** in Workbench, select the paper, fill and source-check its structures, then export. This keeps its original IDs. New paper-local labels get DOI-scoped IDs; qualify distinct repeated labels as main:4/SI:4. In the main app, **Import package → Review paper import → Apply import** explicitly adds safe missing structure fields and paper labels after an exact private backup. Names/notes/non-null user structures and existing routes retain precedence; identity/path collisions require correction instead of silent relinking. Equivalent alternate SMILES require real graph verification. No incoming-wins feed behavior was introduced.
+
+Use **Save workspace / Backup workspace** for private progress, and **Export facts** for the main library. Reselect the same fingerprinted PDFs after reload. Failed storage/restore/import leaves previous data usable. Neither JSON contains PDF bytes. The user must install or activate a future weekly collector separately; this workbench does not download journals or run on a schedule.
+
+Developer commands: `npm ci`, `npm run dev:paper` then open the local `/paper.html` internally, or `npm run build:paper` for the self-contained file in `release/`. Real `scripts/paper_workbench_smoke.py` verifies actual offline file execution on normal CI, including a real private synthetic PDF and exported JSON consumed by the main app. Managed local file policy is not bypassed; `--http-only` is explicitly only a local same-HTML check.
+
+---
+
+# Separate journal discovery / local CLI processor
 
 The browser and all GitHub publication paths accept only compact chemistry facts and paper DOI/authors. Public paper rows contain `id`, `doi`, `authors`; titles, abstracts, journals, years, source paths, PDF download links and paper prose are not portable metadata. Reactions, chemicals and solutions remain normalized tables with explicit stage conditions and DOI-linked evidence locators. Unknown structures and conditions remain unknown.
 

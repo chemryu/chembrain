@@ -134,6 +134,14 @@ jobs:
           cp release/browser-manifest.json browser-manifest.json
           python scripts/check_repository_payloads.py --dist dist-portable
           python scripts/portable_smoke.py 2>&1 | tee portable-browser.log
+      - name: Build and verify separate paper workbench
+        id: paper_workbench
+        run: |
+          set -euo pipefail
+          npm run build:paper 2>&1 | tee paper-build.log
+          cp release/paper-manifest.json paper-manifest.json
+          python scripts/check_repository_payloads.py --dist dist-paper
+          python scripts/paper_workbench_smoke.py 2>&1 | tee paper-browser.log
       - name: Save install-free browser download
         id: portable_artifact
         uses: actions/upload-artifact@v4
@@ -144,6 +152,10 @@ jobs:
             release/README-Browser.txt
             release/browser-manifest.json
             release/SHA256SUMS.txt
+            release/Chembrain-Paper-Workbench.html
+            release/README-Paper-Workbench.txt
+            release/paper-manifest.json
+            release/SHA256SUMS-Paper.txt
           if-no-files-found: error
           retention-days: 30
       - name: Record artifact stage

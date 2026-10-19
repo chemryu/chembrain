@@ -1,3 +1,11 @@
+# Current request — 20261019-paper-workbench-08
+
+User: “논문 읽는 프로그램을 메인 프로그램과 분리할거야. 특정 저널의 논문 다운로드와 논문 내 chemical들 정보를 따오고 경로를 연결해서 메인프로그램에 넘겨주는 프로그램. 일단 후자인 논문 내 chemical 정보를 정확히 따오고 경로를 연결해서 메인프로그램에 넘겨주는 프로그램이 필요해. 지금은 chemical들이 잘 안넘어가고 있는거 같아.”
+
+Priority is a separate paper-to-chemistry/route processing program and reliable main handoff; journal download is later. Build private local PDF/source-assisted Workbench with explicit chemical structure/stereo checking and recorded reactant/product/stage/solution connections, strict reviewed-facts export and main missing-structure import review. Diagnose no existing automatic chemistry extraction and null-SMILES merge precedence. Preserve baseline IDs, source scope and user edits, exact private backups, no original PDF/text/images in GitHub or compact handoff, no invented schemes or claimed automatic exact OCSR. Same new frozen source and both HTML files require actual-file offline transfer checks plus separate QA/Revision/Wiki. Existing hosting/history/schedule/Box constraints unchanged.
+
+---
+
 # Current request — 20261018-structures-07
 
 User: “structure들은 구조가 나타나질 않니?” Add actual current-SMILES drawings in molecule tiles, selected large structure and synthesis map. Include source-checked neutral parent Taxol and doxycycline, retain unknown paper-numbered structures without guessing. Generic offline bundled renderer must handle valid imported/edited SMILES independently of name/ID and visibly report invalid/unencoded inputs. Explicit narrow old-example enrichment must preserve user edits and exact private original bytes before replacement. Same frozen source must pass hosted and actual file HTML checks and separate QA/Revision, then Wiki. Existing Pages403, history/Public, no-main, no-Box-sync and no-schedule constraints are retained.

@@ -1,0 +1,11 @@
+.import-review{margin:0 0 24px;padding:22px;border:1px solid #c4d5ca;background:#f4f9f5;border-radius:14px;color:#243b2b;overflow-wrap:anywhere}
+.import-review h2{margin:0 0 10px;font-size:20px}
+.import-review p{line-height:1.55;max-width:1000px}
+.import-review ul{list-style:none;margin:16px 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:12px}
+.import-review li{padding:14px;border:1px solid #d6e1d8;background:white;border-radius:10px;min-width:0}
+.import-review li strong,.import-review li small,.import-review li span{display:block}
+.import-review li small{margin:6px 0;color:#53665a}
+.import-review li img{width:100%;height:150px;object-fit:contain}
+.import-review button{margin:4px 10px 0 0}
+.import-review .import-conflicts{grid-template-columns:1fr;color:#8c3025}
+.import-review .import-conflicts li span{margin-top:6px}
