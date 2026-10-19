@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import shutil
 import tempfile
+import time
 
 import pymupdf as fitz
 from playwright.sync_api import expect, sync_playwright
@@ -21,6 +22,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 from structure_smoke import _diagram
+from paper_worker_smoke import (WORKER_OBSERVER, opaque_worker_ready, pinned_worker,
+                                safe_summary, safe_diagnostic, safe_terminal_failure, validate_worker_url)
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKSPACE = 'chembrain.paper-workbench.v1'
@@ -92,39 +95,134 @@ def context_for(browser, documents, init=None):
     context = browser.new_context(offline=True, accept_downloads=True,
                                   viewport={'width': 1440, 'height': 1000})
     requests, errors, forbidden, workers = [], [], [], []
+    expected = pinned_worker()
+    manifest = json.loads((ROOT / 'release/paper-manifest.json').read_bytes())
+    observations, console = [], []
+
+    def observe(_source, record):
+        if len(observations) >= 64:
+            return
+        event = record.get('event')
+        if event == 'construct':
+            try:
+                result = validate_worker_url(record.get('url'), expected, manifest)
+            except AssertionError:
+                result = {**safe_summary(record.get('url')), 'valid': False}
+            observations.append({**result, 'event': event, 'module': record.get('module') is True,
+                                 'named': record.get('named') is True})
+        elif event in ('terminate', 'error', 'messageerror'):
+            observations.append({'event': event})
+
+    context.expose_binding('__pwWorkerObservation', observe)
+    context.add_init_script(WORKER_OBSERVER)
 
     def resource(route):
         address = route.request.url
-        if address in documents and route.request.is_navigation_request():
+        allowed = address in documents and route.request.is_navigation_request()
+        if allowed:
             if documents[address] is None:
                 route.continue_()
             else:
                 route.fulfill(status=200, content_type='text/html; charset=utf-8', body=documents[address])
         elif address.startswith('blob:'):
-            # Locally constructed PDF worker/module or downloaded JSON only.
+            # Existing in-memory download/module-resource policy; native worker
+            # events are independently required to contain exact static bytes.
             route.continue_()
+        elif address.startswith('data:'):
+            try:
+                validate_worker_url(address, expected, manifest)
+            except AssertionError:
+                forbidden.append(safe_summary(address))
+                route.abort('internetdisconnected')
+            else:
+                route.continue_()
         else:
-            forbidden.append(address)
+            forbidden.append(safe_summary(address))
             route.abort('internetdisconnected')
 
     context.route('**/*', resource)
     if init:
         context.add_init_script(init)
     page = context.new_page()
-    page.on('request', lambda request: requests.append(request.url))
-    page.on('pageerror', lambda error: errors.append(str(error)))
-    page.on('worker', lambda worker: workers.append(worker.url))
+    def request_seen(request):
+        address = request.url
+        allowed = address in documents or address.startswith('blob:')
+        if address.startswith('data:'):
+            try:
+                validate_worker_url(address, expected, manifest)
+                allowed = True
+            except AssertionError:
+                allowed = False
+        requests.append({**safe_summary(address), 'allowed': allowed})
+    def worker_seen(worker):
+        try:
+            result = validate_worker_url(worker.url, expected, manifest)
+        except AssertionError:
+            result = {**safe_summary(worker.url), 'valid': False}
+        record = {**result, 'closed': False}
+        workers.append(record)
+        worker.on('close', lambda: record.update(closed=True))
+    def console_seen(message):
+        if len(console) >= 12:
+            return
+        # Arbitrary native/PDF strings are represented only by digest/category.
+        record = {'kind': message.type if message.type in ('error', 'warning', 'log', 'info') else 'other',
+                  **safe_summary(message.text)}
+        if message.text.startswith('PDF worker diagnostic'):
+            for argument in message.args[1:2]:
+                try:
+                    diagnostic = argument.json_value()
+                    record['diagnostic'] = safe_diagnostic(diagnostic)
+                except Exception:
+                    pass
+        console.append(record)
+    page.on('request', request_seen)
+    page.on('pageerror', lambda error: errors.append(safe_summary(error)))
+    page.on('worker', worker_seen)
+    page.on('console', console_seen)
+    # Private Python-side diagnostic state; never an application debug export.
+    page._paper_smoke_diagnostics = {'observations': observations, 'console': console,
+                                    'workers': workers, 'errors': errors, 'forbidden': forbidden}
     return context, page, requests, errors, forbidden, workers
 
 
 def verify_resources(state, documents, require_worker=False):
-    _, _, requests, errors, forbidden, workers = state
-    assert not errors, errors
-    assert not forbidden, forbidden
-    assert all(url in documents or url.startswith('blob:') for url in requests), requests
-    assert all(url.startswith('blob:') for url in workers), workers
+    _, page, requests, errors, forbidden, workers = state
+    assert not errors, errors[:8]
+    assert not forbidden, forbidden[:8]
+    assert all(record['allowed'] for record in requests), requests[:8]
+    assert all(record.get('valid') for record in workers), workers[:8]
+    observations = page._paper_smoke_diagnostics['observations']
+    constructed = [record for record in observations if record['event'] == 'construct']
+    assert all(record.get('valid') and record['module'] and record['named'] for record in constructed), constructed[:8]
+    assert len(workers) < 64 and len(observations) < 64, 'Worker lifecycle exceeded bounded observation budget'
     if require_worker:
-        assert workers, 'Actual locally constructed PDF worker never ran'
+        assert workers and constructed, 'Actual exact-byte native PDF module worker never ran'
+        assert len(workers) == len(constructed), 'Native worker/constructor observation mismatch'
+        assert sum(not record['closed'] for record in workers) <= 1, 'Replaced PDF worker remained alive'
+
+
+def wait_first_pdf(page, canvas):
+    # Inspect the safe failure state before asserting; Playwright's assertion log
+    # must never stringify native worker URLs, page text or PDF source details.
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline:
+        if canvas.get_attribute('data-rendered') == 'true':
+            return
+        if page.get_by_role('alert').count():
+            break
+        page.wait_for_timeout(100)
+    diagnostic = page._paper_smoke_diagnostics
+    summary = {'browser': page.context.browser.version,
+               'origin': page.evaluate("({protocol:location.protocol,opaque:self.origin==='null'})"),
+               'transport': 'native-module-data-url', 'module': True,
+               'workers': diagnostic['workers'][:16],
+               'lifecycle': diagnostic['observations'][:32],
+               'console': diagnostic['console'][:12], 'errors': diagnostic['errors'][:8],
+               'nativeErrorDetail': 'present' if any(record['event'] in ('error','messageerror')
+                   for record in diagnostic['observations']) else 'absent'}
+    print('PAPER_FIRST_PDF_FAILURE '+json.dumps(summary, sort_keys=True), flush=True)
+    raise AssertionError('First private PDF failed to render; bounded diagnostics emitted')
 
 
 def start(page, url):
@@ -175,7 +273,7 @@ def create_checked_package(page, url, folder):
     start(page, url)
     page.get_by_label('Open local PDF', exact=True).set_input_files(str(folder / 'synthetic-source.pdf'))
     canvas = page.get_by_label('Private PDF page', exact=True)
-    expect(canvas).to_have_attribute('data-rendered', 'true', timeout=30000)
+    wait_first_pdf(page, canvas)
     assert canvas.evaluate('''canvas=>{const data=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
       let ink=0;for(let i=0;i<data.length;i+=4)if(data[i]<200||data[i+1]<200||data[i+2]<200)ink++;return ink>500;}'''), 'PDF canvas has no actual rendered ink'
     page.get_by_text('Private page text and explicit notation candidates', exact=True).click()
@@ -616,6 +714,42 @@ def receiving_failures(browser, url, documents, raw, facts):
     print('PAPER_TRANSFER_CHECK: fact-only backup write/readback, primary quota, stale review and concurrent-backup failures preserved primary and working route', flush=True)
 
 
+def worker_failure_recovery(browser, documents, url, folder):
+    # Force a DOM error on the genuine native worker once. Success/reselection
+    # still parses and renders the real PDF through the exact pinned worker.
+    for event in ('error', 'messageerror'):
+        init = """(() => {
+          const ActualWorker=window.Worker;let first=true;
+          window.Worker=new Proxy(ActualWorker,{construct(target,args,newTarget){
+            const worker=Reflect.construct(target,args,newTarget);
+            if(first){first=false;setTimeout(()=>worker.dispatchEvent(new Event(EVENT)),0);}
+            return worker;
+          }});
+        })();""".replace('EVENT', json.dumps(event))
+        state = context_for(browser, documents, init)
+        context, page = state[:2]
+        try:
+            start(page, url)
+            picker = page.get_by_label('Open local PDF', exact=True)
+            picker.set_input_files(str(folder / 'synthetic-source.pdf'))
+            expect(page.get_by_role('alert')).to_contain_text('PDF worker', timeout=10000)
+            deadline = time.monotonic()+3
+            while any(not worker['closed'] for worker in state[5]) and time.monotonic()<deadline:
+                page.wait_for_timeout(50)
+            assert state[5] and all(worker['closed'] for worker in state[5]), 'Failed native worker did not close within cleanup bound'
+            picker.set_input_files([])
+            picker.set_input_files(str(folder / 'synthetic-source.pdf'))
+            canvas = page.get_by_label('Private PDF page', exact=True)
+            wait_first_pdf(page, canvas)
+            assert canvas.evaluate('canvas=>canvas.width>0 && canvas.height>0'), 'Recovery PDF canvas remained empty'
+            page.get_by_text('Private page text and explicit notation candidates', exact=True).click()
+            expect(page.get_by_role('button', name='Use DOI candidate '+DOI, exact=True)).to_be_visible()
+            verify_resources(state, documents, require_worker=True)
+        finally:
+            context.close()
+    print('PAPER_WORKER_FAILURE_RECOVERY_PASS: forced native error/messageerror settle, close, and real PDF reselect/render/text', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--http-only', action='store_true', help='Mocked HTTP only; does not verify file://.')
@@ -631,6 +765,7 @@ def main():
         make_fixtures(folder)
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'), args=['--no-sandbox'])
+            opaque_worker_ready(browser, pinned_worker(), paper_manifest)
             state = context_for(browser, documents)
             context, page = state[:2]
             try:
@@ -639,6 +774,7 @@ def main():
                 sketcher_and_failure_checks(page, folder, original)
                 print('PAPER_CHECK: explicit sketcher transfer, relative-stereo refusal, PDF bounds and failure preservation passed', flush=True)
                 verify_resources(state, documents, require_worker=True)
+                worker_failure_recovery(browser, documents, paper_url, folder)
                 private_storage_failure(browser, documents, paper_url, original)
                 print('PAPER_CHECK: private storage failure retained the last valid workspace and backup', flush=True)
                 main_handoff(browser, main_url, documents, raw, facts)
@@ -648,8 +784,13 @@ def main():
                 context.close()
                 browser.close()
     mode = 'PAPER_HTTP_ONLY_PASS: mocked HTTP bytes (file:// NOT VERIFIED)' if args.http_only else 'PAPER_OFFLINE_PASS: actual file://'
-    print(mode+'; real local blob PDF worker, rendered canvas and explicit candidates; no DOI auto-selection, no invented image chemistry/OCR; checked stereo/charge/fragments, solution/recorded arrows, strict downloaded facts → explicit main import, exact backup/local-note preservation and idempotency; private hash pairing/reload, mismatched/encrypted/over-limit PDF rejection; MOL sketcher explicit transfer; zero external requests; source='+paper_manifest['source_commit']+' paper_sha256='+paper_manifest['sha256']+' main_sha256='+main_manifest['sha256'])
+    print(mode+'; exact pinned native data-URL module PDF worker, rendered canvas and explicit candidates; no DOI auto-selection, no invented image chemistry/OCR; checked stereo/charge/fragments, solution/recorded arrows, strict downloaded facts → explicit main import, exact backup/local-note preservation and idempotency; private hash pairing/reload, mismatched/encrypted/over-limit PDF rejection; MOL sketcher explicit transfer; zero external requests; source='+paper_manifest['source_commit']+' paper_sha256='+paper_manifest['sha256']+' main_sha256='+main_manifest['sha256'])
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as error:
+        # Original Playwright exceptions may include PDF text or worker URLs.
+        print('PAPER_SMOKE_FAILURE '+json.dumps(safe_terminal_failure(error), sort_keys=True), flush=True)
+        raise SystemExit(1) from None
