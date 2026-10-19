@@ -1,0 +1,79 @@
+Traceback (most recent call last):
+  File "/home/runner/work/chembrain/chembrain/scripts/paper_workbench_smoke.py", line 655, in <module>
+    main()
+  File "/home/runner/work/chembrain/chembrain/scripts/paper_workbench_smoke.py", line 637, in main
+    raw, facts, original = create_checked_package(page, paper_url, folder)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/chembrain/chembrain/scripts/paper_workbench_smoke.py", line 178, in create_checked_package
+    expect(canvas).to_have_attribute('data-rendered', 'true', timeout=30000)
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 22107, in to_have_attribute
+    self._sync(
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 349, in to_have_attribute
+    await self._expect_impl(
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to have attribute 'true'
+Actual value: false 
+Call log:
+  - Expect "to_have_attribute" with timeout 30000ms
+  - waiting for get_by_label("Private PDF page", exact=True)
+    63 × locator resolved to <canvas width="0" height="0" data-rendered="false" aria-label="Private PDF page"></canvas>
+       - unexpected value "false"
+
+Aria snapshot:
+- banner:
+  - img
+  - strong: Chembrain Paper Workbench
+  - text: LOCAL · SOURCE-ASSISTED CURATION
+  - button "Save workspace" [disabled]
+  - button "Backup workspace" [disabled]:
+    - img
+    - text: Backup workspace
+  - img
+  - text: Restore workspace
+  - button "Restore private workspace"
+- heading "From paper to connected chemistry" [level=1]
+- paragraph: Review a local paper, encode checked structures, connect recorded reactions, then pass compact facts to your main library.
+- paragraph: PDF drawings are not automatically recognized. Use the sketcher or verified SMILES/MOL input, compare against the source, and confirm each record. No AI API or upload is used.
+- alert:
+  - text: PDF worker could not run locally. Use a current Chrome or Edge browser that allows local module workers.
+  - button "Dismiss error": ×
+- main:
+  - complementary:
+    - heading "Private source PDF" [level=2]:
+      - img
+      - text: Private source PDF
+    - text: Document
+    - combobox "Document":
+      - option "Main article" [selected]
+      - option "Supporting information"
+    - text: Open PDF
+    - button "Open local PDF"
+    - paragraph: Choose an unencrypted PDF up to 30 MB / 400 pages. It stays in memory and must be selected again after reload.
+    - button "Clear source pairing and reviews"
+    - paragraph: Source PDFs, text and page images stay here. Only reviewed chemistry, DOI and authors enter the main-app package.
+  - navigation "Workbench sections":
+    - button "1. Paper"
+    - button "2. Chemicals"
+    - button "3. Solutions"
+    - button "4. Reactions"
+    - button "5. Export"
+  - heading "Paper identity" [level=2]
+  - text: Article DOI
+  - textbox "Article DOI":
+    - /placeholder: 10.xxxx/article
+  - text: Authors (separate with semicolons)
+  - textbox "Authors (separate with semicolons)"
+  - button "Create paper project"
+  - separator
+  - heading "Correct a library package" [level=3]
+  - paragraph: Load the latest Backup JSON from the main app to complete structures, solution facts and recorded stages while retaining existing IDs and known values. Every imported record starts unchecked.
+  - text: Load library draft
+  - button "Load normalized library draft"
+  - paragraph: Save/Backup workspace is private work in progress. Export facts is the separate compact file accepted by the main app. PDFs are never saved in either JSON.
+- contentinfo: Separate from the main library · API-free · no journal downloads or weekly automation in this workbench · use private workspace backups before replacing this HTML file.
