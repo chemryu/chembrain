@@ -206,7 +206,19 @@ export function importLibraryDraft(value:unknown,paperId?:string):WorkbenchProje
  const reactions=baseline.reactions.filter(r=>r.evidence.some(e=>e.paper_id===paper.id));
  const solutionIds=new Set(reactions.flatMap(r=>r.steps.map(s=>s.solution_id))),solutions=baseline.solutions.filter(s=>solutionIds.has(s.id));
  const chemicalSet=new Set([...reactions.flatMap(r=>[...r.reactants,...r.products,...r.targets]),...solutions.flatMap(s=>[...s.solvents,...s.solutes.map(c=>c.chemical_id)])]);
- const sources=(evidence:RecordReaction['evidence']):SourceLocator[]=>evidence.filter(e=>e.paper_id===paper.id).map(e=>({document:/supporting|\bSI\b/i.test(e.locator)?'supporting':'main',page:e.page,locator:e.locator}));
+ const sources=(evidence:RecordReaction['evidence']):SourceLocator[]=>evidence.filter(e=>e.paper_id===paper.id).map(e=>{
+  // Export already wraps the precise locator with its document/page. Unwrap
+  // that exact format on re-edit so repeated main → workbench → main handoffs
+  // do not grow nested prefixes or create duplicate source evidence. A known
+  // wrapper is authoritative even when the precise main locator mentions SI.
+  const wrapped=/^(Main article|Supporting information); PDF page (\d+); /.exec(e.locator);
+  const knownWrapper=wrapped&&Number(wrapped[2])===e.page;
+  const document:SourceLocator['document']=knownWrapper?(wrapped[1]==='Supporting information'?'supporting':'main'):/supporting|\bSI\b/i.test(e.locator)?'supporting':'main';
+  const prefix=(document==='supporting'?'Supporting information':'Main article')+'; PDF page '+e.page+'; ';
+  let locator=e.locator;
+  while(locator.startsWith(prefix)&&locator.length>prefix.length)locator=locator.slice(prefix.length);
+  return {document,page:e.page,locator};
+ });
  const uniqueSources=(rows:SourceLocator[])=>rows.filter((row,index)=>rows.findIndex(x=>canonical(x)===canonical(row))===index);
  const project:WorkbenchProject={project_schema:1,kind:'chembrain-paper-workbench',paper:structuredClone(paper),baseline,chemicals:baseline.chemicals.filter(c=>chemicalSet.has(c.id)).map(c=>({...structuredClone(c),label:c.id,sources:uniqueSources(reactions.filter(r=>[...r.reactants,...r.products,...r.targets].includes(c.id)||r.steps.some(s=>{const solution=solutions.find(x=>x.id===s.solution_id);return solution&&[...solution.solvents,...solution.solutes.map(x=>x.chemical_id)].includes(c.id);})).flatMap(r=>sources(r.evidence))),unknown_reason:''})),solutions:solutions.map(s=>({...structuredClone(s),label:s.id,sources:uniqueSources(reactions.filter(r=>r.steps.some(x=>x.solution_id===s.id)).flatMap(r=>sources(r.evidence)))})),reactions:reactions.map(r=>{const {status:_status,evidence,...row}=structuredClone(r);return {...row,label:r.id,evidence:sources(evidence)};})};
  return validateProject(project);

@@ -6,7 +6,7 @@ import { RecordFields, parseRecordDraft } from './RecordFields';
 import { SynthesisMap } from './SynthesisMap';
 import StructureDiagram from './StructureDiagram';
 import {inspectStructure,type StructureInspection} from './structureRenderer';
-import {prepareImportReview,assertImportBaseline,commitReviewedImport,paperLabelAliases,type ImportReviewPlan,type VerifiedImportGraphMatch} from './importReview';
+import {prepareImportReview,assertImportBaseline,commitReviewedImport,paperLabelAliases,hasExistingImportChanges,type ImportReviewPlan,type VerifiedImportGraphMatch} from './importReview';
 import './import-review.css';
 import {LIBRARY_STORE,verifiedExampleCount,saveVerifiedExamples} from './verifiedExamples';
 import {library as portableLibrary} from 'virtual:chembrain-portable-data';
@@ -19,6 +19,7 @@ export function MolecularLibrary(){
  const hasSavedLibrary=useRef(false);
  const importSequence=useRef(0);
  const [importReview,setImportReview]=useState<{plan:ImportReviewPlan;raw:string|null}|null>(null);
+ const [importResult,setImportResult]=useState<ImportReviewPlan|null>(null);
  const [importing,setImporting]=useState(false);
  const [view,setView]=useState<'map'|'list'>('map');
  const [inspected,setInspected]=useState<string|null>(null);
@@ -62,10 +63,12 @@ export function MolecularLibrary(){
  },[]);
  function save(next:Library){if(recoveryBlocked)throw new Error('Resolve browser data recovery and reload before saving.');const valid=validateLibrary(next);localStorage.setItem(STORE,JSON.stringify(valid));hasSavedLibrary.current=true;setData(valid);setInspected(null);}
  function download(){if(recoveryBlocked)return;const url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='chembrain-library.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
- function importedNotice(plan:ImportReviewPlan){return `Import complete: ${plan.added.chemicals} new molecules, ${plan.added.reactions} new reactions; ${plan.upgrades.length} existing structures added; ${plan.labelAdditions.reduce((n,row)=>n+row.aliases.length,0)} paper labels added. Existing edits were retained.`;}
+ function importedNotice(plan:ImportReviewPlan){return `Import complete: ${plan.changed?'':'no changes. '}${plan.added.chemicals} new molecules, ${plan.added.solutions} new solutions, ${plan.added.reactions} new reactions; ${plan.changedExisting.chemicals} existing molecules, ${plan.changedExisting.solutions} existing solutions and ${plan.changedExisting.reactions} existing reactions updated; ${plan.upgrades.length} existing structures added; ${plan.labelAdditions.reduce((n,row)=>n+row.aliases.length,0)} paper labels added. ${plan.retentions.length} existing field value(s) retained.`;}
+ const importValue=(value:unknown)=>value==null?'Not recorded':typeof value==='string'?(value||'(empty)'):JSON.stringify(value,null,2);
+ function retainedFacts(plan:ImportReviewPlan){return !!plan.retentions.length&&<details className="import-retentions"><summary>{plan.retentions.length} existing field value(s) retained</summary><ul aria-label="Retained import facts">{plan.retentions.map((row,index)=><li key={index}><strong>{row.name}</strong><small>{row.table} · {row.id} · {row.field}</small><dl><dt>Previous</dt><dd><pre>{importValue(row.previous)}</pre></dd><dt>Incoming</dt><dd><pre>{importValue(row.incoming)}</pre></dd></dl><p>{row.reason}</p></li>)}</ul></details>;}
  async function importFile(file?:File){
   if(!file||recoveryBlocked)return;
-  const sequence=++importSequence.current;setError('');setNotice('');setImportReview(null);setImporting(true);
+  const sequence=++importSequence.current;setError('');setNotice('');setImportReview(null);setImportResult(null);setImporting(true);
   try{
    if(file.size>5_000_000)throw new Error('Use a normalized JSON package below 5 MB.');
    let incoming=validateLibrary(JSON.parse(await file.text()));
@@ -101,15 +104,15 @@ export function MolecularLibrary(){
    if(sequence!==importSequence.current)return;
    plan=prepareImportReview(data,incoming,hasSavedLibrary.current,matches);
    assertImportBaseline(plan,localStorage,raw);
-   if(plan.upgrades.length||plan.labelAdditions.length||plan.conflicts.length){setImportReview({plan,raw});return;}
+   if(hasExistingImportChanges(plan)||plan.conflicts.length){setImportReview({plan,raw});return;}
    if(plan.changed)save(plan.next!);
-   setNotice(importedNotice(plan));
+   setNotice(importedNotice(plan));setImportResult(plan);
   }catch(e){if(sequence===importSequence.current)setError((e as Error).message);}
   finally{if(sequence===importSequence.current)setImporting(false);if(input.current)input.current.value='';}
  }
  function applyImport(){
   if(!importReview||recoveryBlocked)return;setError('');
-  try{const next=commitReviewedImport(importReview.plan,localStorage,importReview.raw);hasSavedLibrary.current=true;setData(next);setInspected(null);setNotice(importedNotice(importReview.plan)+' The exact original library was backed up privately in this browser.');setImportReview(null);}
+  try{const next=commitReviewedImport(importReview.plan,localStorage,importReview.raw);hasSavedLibrary.current=true;setData(next);setInspected(null);setNotice(importedNotice(importReview.plan)+' The exact original library was backed up privately in this browser.');setImportResult(importReview.plan);setImportReview(null);}
   catch(e){setError((e as Error).message);}
  }
  function editSave(){if(!editor)return;setError('');try{parseRecordDraft(editor.kind,editor.value);const row=JSON.parse(editor.value);if(row.id!==editor.id)throw new Error('Keep the entity ID unchanged.');const next=structuredClone(data);if(editor.kind==='chemical'){const previous=data.chemicals.find(x=>x.id===editor.id);if(row.smiles!==previous?.smiles){delete row.inchikey;delete row.formula;delete row.molecular_weight;row.notes=(row.notes||'')+' SMILES edited locally; normalize with the processor before trusting structure metadata.';}next.chemicals=next.chemicals.map(x=>x.id===editor.id?row:x);}else if(editor.kind==='paper')next.papers=next.papers.map(x=>x.id===editor.id?row:x);else if(editor.kind==='solution')next.solutions=next.solutions.map(x=>x.id===editor.id?row:x);else next.reactions=next.reactions.map(x=>x.id===editor.id?row:x);save(next);setEditor(null);setNotice('Changes saved in this browser.');}catch(e){setError((e as Error).message);}}
@@ -137,16 +140,20 @@ export function MolecularLibrary(){
   <div className="web-intro"><div><p className="web-kicker">LESS PAPER. MORE CHEMISTRY.</p><h1>Your molecular library</h1><p>Choose a molecule to explore its synthesis map, conditions and DOI references.</p></div><span className="browser-storage">Saved in this browser<br/><small>{portable?'Keep this file in the same location. Use Backup JSON before moving or updating it.':'Export a backup to move between devices'}</small></span></div>
   {error&&<div className="web-alert" role="alert">{error}<button aria-label="Dismiss error" onClick={()=>setError('')}><X size={16}/></button></div>}
   {notice&&<div className="web-notice" role="status">{notice}<button aria-label="Dismiss notice" onClick={()=>setNotice('')}><X size={16}/></button></div>}
+  {!importReview&&importResult&&retainedFacts(importResult)}
   {importReview&&<section className="import-review" aria-label="Review paper import">
    <h2>Review paper import</h2>
    {importReview.plan.conflicts.length?<>
-    <p>This package has conflicting IDs. No records were imported. Load your latest Backup JSON in Paper Workbench, reconcile these IDs and export again. Use a new paper-scoped ID for a different molecule or synthesis step.</p>
-    <ul className="import-conflicts">{importReview.plan.conflicts.map((conflict,index)=><li key={index}><strong>{conflict.table} · {conflict.id}</strong><span>{conflict.reason}</span></li>)}</ul>
+    <p>This package has conflicting IDs or known chemistry facts. No records were imported. Export the latest main Backup JSON, load it in Paper Workbench and reconcile the exact fields below. Preserve current IDs, ordered stages and known local values; source-check and export again. A different molecule or synthesis step needs its own intentional paper-scoped ID.</p>
+    <ul className="import-conflicts" aria-label="Import conflicts">{importReview.plan.conflicts.map((conflict,index)=><li key={index}><strong>{conflict.table} · {conflict.id}{conflict.field&&' · '+conflict.field}</strong><span>{conflict.reason}</span>{conflict.field&&<dl><dt>Previous</dt><dd><pre>{importValue(conflict.previous)}</pre></dd><dt>Incoming</dt><dd><pre>{importValue(conflict.incoming)}</pre></dd></dl>}</li>)}</ul>
    </>:<>
     <p>Review {importReview.plan.upgrades.length} missing structure(s) and {importReview.plan.labelAdditions.reduce((n,row)=>n+row.aliases.length,0)} added paper label(s). Your names, notes, existing aliases, structures and other edits are retained. Check these facts against the source in Paper Workbench before applying.</p>
     <p>{importReview.plan.added.chemicals} new molecules · {importReview.plan.added.reactions} new reactions · {importReview.plan.added.solutions} new solutions · {importReview.plan.added.papers} new papers</p>
+    <p>{importReview.plan.changedExisting.chemicals} existing molecules · {importReview.plan.changedExisting.solutions} existing solutions · {importReview.plan.changedExisting.reactions} existing reactions will be updated.</p>
     <ul>{importReview.plan.upgrades.map(row=><li key={row.id}><strong>{row.name}</strong><small>{row.id} · adding {row.fields.join(', ')}</small><StructureDiagram chemical={importReview.plan.next!.chemicals.find(c=>c.id===row.id)!}/></li>)}</ul>
     {!!importReview.plan.labelAdditions.length&&<ul aria-label="Paper labels to add">{importReview.plan.labelAdditions.map(row=><li key={row.id}><strong>{row.name}</strong>{row.aliases.map(alias=><small key={alias}>{alias}</small>)}</li>)}</ul>}
+    {!!importReview.plan.factChanges.length&&<ul aria-label="Existing chemistry changes">{importReview.plan.factChanges.map((row,index)=><li key={index} data-record-id={row.id} data-field={row.field}><strong>{row.name}</strong><small>{row.table} · {row.id} · {row.field} · {row.action}</small><dl><dt>Previous</dt><dd><pre>{importValue(row.previous)}</pre></dd><dt>Incoming</dt><dd><pre>{importValue(row.incoming)}</pre></dd></dl></li>)}</ul>}
+    {retainedFacts(importReview.plan)}
     <p>The original library will be backed up privately in this browser before the import is saved.</p>
     <button className="web-primary" onClick={applyImport}>Apply import</button>
    </>}

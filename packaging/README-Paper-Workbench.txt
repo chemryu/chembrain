@@ -23,9 +23,13 @@ Python, Node.js, an AI API key, a local server or installation to open.
    The compact file contains chemistry facts, DOI/authors and linking/evidence
    fields, without source PDFs/text, workspace proofs or page images.
 6. In the main app choose Import package. Review paper import shows missing
-   structures and any additive paper labels. Apply import backs up original
-   browser bytes before filling safe missing fields; conflicts require explicit
-   correction in Workbench. Non-null user structures and edits are retained.
+   structures, paper labels, solution quantities and recorded stages, conditions
+   and evidence proposed for existing records. Inspect each previous/incoming
+   value before Apply import. Existing-record updates first back up the exact
+   original browser bytes. Conflicting known values, roles or stage ordering
+   block the package. Export the latest main Backup JSON, load that library
+   draft in Workbench, reconcile the indicated records and source-check again.
+   Known user facts, names and notes are retained; no reaction is inferred.
 
 Use qualified local labels such as main:4 and SI:4 when repeated numbering
 denotes distinct compounds; names or adjacent labels do not establish identity.

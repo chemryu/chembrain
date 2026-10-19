@@ -190,3 +190,30 @@ assert.equal(out.reactions.length,1,'no extra reaction inferred from two conditi
 assert.equal(out.reactions[0].steps.length,2);assert.equal(out.reactions[0].steps[0].temperature,'-78 C');
 assert.equal(out.reactions[0].evidence[1].locator,'Supporting information; PDF page 12; Compound 1 characterization');
 """)
+
+
+def test_source_evidence_is_stable_across_repeated_reediting(model_modules):
+    run_model(model_modules, """
+let facts=await m.buildExport(checked());
+const id=facts.papers[0].id;
+facts.reactions[0].evidence=[
+ {paper_id:id,page:3,locator:'Main article; PDF page 3; Scheme 1, compound 1; SI comparison'},
+ {paper_id:id,page:12,locator:'Supporting information; PDF page 12; Procedure S2'}
+];
+const original=structuredClone(facts.reactions[0].evidence);
+for(let round=0;round<3;round++){
+ let p=m.importLibraryDraft(facts);
+ assert.deepEqual(p.reactions[0].evidence,[
+  {document:'main',page:3,locator:'Scheme 1, compound 1; SI comparison'},
+  {document:'supporting',page:12,locator:'Procedure S2'}
+ ]);
+ for(const c of p.chemicals)p=m.checkChemical(p,c.id,descriptors[c.smiles],true);
+ for(const s of p.solutions)p=m.checkSolution(p,s.id,true);
+ for(const r of p.reactions)p=m.checkReaction(p,r.id,true);
+ facts=await m.buildExport(p);
+ assert.deepEqual(facts.reactions[0].evidence,original,'Re-editing must not invent new evidence locators or misclassify main/SI');
+}
+const historical=structuredClone(facts);
+historical.reactions[0].evidence[0].locator='Main article; PDF page 3; '+original[0].locator;
+assert.equal(m.importLibraryDraft(historical).reactions[0].evidence[0].locator,'Scheme 1, compound 1; SI comparison');
+""")

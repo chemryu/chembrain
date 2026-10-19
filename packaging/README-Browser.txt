@@ -3,8 +3,10 @@ Chembrain — local browser preview
 This download also includes the independent Chembrain-Paper-Workbench.html.
 Use that file for private paper/source checking, structure encoding and recorded
 reaction/solution preparation. Export checked facts, then use Import package
-here. Review/apply missing structures or paper labels after checking the preview;
-existing non-null structures and edits are retained. See README-Paper-Workbench.
+here. Review/apply missing structures, solution facts and recorded reaction
+stages/conditions/evidence after checking the preview. Existing known facts and
+edits are retained; conflicts require reconciliation before import. See
+README-Paper-Workbench.
 
 Double-click Chembrain.html to open the English molecular library in a modern
 browser. No Python, Node.js, local server, API key or installation is required.

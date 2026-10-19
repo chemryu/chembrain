@@ -197,6 +197,7 @@ def check_import_handoff(page):
             assert stored() == raw, (failure, 'Import replaced the original primary bytes')
             expect(review).to_be_visible()
             page.reload(wait_until='load')
+        check_fact_handoff(page)
     finally:
         page.reload(wait_until='load')  # Restore any patched Storage methods.
         page.evaluate('''([key,raw,oldKeys])=>{
@@ -206,3 +207,145 @@ def check_import_handoff(page):
         page.reload(wait_until='load')
         expect(page.get_by_role('heading', name='Select a molecule', exact=True)).to_be_visible()
         assert stored() == original
+
+
+def check_fact_handoff(page):
+    """Exercise existing reaction/solution-only updates through the real main UI.
+
+    This is complementary to the mandatory actual Workbench UI-export transfer.
+    All experimental values here are private synthetic test values.
+    """
+    source = json.loads((ROOT / 'public/library.json').read_text())
+    reaction_id = 'h-methyl'
+    reaction = next(row for row in source['reactions'] if row['id'] == reaction_id)
+    first_id = reaction['steps'][0]['solution_id']
+    first = next(row for row in source['solutions'] if row['id'] == first_id)
+    first.update(concentration=0.1, concentration_unit='M')
+    for item in first['solutes']:
+        item.update(amount=1, unit='mmol')
+    second = copy.deepcopy(first)
+    second.update(id='handoff-facts-second', concentration=0.25)
+    for item in second['solutes']:
+        item['amount'] = 0.5
+    source['solutions'].append(second)
+    reaction.update(steps=[{'solution_id': first_id, 'temperature': '20 °C', 'time': '1 h'},
+                            {'solution_id': second['id'], 'temperature': '40 °C', 'time': '2 h'}],
+                    yield_percent=88, yield_basis='Synthetic receiving fixture, both stages', status='reviewed')
+    reaction['evidence'].append({**reaction['evidence'][0], 'locator': 'SI, synthetic receiving fixture'})
+    baseline = copy.deepcopy(source)
+    old_reaction = next(row for row in baseline['reactions'] if row['id'] == reaction_id)
+    old_reaction.update(steps=[], yield_percent=None, notes='Private fact-only reaction note', status='draft')
+    old_reaction.pop('yield_basis', None)
+    old_reaction['evidence'] = old_reaction['evidence'][:1]
+    for solution in baseline['solutions']:
+        if solution['id'] in [first_id, second['id']]:
+            solution.update(concentration=None, concentration_unit=None)
+            for item in solution['solutes']:
+                item.update(amount=None, unit=None)
+
+    def stored():
+        return page.evaluate('(key)=>localStorage.getItem(key)', STORE)
+
+    def load(data=baseline):
+        raw = json.dumps(data, indent=3, ensure_ascii=False) + '\n'
+        page.evaluate('([key,raw])=>localStorage.setItem(key,raw)', [STORE, raw])
+        page.reload(wait_until='load')
+        expect(page.locator('.molecule-tile').first).to_be_visible()
+        assert stored() == raw
+        return raw
+
+    def upload(data=source, name='facts-only.json'):
+        page.get_by_label('Import normalized library').set_input_files({
+            'name': name, 'mimeType': 'application/json', 'buffer': json.dumps(data).encode()})
+
+    def backup_values():
+        return page.evaluate('Object.keys(localStorage).filter(k=>k.includes(".import-backup.")).map(k=>localStorage.getItem(k))')
+
+    review = page.get_by_role('region', name='Review paper import', exact=True)
+    apply = review.get_by_role('button', name='Apply import', exact=True)
+    raw = load()
+    old_backups = backup_values()
+    upload()
+    changes = review.get_by_label('Existing chemistry changes', exact=True)
+    expect(changes).to_contain_text('steps')
+    expect(changes).to_contain_text('concentration')
+    expect(changes).to_contain_text('Previous')
+    expect(changes).to_contain_text('Incoming')
+    expect(review).to_contain_text('0 existing molecules · 2 existing solutions · 1 existing reactions')
+    assert stored() == raw and backup_values() == old_backups
+    apply.click()
+    expect(page.locator('.web-notice')).to_contain_text('0 existing structures added')
+    expect(page.locator('.web-notice')).to_contain_text('2 existing solutions and 1 existing reactions updated')
+    after = json.loads(stored())
+    actual = next(row for row in after['reactions'] if row['id'] == reaction_id)
+    for field in ['steps', 'yield_percent', 'yield_basis', 'evidence']:
+        assert actual[field] == reaction[field], ('Missing imported reaction fact', field)
+    assert actual['notes'] == old_reaction['notes'] and actual['status'] == 'draft'
+    for expected in [first, second]:
+        assert next(row for row in after['solutions'] if row['id'] == expected['id']) == expected
+    assert raw in backup_values() and len(backup_values()) == len(old_backups) + 1
+    saved = stored()
+    page.reload(wait_until='load')
+    assert stored() == saved
+    tile = page.locator('.molecule-tile').filter(has=page.get_by_text('Holton compound 17', exact=True))
+    tile.click()
+    page.get_by_role('tab', name='List', exact=True).click()
+    page.locator(f'.web-reaction[data-reaction-id="{reaction_id}"] .reaction-summary').click()
+    expect(page.locator('.step')).to_have_count(2)
+    expect(page.locator('.step').nth(0)).to_contain_text('20 °C · 1 h')
+    expect(page.locator('.step').nth(1)).to_contain_text('40 °C · 2 h')
+    expect(page.locator('.paper-reference')).to_have_count(1)
+    expect(page.locator('.paper-reference')).to_contain_text('SI, synthetic receiving fixture')
+    count = len(backup_values())
+    page.evaluate('''()=>{window.__factWrites=[];const set=Storage.prototype.setItem;
+      Storage.prototype.setItem=function(k,v){window.__factWrites.push(k);return set.call(this,k,v);};}''')
+    upload()
+    expect(page.locator('.web-notice')).to_contain_text('no changes')
+    expect(review).to_have_count(0)
+    assert stored() == saved and len(backup_values()) == count
+    assert page.evaluate('window.__factWrites') == [], 'No-op rewrote private storage'
+    page.reload(wait_until='load')
+
+    for failure in ['backup', 'concurrent']:
+        raw = load()
+        upload()
+        expect(apply).to_be_visible()
+        if failure == 'backup':
+            page.evaluate('''()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){
+              if(k.includes('.import-backup.'))throw new DOMException('Quota','QuotaExceededError');return set.call(this,k,v);};}''')
+        else:
+            raw += ' '
+            page.evaluate('([key,raw])=>localStorage.setItem(key,raw)', [STORE, raw])
+        apply.click()
+        expect(page.get_by_role('alert')).to_be_visible()
+        assert stored() == raw
+        tile.click()
+        page.get_by_role('tab', name='List', exact=True).click()
+        page.locator(f'.web-reaction[data-reaction-id="{reaction_id}"] .reaction-summary').click()
+        expect(page.locator('.step')).to_have_count(0)
+        expect(page.locator('.reaction-expanded')).to_contain_text('Private fact-only reaction note')
+        page.reload(wait_until='load')
+
+    # An older delayed File.text() result must not replace a newer import plan.
+    raw = load()
+    first_source = copy.deepcopy(source)
+    next(row for row in first_source['reactions'] if row['id'] == reaction_id)['steps'][0]['temperature'] = 'STALE first temperature'
+    latest_source = copy.deepcopy(source)
+    next(row for row in latest_source['reactions'] if row['id'] == reaction_id)['steps'][0]['temperature'] = 'LATEST temperature'
+    page.evaluate('''()=>{const text=File.prototype.text;File.prototype.text=function(){
+      if(this.name!=='slow-first-facts.json')return text.call(this);
+      const file=this;return new Promise(resolve=>{window.__releaseSlowFacts=()=>{
+        window.__slowFactsDone=text.call(file).then(resolve);};});};}''')
+    upload(first_source, 'slow-first-facts.json')
+    page.wait_for_function('typeof window.__releaseSlowFacts === "function"')
+    upload(latest_source, 'latest-facts.json')
+    expect(changes).to_contain_text('LATEST temperature')
+    page.evaluate('''async()=>{window.__releaseSlowFacts();await window.__slowFactsDone;
+      await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);}''')
+    expect(changes).to_contain_text('LATEST temperature')
+    expect(changes).not_to_contain_text('STALE first temperature')
+    assert stored() == raw
+    apply.click()
+    expect(review).to_have_count(0)
+    assert next(row for row in json.loads(stored())['reactions'] if row['id'] == reaction_id)['steps'][0]['temperature'] == 'LATEST temperature'
+    page.reload(wait_until='load')

@@ -5,6 +5,97 @@ from pathlib import Path
 from playwright.sync_api import expect
 
 
+def _check_post_drag_keyboard(page, graph, coupling, node, before_drag, original):
+    """Exercise real keyboard input while D3's real post-drag click guard lives.
+
+    Clock control makes this short interval deterministic; it neither replaces
+    the D3 handler nor waits it away before the required keyboard assertions.
+    The mouse is already down and the header has actually moved on entry.
+    """
+    page.clock.install(time=0)
+    page.clock.pause_at(1000)
+    page.evaluate('''()=>{
+      window.__mapKeyboardClicks=0;
+      window.__mapClickObserver=event=>{
+        if(event.detail===0&&event.target.closest?.('.synthesis-node-button'))window.__mapKeyboardClicks++;
+      };
+      window.addEventListener('click',window.__mapClickObserver,true);
+    }''')
+    suppression="(window.__on||[]).some(handler=>handler.type==='click'&&handler.name==='drag')"
+    try:
+        page.mouse.up()
+        expect(node).not_to_have_attribute('style', before_drag)
+        dragged=node.get_attribute('style')
+        assert page.evaluate(suppression), 'Post-drag regression did not retain the actual D3 click guard'
+        coupling.focus()
+        expect(coupling).to_be_focused()
+        page.keyboard.press('Enter')
+        inspector=page.get_by_role('region', name='Selected reaction details', exact=True)
+        expect(inspector).to_be_visible()
+        expect(inspector.locator('.step')).to_have_count(3)
+        expect(inspector).to_contain_text('Ethanol')
+        expect(inspector.locator('.paper-reference')).to_have_count(1)
+        expect(inspector.locator('.paper-reference a')).to_have_attribute('href', 'https://doi.org/10.1021/ja00083a067')
+        expect(coupling).to_have_attribute('aria-pressed', 'true')
+        expect(node).to_have_attribute('style', dragged)
+        # A held Space must activate on release, not on initial/repeat keydown.
+        other=graph.get_by_role('button', name='Open reaction: Taxol coupling and hydrogenolysis sequence', exact=True)
+        other.focus();expect(other).to_be_focused()
+        page.keyboard.down('Space');page.keyboard.down('Space')
+        expect(coupling).to_have_attribute('aria-pressed', 'true')
+        expect(other).to_have_attribute('aria-pressed', 'false')
+        page.keyboard.up('Space')
+        expect(other).to_have_attribute('aria-pressed', 'true')
+        expect(coupling).to_have_attribute('aria-pressed', 'false')
+        expect(node).to_have_attribute('style', dragged)
+        assert page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")==original
+        # Both molecule keys must also work during that same D3 guard interval.
+        chemical=graph.get_by_role('button', name='Open molecule: Holton compound 24b', exact=True)
+        chemical.focus();expect(chemical).to_be_focused();page.keyboard.press('Enter')
+        expect(page.locator('.selected-heading h2')).to_have_text('Holton compound 24b')
+        expect(inspector).to_have_count(0)
+        expect(page.get_by_role('tab', name='Map', exact=True)).to_have_attribute('aria-selected', 'true')
+        next_chemical=graph.get_by_role('button', name='Open molecule: Holton compound 25', exact=True)
+        next_chemical.focus();page.keyboard.down('Space')
+        expect(page.locator('.selected-heading h2')).to_have_text('Holton compound 24b')
+        # Blurring a held Space cancels it. A bare release on another button
+        # must not activate a molecule that never received the matching press.
+        chemical.focus();page.keyboard.up('Space')
+        next_chemical.focus();page.keyboard.up('Space')
+        expect(page.locator('.selected-heading h2')).to_have_text('Holton compound 24b')
+        page.keyboard.down('Space');page.keyboard.down('Space')
+        expect(page.locator('.selected-heading h2')).to_have_text('Holton compound 24b')
+        page.keyboard.up('Space')
+        expect(page.locator('.selected-heading h2')).to_have_text('Holton compound 25')
+        expect(inspector).to_have_count(0)
+        assert page.evaluate(suppression), 'Keyboard checks unexpectedly waited away D3 click suppression'
+        assert page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")==original
+        # Only after the boundary assertions release the timer. Normal Enter
+        # still works, and prevented native clicks cannot duplicate activation.
+        page.clock.run_for(1)
+        assert not page.evaluate(suppression), 'D3 click guard did not clear with its timer'
+        coupling.focus();expect(coupling).to_be_focused()
+        page.keyboard.down('Enter');page.keyboard.down('Enter');page.keyboard.up('Enter')
+        expect(inspector).to_be_visible()
+        assert page.evaluate('window.__mapKeyboardClicks')==0, 'Map keys emitted duplicate native clicks'
+        assert page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")==original
+    except Exception as error:
+        state=page.evaluate('''()=>({
+          active:document.activeElement?.getAttribute('aria-label'),
+          d3ClickGuard:(window.__on||[]).some(handler=>handler.type==='click'&&handler.name==='drag'),
+          selected:document.querySelector('.selected-heading h2')?.textContent,
+          inspectorCount:document.querySelectorAll('.map-reaction-inspector').length,
+          nativeKeyboardClicks:window.__mapKeyboardClicks
+        })''')
+        raise AssertionError('Post-drag keyboard state: '+json.dumps(state)) from error
+    finally:
+        page.clock.run_for(1);page.clock.resume()
+        page.evaluate('''()=>{
+          window.removeEventListener('click',window.__mapClickObserver,true);
+          delete window.__mapClickObserver;delete window.__mapKeyboardClicks;
+        }''')
+
+
 def check_synthesis_map(page):
     # Exploration must never write the only browser copy or change chemistry.
     original = page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')")
@@ -50,26 +141,7 @@ def check_synthesis_map(page):
     page.mouse.move(box['x']+box['width']/2, box['y']+box['height']/2)
     page.mouse.down()
     page.mouse.move(box['x']+box['width']/2+35, box['y']+box['height']/2+28, steps=8)
-    page.mouse.up()
-    expect(node).not_to_have_attribute('style', before_drag)
-    dragged = node.get_attribute('style')
-    coupling.focus()
-    page.keyboard.press('Enter')
-    inspector = page.get_by_role('region', name='Selected reaction details', exact=True)
-    expect(inspector).to_be_visible()
-    expect(inspector.locator('.step')).to_have_count(3)
-    expect(inspector).to_contain_text('Ethanol')
-    expect(inspector.locator('.paper-reference')).to_have_count(1)
-    expect(inspector.locator('.paper-reference a')).to_have_attribute('href', 'https://doi.org/10.1021/ja00083a067')
-    expect(coupling).to_have_attribute('aria-pressed', 'true')
-    expect(node).to_have_attribute('style', dragged)
-    assert page.evaluate("localStorage.getItem('chembrain.normalized-library.v1')") == original
-    # Chemical activation changes the chosen context and clears old inspection.
-    page.get_by_role('button', name='Open molecule: Holton compound 24b', exact=True).focus()
-    page.keyboard.press('Enter')
-    expect(page.locator('.selected-heading h2')).to_have_text('Holton compound 24b')
-    expect(page.get_by_role('region', name='Selected reaction details', exact=True)).to_have_count(0)
-    expect(page.get_by_role('tab', name='Map', exact=True)).to_have_attribute('aria-selected', 'true')
+    _check_post_drag_keyboard(page, graph, coupling, node, before_drag, original)
     page.locator('.molecule-tile').filter(has_text='Doxycycline').click()
     expect(page.locator('.synthesis-heading')).to_contain_text('4 recorded reactions')
     # Both true multi-step fragments must be present, without a guessed bridge.
